@@ -4,7 +4,7 @@ import base64
 import os
 import time
 
-# ===== CSS: Background + Chat bubble + Animation + Marquee =====
+# ===== CSS: Background + Chat bubble + Animation + Gradient Banner =====
 def add_bg_from_local(image_file):
     if not os.path.exists(image_file):
         st.warning("⚠️ Không tìm thấy file background, sẽ dùng màu nền trắng.")
@@ -48,10 +48,12 @@ def add_bg_from_local(image_file):
       white-space: nowrap;
       box-sizing: border-box;
       animation: marquee 12s linear infinite;
-      font-size: 22px;
+      font-size: 28px;
       font-weight: bold;
-      color: #dc2626;
-      text-shadow: 1px 1px 2px white;
+      background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
       margin-bottom: 15px;
     }}
     @keyframes marquee {{
@@ -92,6 +94,8 @@ if "step" not in st.session_state:
     st.session_state.step = "category"
 if "category" not in st.session_state:
     st.session_state.category = None
+if "aircraft" not in st.session_state:
+    st.session_state.aircraft = None
 if "description" not in st.session_state:
     st.session_state.description = None
 
@@ -104,31 +108,47 @@ if st.session_state.step == "category":
     category = st.selectbox("Chọn Category:", ["-- Chọn --"] + list(categories), key="cat_select")
     if category != "-- Chọn --":
         st.session_state.category = category
+        st.session_state.step = "aircraft"
+
+# Step 2: chọn Loại tàu (A/C)
+if st.session_state.step == "aircraft" and st.session_state.category:
+    st.markdown(f'<div class="chat-user">{st.session_state.category}</div>', unsafe_allow_html=True)
+    bot_say("Loại tàu nào?")
+
+    aircrafts = df[df["CATEGORY"] == st.session_state.category]["A/C"].dropna().unique()
+    aircraft = st.selectbox("Chọn A/C:", ["-- Chọn --"] + list(aircrafts), key="ac_select")
+    if aircraft != "-- Chọn --":
+        st.session_state.aircraft = aircraft
         st.session_state.step = "description"
 
-# Step 2: chọn Description
-if st.session_state.step == "description" and st.session_state.category:
-    st.markdown(f'<div class="chat-user">{st.session_state.category}</div>', unsafe_allow_html=True)
+# Step 3: chọn Description
+if st.session_state.step == "description" and st.session_state.aircraft:
+    st.markdown(f'<div class="chat-user">{st.session_state.aircraft}</div>', unsafe_allow_html=True)
     bot_say("Bạn muốn tra cứu Description nào?")
 
-    descriptions = df[df["CATEGORY"] == st.session_state.category]["DESCRIPTION"].dropna().unique()
+    descriptions = df[(df["CATEGORY"] == st.session_state.category) & (df["A/C"] == st.session_state.aircraft)]["DESCRIPTION"].dropna().unique()
     description = st.selectbox("Chọn Description:", ["-- Chọn --"] + list(descriptions), key="desc_select")
     if description != "-- Chọn --":
         st.session_state.description = description
         st.session_state.step = "result"
 
-# Step 3: hiển thị kết quả
+# Step 4: hiển thị kết quả
 if st.session_state.step == "result" and st.session_state.description:
     st.markdown(f'<div class="chat-user">{st.session_state.description}</div>', unsafe_allow_html=True)
 
-    result = df[(df["CATEGORY"] == st.session_state.category) & (df["DESCRIPTION"] == st.session_state.description)]
+    result = df[(df["CATEGORY"] == st.session_state.category) &
+                (df["A/C"] == st.session_state.aircraft) &
+                (df["DESCRIPTION"] == st.session_state.description)]
     if not result.empty:
-        pn_text = ", ".join(result['PART NUMBER (PN)'].astype(str))
-        reply = f"✅ PN cho {st.session_state.description} là: {pn_text}"
+        pn_list = result['PART NUMBER (PN)'].astype(str).tolist()
+        note_list = []
         if "NOTE" in result.columns:
-            notes = result["NOTE"].dropna().astype(str).unique()
-            if len(notes) > 0:
-                reply += f"\n📌 Ghi chú: {', '.join(notes)}"
+            note_list = result["NOTE"].dropna().astype(str).tolist()
+
+        reply = f"✅ PN cho {st.session_state.description}:<br>" + "<br>".join(pn_list)
+        if note_list:
+            reply += "<br>📌 Ghi chú:<br>" + "<br>".join(note_list)
+
         bot_say(reply)
     else:
         bot_say("Rất tiếc, dữ liệu bạn nhập chưa có.")
