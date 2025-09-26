@@ -2,12 +2,15 @@ import streamlit as st
 import pandas as pd
 import base64
 
-# ===== CSS cho background + chat bubble =====
+# ===== CSS: background + chat bubble =====
 def add_bg_from_local(image_file):
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
     css = f"""
     <style>
+    .stApp {{
+      background: none;
+    }}
     .stApp::before {{
       content: "";
       position: fixed;
@@ -34,6 +37,8 @@ def add_bg_from_local(image_file):
 
 # ===== Page config =====
 st.set_page_config(page_title="Tra cứu PN", page_icon="🔎", layout="centered")
+
+# ===== Gọi hàm add_bg sau khi set_page_config =====
 add_bg_from_local("airplane.jpg")
 
 st.title("✈️ Chatbot Tra cứu PN")
