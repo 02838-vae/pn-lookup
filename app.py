@@ -2,8 +2,9 @@ import streamlit as st
 import pandas as pd
 import base64
 import os
+import time
 
-# ===== CSS: Background + Chat bubble + Animation =====
+# ===== CSS: Background + Chat bubble + Animation + Marquee =====
 def add_bg_from_local(image_file):
     if not os.path.exists(image_file):
         st.warning("⚠️ Không tìm thấy file background, sẽ dùng màu nền trắng.")
@@ -41,9 +42,35 @@ def add_bg_from_local(image_file):
       background:#0ea5a4; color:white; margin-bottom:8px;
       animation: fadeIn 0.6s ease-out;
     }}
+    .marquee {{
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+      animation: marquee 12s linear infinite;
+      font-size: 22px;
+      font-weight: bold;
+      color: #dc2626;
+      text-shadow: 1px 1px 2px white;
+      margin-bottom: 15px;
+    }}
+    @keyframes marquee {{
+      0%   {{ transform: translateX(100%); }}
+      100% {{ transform: translateX(-100%); }}
+    }}
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
+
+# ===== Typing Effect cho bot =====
+def bot_say(text):
+    placeholder = st.empty()
+    full_text = ""
+    for char in text:
+        full_text += char
+        placeholder.markdown(f'<div class="chat-bot">{full_text}</div>', unsafe_allow_html=True)
+        time.sleep(0.02)  # tốc độ gõ
+    return placeholder
 
 # ===== Page config =====
 st.set_page_config(page_title="Tra cứu PN", page_icon="🔎", layout="centered")
@@ -51,7 +78,10 @@ st.set_page_config(page_title="Tra cứu PN", page_icon="🔎", layout="centered
 # ===== Thêm background =====
 add_bg_from_local("airplane.jpg")
 
-st.title("✈️ Chatbot Tra cứu PN")
+# ===== Banner chạy chữ =====
+st.markdown('<div class="marquee">✈️ TỔ BẢO DƯỠNG SỐ 1 ✈️</div>', unsafe_allow_html=True)
+
+st.title("🔎 Chatbot Tra cứu PN")
 
 # ===== Load Data =====
 df = pd.read_excel("A787.xlsx")
@@ -66,7 +96,7 @@ if "description" not in st.session_state:
     st.session_state.description = None
 
 # ===== Hội thoại =====
-st.markdown('<div class="chat-bot">Xin chào! Bạn muốn tra cứu gì?</div>', unsafe_allow_html=True)
+bot_say("Xin chào! Bạn muốn tra cứu gì?")
 
 # Step 1: chọn Category
 if st.session_state.step == "category":
@@ -79,7 +109,7 @@ if st.session_state.step == "category":
 # Step 2: chọn Description
 if st.session_state.step == "description" and st.session_state.category:
     st.markdown(f'<div class="chat-user">{st.session_state.category}</div>', unsafe_allow_html=True)
-    st.markdown('<div class="chat-bot">Bạn muốn tra cứu Description nào?</div>', unsafe_allow_html=True)
+    bot_say("Bạn muốn tra cứu Description nào?")
 
     descriptions = df[df["CATEGORY"] == st.session_state.category]["DESCRIPTION"].dropna().unique()
     description = st.selectbox("Chọn Description:", ["-- Chọn --"] + list(descriptions), key="desc_select")
@@ -98,10 +128,10 @@ if st.session_state.step == "result" and st.session_state.description:
         if "NOTE" in result.columns:
             notes = result["NOTE"].dropna().astype(str).unique()
             if len(notes) > 0:
-                reply += f"<br>📌 Ghi chú: {', '.join(notes)}"
-        st.markdown(f'<div class="chat-bot">{reply}</div>', unsafe_allow_html=True)
+                reply += f"\n📌 Ghi chú: {', '.join(notes)}"
+        bot_say(reply)
     else:
-        st.markdown('<div class="chat-bot">Rất tiếc, dữ liệu bạn nhập chưa có.</div>', unsafe_allow_html=True)
+        bot_say("Rất tiếc, dữ liệu bạn nhập chưa có.")
 
     if st.button("🔄 Bắt đầu lại"):
         st.session_state.clear()
