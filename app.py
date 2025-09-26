@@ -10,7 +10,7 @@ DATA_FILE = "A787.xlsx"
 BG_IMAGE = "airplane.jpg"  # thay tên nếu bạn dùng tên khác
 
 # ---------- CSS: background mờ + chat style ----------
-def local_css_background(image_file: str, opacity: float = 0.12):
+def local_css_background(image_file: str, opacity: float = 0.25):
     """
     Thêm ảnh nền mờ cho toàn app bằng CSS ::before.
     opacity: 0..1 (0 là trong suốt, 1 là đậm)
@@ -208,3 +208,4 @@ elif st.session_state.step == 2:
 # ---------- Footer hint ----------
 st.write("")
 st.markdown("<div class='muted'>Ghi chú: Để background hiển thị, hãy upload file ảnh (ví dụ airplane.jpg) vào cùng thư mục repo.</div>", unsafe_allow_html=True)
+
