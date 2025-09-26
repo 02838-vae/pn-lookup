@@ -1,4 +1,4 @@
->>> import pandas as pd
+import pandas as pd
 ... import streamlit as st
 ... 
 ... # Đọc dữ liệu
@@ -27,4 +27,5 @@
 ...                 if len(notes) > 0:
 ...                     st.info(f"📌 Ghi chú: {', '.join(notes)}")
 ...         else:
+
 
