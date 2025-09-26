@@ -122,39 +122,16 @@ st.button("🔄 Tra cứu lại từ đầu", on_click=reset_chat)
 
 # Step 1: chọn Category
 if st.session_state.step == "category":
-    if not st.session_state.chat_history:
+    if not st.session_state.chat_history:   # chỉ hỏi nếu chưa có tin nhắn nào
         bot_say("Bạn muốn tra cứu gì?")
-    category = st.selectbox("Chọn Category", ["-- Chọn Category --"] + sorted(df["CATEGORY"].dropna().unique().tolist()))
-    if category != "-- Chọn Category --":
-        if "category" not in st.session_state or st.session_state.category != category:
-            user_say(category)
-            st.session_state.category = category
-            st.session_state.step = "aircraft"
-            st.rerun()
-
 # Step 2: chọn A/C
 if st.session_state.step == "aircraft" and "category" in st.session_state:
-    bot_say("Loại tàu nào?")
-    aircrafts = df[df["CATEGORY"] == st.session_state.category]["A/C"].dropna().unique().tolist()
-    aircraft = st.selectbox("Chọn A/C", ["-- Chọn A/C --"] + sorted(aircrafts))
-    if aircraft != "-- Chọn A/C --":
-        if "aircraft" not in st.session_state or st.session_state.aircraft != aircraft:
-            user_say(aircraft)
-            st.session_state.aircraft = aircraft
-            st.session_state.step = "item"
-            st.rerun()
-
+    if not any("Loại tàu nào?" in m for s, m in st.session_state.chat_history if s == "bot"):
+        bot_say("Loại tàu nào?")
 # Step 3: chọn Item
 if st.session_state.step == "item" and "aircraft" in st.session_state:
-    bot_say("Bạn muốn tra cứu Item nào?")
-    items = df[(df["CATEGORY"] == st.session_state.category) & (df["A/C"] == st.session_state.aircraft)]["DESCRIPTION"].dropna().unique().tolist()
-    item = st.selectbox("Chọn Item", ["-- Chọn Item --"] + sorted(items))
-    if item != "-- Chọn Item --":
-        if "item" not in st.session_state or st.session_state.item != item:
-            user_say(item)
-            st.session_state.item = item
-            st.session_state.step = "result"
-            st.rerun()
+    if not any("Bạn muốn tra cứu Item nào?" in m for s, m in st.session_state.chat_history if s == "bot"):
+        bot_say("Bạn muốn tra cứu Item nào?")
 
 # Step 4: hiển thị kết quả
 if st.session_state.step == "result" and "item" in st.session_state:
@@ -175,3 +152,4 @@ if st.session_state.step == "result" and "item" in st.session_state:
 
 # Hiển thị lại hội thoại cuối
 render_chat()
+
