@@ -119,15 +119,15 @@ if st.session_state.step == "aircraft" and st.session_state.category:
     aircraft = st.selectbox("Chọn A/C:", ["-- Chọn --"] + list(aircrafts), key="ac_select")
     if aircraft != "-- Chọn --":
         st.session_state.aircraft = aircraft
-        st.session_state.step = ""
+        st.session_state.step = "description"
 
-# Step 3: chọn Description
+# Step 3: chọn Item (Description)
 if st.session_state.step == "description" and st.session_state.aircraft:
     st.markdown(f'<div class="chat-user">{st.session_state.aircraft}</div>', unsafe_allow_html=True)
-    bot_say("Bạn muốn tra cứu Item nào?")   # 🔹 đổi từ "Description" -> "Item"
+    bot_say("Bạn muốn tra cứu Item nào?")
 
     descriptions = df[(df["CATEGORY"] == st.session_state.category) & (df["A/C"] == st.session_state.aircraft)]["DESCRIPTION"].dropna().unique()
-    description = st.selectbox("Chọn Description:", ["-- Chọn --"] + list(descriptions), key="desc_select")
+    description = st.selectbox("Chọn Item:", ["-- Chọn --"] + list(descriptions), key="desc_select")
     if description != "-- Chọn --":
         st.session_state.description = description
         st.session_state.step = "result"
@@ -145,15 +145,15 @@ if st.session_state.step == "result" and st.session_state.description:
         if "NOTE" in result.columns:
             note_list = result["NOTE"].dropna().astype(str).tolist()
 
-        reply = f"✅ PN cho {st.session_state.description}:<br>" + "<br>".join(pn_list)
+        reply = f"✅ PN cho {st.session_state.description}:\n" + "\n".join([f"• {pn}" for pn in pn_list])
         if note_list:
-            reply += "<br>📌 Ghi chú:<br>" + "<br>".join(note_list)
+            reply += "\n📌 Ghi chú:\n" + "\n".join([f"- {note}" for note in note_list])
 
-        bot_say(reply)
+        # chuyển \n thành <br> để hiển thị đẹp
+        bot_say(reply.replace("\n", "<br>"))
     else:
         bot_say("Rất tiếc, dữ liệu bạn nhập chưa có.")
 
     if st.button("🔄 Bắt đầu lại"):
         st.session_state.clear()
         st.rerun()
-
