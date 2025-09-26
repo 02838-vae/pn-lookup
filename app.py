@@ -150,8 +150,10 @@ if st.session_state.step == "result" and st.session_state.description:
             note_list = result["NOTE"].dropna().astype(str).tolist()
 
         reply = f"✅ PN cho {st.session_state.description}:\n" + "\n".join([f"• {pn}" for pn in pn_list])
-        if note_list:
-            reply += "\n📌 Ghi chú:\n" + "\n".join([f"- {note}" for note in note_list])
+if note_list:
+    reply += "\n📌 Ghi chú:\n" + "\n".join([f"- {note}" for note in note_list])
+
+bot_say(reply)   # Không cần .replace("\n", "<br>")
 
         # chuyển \n thành <br> để hiển thị đẹp
         bot_say(reply.replace("\n", "<br>"))
@@ -161,4 +163,5 @@ if st.session_state.step == "result" and st.session_state.description:
     if st.button("🔄 Bắt đầu lại"):
         st.session_state.clear()
         st.rerun()
+
 
