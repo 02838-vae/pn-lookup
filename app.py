@@ -88,7 +88,7 @@ if st.session_state.step == "category":
         user_say(category)
         st.session_state.category = category
         st.session_state.step = "aircraft"
-        st.experimental_rerun()
+        st.rerun()
 
 # Bước 2: chọn loại tàu (A/C)
 elif st.session_state.step == "aircraft":
@@ -99,7 +99,7 @@ elif st.session_state.step == "aircraft":
         user_say(aircraft)
         st.session_state.aircraft = aircraft
         st.session_state.step = "item"
-        st.experimental_rerun()
+        st.rerun()
 
 # Bước 3: chọn Item (Description)
 elif st.session_state.step == "item":
@@ -110,7 +110,7 @@ elif st.session_state.step == "item":
         user_say(item)
         st.session_state.item = item
         st.session_state.step = "result"
-        st.experimental_rerun()
+        st.rerun()
 
 # Bước 4: kết quả PN + Note
 elif st.session_state.step == "result":
@@ -131,4 +131,5 @@ elif st.session_state.step == "result":
         bot_say(reply)
     else:
         bot_say("Rất tiếc, dữ liệu bạn nhập chưa có.")
+
 
