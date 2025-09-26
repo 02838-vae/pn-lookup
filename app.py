@@ -65,13 +65,17 @@ def add_bg_from_local(image_file):
     st.markdown(css, unsafe_allow_html=True)
 
 # ===== Typing Effect cho bot =====
+import html
+
 def bot_say(text):
     placeholder = st.empty()
     full_text = ""
     for char in text:
         full_text += char
-        placeholder.markdown(f'<div class="chat-bot">{full_text}</div>', unsafe_allow_html=True)
-        time.sleep(0.02)  # tốc độ gõ
+        # Escape HTML để tránh lỗi <b< ... >
+        safe_text = html.escape(full_text).replace("\n", "<br>")
+        placeholder.markdown(f'<div class="chat-bot">{safe_text}</div>', unsafe_allow_html=True)
+        time.sleep(0.02)
     return placeholder
 
 # ===== Page config =====
@@ -157,3 +161,4 @@ if st.session_state.step == "result" and st.session_state.description:
     if st.button("🔄 Bắt đầu lại"):
         st.session_state.clear()
         st.rerun()
+
