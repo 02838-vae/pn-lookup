@@ -3,7 +3,7 @@ import pandas as pd
 import base64
 import os
 
-# ===== CSS: Background + Chat bubble =====
+# ===== CSS: Background + Chat bubble + Animation =====
 def add_bg_from_local(image_file):
     if not os.path.exists(image_file):
         st.warning("⚠️ Không tìm thấy file background, sẽ dùng màu nền trắng.")
@@ -25,15 +25,21 @@ def add_bg_from_local(image_file):
       opacity: 0.15;
       z-index: -1;
     }}
+    @keyframes fadeIn {{
+      from {{ opacity: 0; transform: translateY(10px); }}
+      to {{ opacity: 1; transform: translateY(0); }}
+    }}
     .chat-bot {{
       margin-right:auto; max-width:80%;
       padding:10px 14px; border-radius:14px;
       background:#f1f5f9; color:#0f172a; margin-bottom:8px;
+      animation: fadeIn 0.6s ease-out;
     }}
     .chat-user {{
       margin-left:auto; max-width:80%;
       padding:10px 14px; border-radius:14px;
       background:#0ea5a4; color:white; margin-bottom:8px;
+      animation: fadeIn 0.6s ease-out;
     }}
     </style>
     """
