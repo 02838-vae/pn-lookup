@@ -1,13 +1,20 @@
 import streamlit as st
 import pandas as pd
 import base64
+import os
 
-# ===== CSS: background + chat bubble =====
+# ===== CSS: Background + Chat bubble =====
 def add_bg_from_local(image_file):
+    if not os.path.exists(image_file):
+        st.warning("⚠️ Không tìm thấy file background, sẽ dùng màu nền trắng.")
+        return
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
     css = f"""
     <style>
+    .stApp {{
+      background: none;
+    }}
     .stApp::before {{
       content: "";
       position: fixed;
@@ -34,6 +41,8 @@ def add_bg_from_local(image_file):
 
 # ===== Page config =====
 st.set_page_config(page_title="Tra cứu PN", page_icon="🔎", layout="centered")
+
+# ===== Thêm background =====
 add_bg_from_local("airplane.jpg")
 
 st.title("✈️ Chatbot Tra cứu PN")
@@ -91,5 +100,3 @@ if st.session_state.step == "result" and st.session_state.description:
     if st.button("🔄 Bắt đầu lại"):
         st.session_state.clear()
         st.rerun()
-
-
