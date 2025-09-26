@@ -8,9 +8,6 @@ def add_bg_from_local(image_file):
         encoded = base64.b64encode(f.read()).decode()
     css = f"""
     <style>
-    .stApp {{
-      background: none;
-    }}
     .stApp::before {{
       content: "";
       position: fixed;
@@ -37,8 +34,6 @@ def add_bg_from_local(image_file):
 
 # ===== Page config =====
 st.set_page_config(page_title="Tra cứu PN", page_icon="🔎", layout="centered")
-
-# ===== Gọi hàm add_bg sau khi set_page_config =====
 add_bg_from_local("airplane.jpg")
 
 st.title("✈️ Chatbot Tra cứu PN")
@@ -61,26 +56,24 @@ st.markdown('<div class="chat-bot">Xin chào! Bạn muốn tra cứu gì?</div>'
 # Step 1: chọn Category
 if st.session_state.step == "category":
     categories = df["CATEGORY"].dropna().unique()
-    category = st.selectbox("Chọn Category:", ["-- Chọn --"] + list(categories))
+    category = st.selectbox("Chọn Category:", ["-- Chọn --"] + list(categories), key="cat_select")
     if category != "-- Chọn --":
         st.session_state.category = category
         st.session_state.step = "description"
-        st.experimental_rerun()
 
 # Step 2: chọn Description
-elif st.session_state.step == "description":
+if st.session_state.step == "description" and st.session_state.category:
     st.markdown(f'<div class="chat-user">{st.session_state.category}</div>', unsafe_allow_html=True)
     st.markdown('<div class="chat-bot">Bạn muốn tra cứu Description nào?</div>', unsafe_allow_html=True)
 
     descriptions = df[df["CATEGORY"] == st.session_state.category]["DESCRIPTION"].dropna().unique()
-    description = st.selectbox("Chọn Description:", ["-- Chọn --"] + list(descriptions))
+    description = st.selectbox("Chọn Description:", ["-- Chọn --"] + list(descriptions), key="desc_select")
     if description != "-- Chọn --":
         st.session_state.description = description
         st.session_state.step = "result"
-        st.experimental_rerun()
 
 # Step 3: hiển thị kết quả
-elif st.session_state.step == "result":
+if st.session_state.step == "result" and st.session_state.description:
     st.markdown(f'<div class="chat-user">{st.session_state.description}</div>', unsafe_allow_html=True)
 
     result = df[(df["CATEGORY"] == st.session_state.category) & (df["DESCRIPTION"] == st.session_state.description)]
@@ -97,4 +90,6 @@ elif st.session_state.step == "result":
 
     if st.button("🔄 Bắt đầu lại"):
         st.session_state.clear()
-        st.experimental_rerun()
+        st.rerun()
+
+
