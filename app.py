@@ -1,5 +1,8 @@
+import streamlit as st
+import pandas as pd
 import base64
 
+# Hàm thêm background
 def add_bg_from_local(image_file):
     with open(image_file, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
@@ -27,7 +30,5 @@ def add_bg_from_local(image_file):
     """
     st.markdown(css, unsafe_allow_html=True)
 
-# Gọi hàm ngay sau st.set_page_config:
+# Gọi hàm sau khi khai báo
 add_bg_from_local("airplane.jpg")
-
-
