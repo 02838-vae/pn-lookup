@@ -119,12 +119,12 @@ if st.session_state.step == "aircraft" and st.session_state.category:
     aircraft = st.selectbox("Chọn A/C:", ["-- Chọn --"] + list(aircrafts), key="ac_select")
     if aircraft != "-- Chọn --":
         st.session_state.aircraft = aircraft
-        st.session_state.step = "description"
+        st.session_state.step = ""
 
 # Step 3: chọn Description
 if st.session_state.step == "description" and st.session_state.aircraft:
     st.markdown(f'<div class="chat-user">{st.session_state.aircraft}</div>', unsafe_allow_html=True)
-    bot_say("Bạn muốn tra cứu Description nào?")
+    bot_say("Bạn muốn tra cứu Item nào?")   # 🔹 đổi từ "Description" -> "Item"
 
     descriptions = df[(df["CATEGORY"] == st.session_state.category) & (df["A/C"] == st.session_state.aircraft)]["DESCRIPTION"].dropna().unique()
     description = st.selectbox("Chọn Description:", ["-- Chọn --"] + list(descriptions), key="desc_select")
@@ -156,3 +156,4 @@ if st.session_state.step == "result" and st.session_state.description:
     if st.button("🔄 Bắt đầu lại"):
         st.session_state.clear()
         st.rerun()
+
