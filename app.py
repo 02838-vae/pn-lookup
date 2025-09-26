@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import time
 import html
+import base64
 
 # ===================== CONFIG =====================
 st.set_page_config(page_title="PN Lookup", layout="centered")
@@ -130,3 +131,4 @@ elif st.session_state.step == "result":
         bot_say(reply)
     else:
         bot_say("Rất tiếc, dữ liệu bạn nhập chưa có.")
+
