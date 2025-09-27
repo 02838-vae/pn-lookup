@@ -126,12 +126,26 @@ if st.session_state.step == "category":
         bot_say("Bạn muốn tra cứu gì?")
 # Step 2: chọn A/C
 if st.session_state.step == "aircraft" and "category" in st.session_state:
-    if not any("Loại tàu nào?" in m for s, m in st.session_state.chat_history if s == "bot"):
-        bot_say("Loại tàu nào?")
+    bot_say("Loại tàu nào?")
+    aircrafts = df[df["CATEGORY"] == st.session_state.category]["A/C"].dropna().unique().tolist()
+    aircraft = st.selectbox("Chọn A/C", ["-- Chọn A/C --"] + sorted(aircrafts))
+    if aircraft != "-- Chọn A/C --":
+        if "aircraft" not in st.session_state or st.session_state.aircraft != aircraft:
+            user_say(aircraft)
+            st.session_state.aircraft = aircraft
+            st.session_state.step = "item"
+            st.rerun()
 # Step 3: chọn Item
 if st.session_state.step == "item" and "aircraft" in st.session_state:
-    if not any("Bạn muốn tra cứu Item nào?" in m for s, m in st.session_state.chat_history if s == "bot"):
-        bot_say("Bạn muốn tra cứu Item nào?")
+    bot_say("Bạn muốn tra cứu Item nào?")
+    items = df[(df["CATEGORY"] == st.session_state.category) & (df["A/C"] == st.session_state.aircraft)]["DESCRIPTION"].dropna().unique().tolist()
+    item = st.selectbox("Chọn Item", ["-- Chọn Item --"] + sorted(items))
+    if item != "-- Chọn Item --":
+        if "item" not in st.session_state or st.session_state.item != item:
+            user_say(item)
+            st.session_state.item = item
+            st.session_state.step = "result"
+            st.rerun()
 
 # Step 4: hiển thị kết quả
 if st.session_state.step == "result" and "item" in st.session_state:
@@ -152,4 +166,5 @@ if st.session_state.step == "result" and "item" in st.session_state:
 
 # Hiển thị lại hội thoại cuối
 render_chat()
+
 
