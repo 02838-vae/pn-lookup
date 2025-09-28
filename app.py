@@ -2,10 +2,14 @@ import streamlit as st
 import pandas as pd
 import base64
 
-# ===================== CONFIG =====================
-st.set_page_config(page_title="PN Lookup", layout="wide")
+# ========== LOAD DATA ==========
+@st.cache_data
+def load_data():
+    return pd.read_excel("A787.xlsx")
 
-# ===================== BACKGROUND =====================
+df = load_data()
+
+# ========== BACKGROUND ==========
 def add_bg_from_local(image_file):
     with open(image_file, "rb") as f:
         data = f.read()
@@ -13,7 +17,7 @@ def add_bg_from_local(image_file):
     css = f"""
     <style>
     .stApp {{
-        background: url("data:image/jpg;base64,{b64}") no-repeat center fixed;
+        background: url("data:image/png;base64,{b64}") no-repeat center center fixed;
         background-size: cover;
     }}
     .overlay {{
@@ -22,7 +26,7 @@ def add_bg_from_local(image_file):
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(255, 255, 255, 0.6); /* mờ nền */
+        background: rgba(255, 255, 255, 0.75); /* làm mờ */
         z-index: -1;
     }}
     </style>
@@ -32,9 +36,10 @@ def add_bg_from_local(image_file):
 
 add_bg_from_local("airplane.jpg")
 
-# ===================== CSS DECOR =====================
+# ========== CSS DECORATION ==========
 st.markdown("""
 <style>
+/* ================= MARQUEE HEADER ================= */
 @keyframes colorchange {
   0% {color: red;}
   25% {color: orange;}
@@ -43,13 +48,28 @@ st.markdown("""
   100% {color: red;}
 }
 
-.header-text {
-  font-size: 32px;
-  font-weight: bold;
-  text-align: center;
+.marquee {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
   animation: colorchange 6s infinite;
+  font-size: 36px;
+  font-weight: bold;
 }
 
+.marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 15s linear infinite;
+}
+
+@keyframes marquee {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(-100%, 0); }
+}
+
+/* ================= SUB HEADER ================= */
 .sub-header {
   font-size: 22px;
   font-weight: bold;
@@ -57,53 +77,44 @@ st.markdown("""
   margin-bottom: 20px;
 }
 
+/* ================= FOOTER ================= */
 .footer-text {
   position: fixed;
   bottom: 10px;
   left: 10px;
-  font-size: 14px;
+  font-size: 20px; /* to hơn */
   font-weight: bold;
   animation: colorchange 6s infinite;
   z-index: 100;
 }
+
+/* ================= CHAT FONT ================= */
+.chat-text {
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 5px 0;
+}
+
+/* ================= DROPDOWN STYLE ================= */
+.stSelectbox > div > div {
+    font-size: 16px !important;
+    padding: 6px !important;
+}
+.stSelectbox [data-baseweb="select"] {
+    border-radius: 10px !important;
+    border: 2px solid #4a90e2 !important;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.2) !important;
+}
 </style>
-<div class="header-text">TỔ BẢO DƯỠNG SỐ 1</div>
+
+<div class="marquee"><span>TỔ BẢO DƯỠNG SỐ 1</span></div>
 <div class="sub-header">CHATBOT TRA CỨU PN</div>
 <div class="footer-text">PHAN VIỆT THẮNG</div>
 """, unsafe_allow_html=True)
 
-# ===================== DATA =====================
-@st.cache_data
-def load_data():
-    df = pd.read_excel("A787.xlsx")
-
-    # Chuẩn hóa tên cột: bỏ khoảng trắng, đổi về chữ hoa
-    df.columns = df.columns.str.strip().str.upper()
-
-    # Map các tên cột tương tự về PN, NOTE
-    rename_map = {}
-    for col in df.columns:
-        if "PN" in col or "P/N" in col or "PART" in col:
-            rename_map[col] = "PN"
-        if "NOTE" in col or "REMARK" in col:
-            rename_map[col] = "NOTE"
-
-    df = df.rename(columns=rename_map)
-
-    # Đảm bảo các cột cần thiết luôn tồn tại
-    for col in ["PN", "NOTE", "CATEGORY", "A/C", "DESCRIPTION"]:
-        if col not in df.columns:
-            df[col] = ""
-
-    return df
-
-df = load_data()
-
-# ===================== SESSION STATE =====================
+# ========== INIT SESSION ==========
 if "history" not in st.session_state:
     st.session_state.history = []
-if "step" not in st.session_state:
-    st.session_state.step = "category"
 if "category" not in st.session_state:
     st.session_state.category = None
 if "aircraft" not in st.session_state:
@@ -111,71 +122,61 @@ if "aircraft" not in st.session_state:
 if "item" not in st.session_state:
     st.session_state.item = None
 
-# ===================== CHAT FUNCTIONS =====================
-def bot_say(msg):
-    st.session_state.history.append(("🤖 Bot", msg))
+# ========== RESET FUNCTION ==========
+def reset_chat():
+    st.session_state.history = []
+    st.session_state.category = None
+    st.session_state.aircraft = None
+    st.session_state.item = None
 
-def user_say(msg):
-    st.session_state.history.append(("🧑 Bạn", msg))
-
-# ===================== MAIN FLOW =====================
-# Step 1: chọn Category
-if st.session_state.step == "category":
-    category = st.selectbox("Bạn muốn tra cứu gì?", [""] + sorted(df["CATEGORY"].dropna().unique().tolist()))
+# ========== CHATBOT LOGIC ==========
+# Hỏi CATEGORY
+if st.session_state.category is None:
+    st.session_state.history.append(("Bot", "Bạn muốn tra cứu Category nào?"))
+    category = st.selectbox("Chọn Category:", df["CATEGORY"].dropna().unique())
     if category:
-        user_say(category)
         st.session_state.category = category
-        st.session_state.step = "aircraft"
+        st.session_state.history.append(("User", category))
         st.rerun()
 
-# Step 2: chọn A/C
-elif st.session_state.step == "aircraft":
-    ac = st.selectbox("Loại tàu nào?", [""] + sorted(df["A/C"].dropna().unique().tolist()))
-    if ac:
-        user_say(ac)
-        st.session_state.aircraft = ac
-        st.session_state.step = "item"
+# Hỏi A/C
+elif st.session_state.aircraft is None:
+    st.session_state.history.append(("Bot", "Loại tàu nào?"))
+    aircrafts = df[df["CATEGORY"] == st.session_state.category]["A/C"].dropna().unique()
+    aircraft = st.selectbox("Chọn loại tàu:", aircrafts)
+    if aircraft:
+        st.session_state.aircraft = aircraft
+        st.session_state.history.append(("User", aircraft))
         st.rerun()
 
-# Step 3: chọn Item
-elif st.session_state.step == "item":
+# Hỏi Item
+elif st.session_state.item is None:
+    st.session_state.history.append(("Bot", "Bạn muốn tra cứu Item nào?"))
     items = df[
         (df["CATEGORY"] == st.session_state.category) &
         (df["A/C"] == st.session_state.aircraft)
-    ]["DESCRIPTION"].dropna().unique().tolist()
-
-    item = st.selectbox("Bạn muốn tra cứu Item nào?", [""] + sorted(items))
+    ]["DESCRIPTION"].dropna().unique()
+    item = st.selectbox("Chọn Item:", items)
     if item:
-        user_say(item)
         st.session_state.item = item
-        st.session_state.step = "result"
+        st.session_state.history.append(("User", item))
         st.rerun()
 
-# Step 4: hiển thị kết quả
-elif st.session_state.step == "result":
+# Hiển thị kết quả
+else:
     results = df[
         (df["CATEGORY"] == st.session_state.category) &
         (df["A/C"] == st.session_state.aircraft) &
         (df["DESCRIPTION"] == st.session_state.item)
     ][["PN", "NOTE"]]
 
-    if not results.empty:
-        for _, row in results.iterrows():
-            pn = row["PN"] if pd.notna(row["PN"]) else "—"
-            note = row["NOTE"] if pd.notna(row["NOTE"]) else "—"
-            bot_say(f"PN: {pn}\nNote: {note}")
-    else:
-        bot_say("Rất tiếc, dữ liệu bạn nhập chưa có.")
+    st.session_state.history.append(("Bot", f"Kết quả tra cứu:\n{results.to_string(index=False)}"))
 
-    st.session_state.step = "done"
-
-# ===================== HIỂN THỊ LỊCH SỬ CHAT =====================
+# ========== HIỂN THỊ HỘI THOẠI ==========
+st.markdown("---")
+st.subheader("📜 Lịch sử hội thoại")
 for sender, msg in st.session_state.history:
-    st.markdown(f"**{sender}:** {msg}")
+    st.markdown(f"<div class='chat-text'><b>{sender}:</b> {msg}</div>", unsafe_allow_html=True)
 
-# ===================== RESET BUTTON =====================
-if st.button("🔄 Tra cứu lại từ đầu"):
-    for key in ["history", "step", "category", "aircraft", "item"]:
-        if key in st.session_state:
-            del st.session_state[key]
-    st.rerun()
+# Nút reset
+st.button("🔄 Tra cứu lại từ đầu", on_click=reset_chat)
