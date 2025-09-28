@@ -75,9 +75,12 @@ st.markdown("""
 # ===================== DATA =====================
 @st.cache_data
 def load_data():
-    df = pd.read_excel("data.xlsx")
+    df = pd.read_excel("A787.xlsx")
 
-    # đảm bảo các cột cần thiết luôn tồn tại
+    # Chuẩn hóa tên cột: bỏ khoảng trắng, đổi về chữ hoa
+    df.columns = df.columns.str.strip().str.upper()
+
+    # Đảm bảo các cột cần thiết luôn tồn tại
     for col in ["PN", "NOTE", "CATEGORY", "A/C", "DESCRIPTION"]:
         if col not in df.columns:
             df[col] = ""
