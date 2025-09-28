@@ -5,9 +5,15 @@ import base64
 # ========== LOAD DATA ==========
 @st.cache_data
 def load_data():
-    return pd.read_excel("A787.xlsx")
+    df = pd.read_excel("A787.xlsx")
+    # chuẩn hoá tên cột: xoá khoảng trắng, viết hoa hết
+    df.columns = df.columns.str.strip().str.upper()
+    return df
 
 df = load_data()
+
+# Hiển thị cột để debug
+st.sidebar.write("📌 Các cột trong file:", list(df.columns))
 
 # ========== BACKGROUND ==========
 def add_bg_from_local(image_file):
@@ -39,7 +45,6 @@ add_bg_from_local("airplane.jpg")
 # ========== CSS DECORATION ==========
 st.markdown("""
 <style>
-/* ================= MARQUEE HEADER ================= */
 @keyframes colorchange {
   0% {color: red;}
   25% {color: orange;}
@@ -69,7 +74,6 @@ st.markdown("""
   100% { transform: translate(-100%, 0); }
 }
 
-/* ================= SUB HEADER ================= */
 .sub-header {
   font-size: 22px;
   font-weight: bold;
@@ -77,25 +81,22 @@ st.markdown("""
   margin-bottom: 20px;
 }
 
-/* ================= FOOTER ================= */
 .footer-text {
   position: fixed;
   bottom: 10px;
   left: 10px;
-  font-size: 20px; /* to hơn */
+  font-size: 22px;
   font-weight: bold;
   animation: colorchange 6s infinite;
   z-index: 100;
 }
 
-/* ================= CHAT FONT ================= */
 .chat-text {
   font-size: 18px;
   line-height: 1.6;
   margin: 5px 0;
 }
 
-/* ================= DROPDOWN STYLE ================= */
 .stSelectbox > div > div {
     font-size: 16px !important;
     padding: 6px !important;
@@ -132,7 +133,8 @@ def reset_chat():
 # ========== CHATBOT LOGIC ==========
 # Hỏi CATEGORY
 if st.session_state.category is None:
-    st.session_state.history.append(("Bot", "Bạn muốn tra cứu Category nào?"))
+    if not any("Category" in m for s, m in st.session_state.history if s == "Bot"):
+        st.session_state.history.append(("Bot", "Bạn muốn tra cứu Category nào?"))
     category = st.selectbox("Chọn Category:", df["CATEGORY"].dropna().unique())
     if category:
         st.session_state.category = category
@@ -141,7 +143,8 @@ if st.session_state.category is None:
 
 # Hỏi A/C
 elif st.session_state.aircraft is None:
-    st.session_state.history.append(("Bot", "Loại tàu nào?"))
+    if not any("Loại tàu" in m for s, m in st.session_state.history if s == "Bot"):
+        st.session_state.history.append(("Bot", "Loại tàu nào?"))
     aircrafts = df[df["CATEGORY"] == st.session_state.category]["A/C"].dropna().unique()
     aircraft = st.selectbox("Chọn loại tàu:", aircrafts)
     if aircraft:
@@ -151,7 +154,8 @@ elif st.session_state.aircraft is None:
 
 # Hỏi Item
 elif st.session_state.item is None:
-    st.session_state.history.append(("Bot", "Bạn muốn tra cứu Item nào?"))
+    if not any("Item nào" in m for s, m in st.session_state.history if s == "Bot"):
+        st.session_state.history.append(("Bot", "Bạn muốn tra cứu Item nào?"))
     items = df[
         (df["CATEGORY"] == st.session_state.category) &
         (df["A/C"] == st.session_state.aircraft)
@@ -164,13 +168,18 @@ elif st.session_state.item is None:
 
 # Hiển thị kết quả
 else:
-    results = df[
-        (df["CATEGORY"] == st.session_state.category) &
-        (df["A/C"] == st.session_state.aircraft) &
-        (df["DESCRIPTION"] == st.session_state.item)
-    ][["PN", "NOTE"]]
-
-    st.session_state.history.append(("Bot", f"Kết quả tra cứu:\n{results.to_string(index=False)}"))
+    try:
+        results = df[
+            (df["CATEGORY"] == st.session_state.category) &
+            (df["A/C"] == st.session_state.aircraft) &
+            (df["DESCRIPTION"] == st.session_state.item)
+        ][["PN", "NOTE"]]
+        if results.empty:
+            st.session_state.history.append(("Bot", "Rất tiếc, dữ liệu bạn nhập chưa có."))
+        else:
+            st.session_state.history.append(("Bot", f"Kết quả tra cứu:\n{results.to_string(index=False)}"))
+    except KeyError:
+        st.session_state.history.append(("Bot", "⚠️ Lỗi: File Excel không có cột PN hoặc NOTE."))
 
 # ========== HIỂN THỊ HỘI THOẠI ==========
 st.markdown("---")
