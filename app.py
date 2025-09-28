@@ -80,6 +80,16 @@ def load_data():
     # Chuẩn hóa tên cột: bỏ khoảng trắng, đổi về chữ hoa
     df.columns = df.columns.str.strip().str.upper()
 
+    # Map các tên cột tương tự về PN, NOTE
+    rename_map = {}
+    for col in df.columns:
+        if "PN" in col or "P/N" in col or "PART" in col:
+            rename_map[col] = "PN"
+        if "NOTE" in col or "REMARK" in col:
+            rename_map[col] = "NOTE"
+
+    df = df.rename(columns=rename_map)
+
     # Đảm bảo các cột cần thiết luôn tồn tại
     for col in ["PN", "NOTE", "CATEGORY", "A/C", "DESCRIPTION"]:
         if col not in df.columns:
