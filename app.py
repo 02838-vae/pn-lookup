@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import time
 import html
 import base64
 
@@ -31,7 +30,17 @@ def add_bg_from_local(image_file):
         position: relative;
         z-index: 1;
     }}
+    .footer-text {{
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #333;
+        z-index: 100;
+    }}
     </style>
+    <div class="footer-text">PHAN VIỆT THẮNG</div>
     """
     st.markdown(css, unsafe_allow_html=True)
 
@@ -58,7 +67,7 @@ st.markdown("""
 .marquee span {
   display: inline-block;
   padding-left: 100%;
-  animation: marquee 15s linear infinite;
+  animation: marquee 20s linear infinite; /* chạy chậm hơn */
 }
 @keyframes marquee {
   0%   { transform: translate(0, 0); }
@@ -104,7 +113,7 @@ def user_say(text):
     st.session_state.chat_history.append(("user", text))
 
 def render_chat():
-     for sender, msg in st.session_state.chat_history:
+    for sender, msg in st.session_state.chat_history:
         if sender == "bot":
             st.markdown(
                 f'<div class="chat-bot">{html.escape(msg).replace("\\n", "<br>")}</div>',
@@ -128,7 +137,7 @@ st.button("🔄 Tra cứu lại từ đầu", on_click=reset_chat)
 
 # Step 1: chọn Category
 if st.session_state.step == "category":
-    if not st.session_state.chat_history:
+    if not any("Bạn muốn tra cứu gì?" in m for s, m in st.session_state.chat_history if s == "bot"):
         bot_say("Bạn muốn tra cứu gì?")
     category = st.selectbox("Chọn Category", ["-- Chọn Category --"] + sorted(df["CATEGORY"].dropna().unique().tolist()))
     if category != "-- Chọn Category --":
@@ -155,7 +164,10 @@ if st.session_state.step == "aircraft" and "category" in st.session_state:
 if st.session_state.step == "item" and "aircraft" in st.session_state:
     if not any("Bạn muốn tra cứu Item nào?" in m for s, m in st.session_state.chat_history if s == "bot"):
         bot_say("Bạn muốn tra cứu Item nào?")
-    items = df[(df["CATEGORY"] == st.session_state.category) & (df["A/C"] == st.session_state.aircraft)]["DESCRIPTION"].dropna().unique().tolist()
+    items = df[
+        (df["CATEGORY"] == st.session_state.category) & 
+        (df["A/C"] == st.session_state.aircraft)
+    ]["DESCRIPTION"].dropna().unique().tolist()
     item = st.selectbox("Chọn Item", ["-- Chọn Item --"] + sorted(items))
     if item != "-- Chọn Item --":
         if "item" not in st.session_state or st.session_state.item != item:
