@@ -15,7 +15,7 @@ df = load_data()
 def add_bg_from_local(image_file):
     with open(image_file, "rb") as f:
         data = f.read()
-    b64 = base64.b64encode(data).decode()
+    b64 = base64.b64encode(f.read()).decode()
     css = f"""
     <style>
     .stApp {{
@@ -35,7 +35,6 @@ def add_bg_from_local(image_file):
     /* Ẩn sidebar và nút mũi tên */
     section[data-testid="stSidebar"] {{display: none !important;}}
     button[kind="header"] {{display: none !important;}}
-
     </style>
     <div class="overlay"></div>
     """
@@ -58,16 +57,16 @@ st.markdown("""
   width: 100%;
   overflow: hidden;
   white-space: nowrap;
-  box-sizing: border-box;
   animation: colorchange 6s infinite;
-  font-size: 36px;
+  font-size: 38px;
   font-weight: bold;
+  text-align: center;
 }
 
 .marquee span {
   display: inline-block;
   padding-left: 100%;
-  animation: marquee 15s linear infinite;
+  animation: marquee 20s linear infinite;
 }
 
 @keyframes marquee {
@@ -76,7 +75,7 @@ st.markdown("""
 }
 
 .sub-header {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: bold;
   text-align: center;
   margin-bottom: 20px;
@@ -84,28 +83,28 @@ st.markdown("""
 
 .footer-text {
   position: fixed;
-  bottom: 10px;
-  left: 10px;
-  font-size: 26px;
+  bottom: 15px;
+  left: 15px;
+  font-size: 28px;
   font-weight: bold;
   animation: colorchange 6s infinite;
   z-index: 100;
 }
 
 .chat-text {
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1.6;
   margin: 5px 0;
 }
 
 .stSelectbox > div > div {
-    font-size: 16px !important;
-    padding: 6px !important;
+    font-size: 18px !important;
+    padding: 8px !important;
 }
 .stSelectbox [data-baseweb="select"] {
     border-radius: 10px !important;
     border: 2px solid #4a90e2 !important;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.2) !important;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.25) !important;
 }
 </style>
 
@@ -182,17 +181,9 @@ for sender, msg in st.session_state.history:
 
 # ====== NÚT RESET ======
 if st.button("🔄 Tra cứu lại từ đầu"):
-    st.session_state.reset_flag = True
-    st.rerun()
-
-# ====== RESET CHECK ======
-if "reset_flag" in st.session_state and st.session_state.reset_flag:
-    # Xoá sạch mọi state cũ
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
-    # Đặt lại cờ để tránh vòng lặp
-    st.session_state.reset_flag = False
-    st.rerun()
-
-
-
+    st.markdown(
+        """
+        <meta http-equiv="refresh" content="0">
+        """,
+        unsafe_allow_html=True
+    )
