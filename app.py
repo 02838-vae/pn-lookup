@@ -7,7 +7,8 @@ df = pd.read_excel("A787.xlsx")
 # Chuẩn hóa text
 for col in ["CATEGORY", "A/C", "DESCRIPTION"]:
     df[col] = (
-        df[col].astype(str)
+        df[col]
+        .astype(str)
         .str.strip()
         .str.replace(r"\s+", " ", regex=True)
         .str.upper()
@@ -25,7 +26,6 @@ if "aircraft" not in st.session_state:
     st.session_state.aircraft = None
 if "keyword" not in st.session_state:
     st.session_state.keyword = None
-
 
 # Step 1: chọn Category
 if st.session_state.step == 1:
@@ -59,14 +59,14 @@ elif st.session_state.step == 3:
     st.write(f"✅ Category: **{st.session_state.category}**")
     st.write(f"✅ A/C: **{st.session_state.aircraft}**")
 
-    # Lấy toàn bộ mô tả theo category + aircraft
+    # Lấy tất cả DESCRIPTION theo category + aircraft
     subset = df[
         (df["CATEGORY"] == st.session_state.category)
         & (df["A/C"] == st.session_state.aircraft)
     ]["DESCRIPTION"].dropna()
 
-    # Tách từ khóa (ví dụ: lấy từ đầu tiên trong mô tả)
-    keywords = sorted(set(desc.split()[0] for desc in subset if isinstance(desc, str)))
+    # Trích ra tất cả từ khóa duy nhất trong DESCRIPTION
+    keywords = sorted({word for desc in subset for word in desc.split()})
 
     keyword = st.selectbox("📑 Bạn muốn tra cứu theo từ khóa nào?", keywords)
 
@@ -85,7 +85,7 @@ elif st.session_state.step == 4:
     st.write(f"✅ A/C: **{st.session_state.aircraft}**")
     st.write(f"✅ Từ khóa Description: **{st.session_state.keyword}**")
 
-    # Lọc tất cả DESCRIPTION có chứa từ khóa
+    # Lọc tất cả DESCRIPTION có chứa từ khóa đã chọn
     result = df[
         (df["CATEGORY"] == st.session_state.category)
         & (df["A/C"] == st.session_state.aircraft)
