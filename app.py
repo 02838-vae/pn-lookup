@@ -15,7 +15,7 @@ df = load_data()
 def add_bg_from_local(image_file):
     with open(image_file, "rb") as f:
         data = f.read()
-    b64 = base64.b64encode(f.read()).decode()
+    b64 = base64.b64encode(data).decode()   # ✅ dùng data thay vì f.read()
     css = f"""
     <style>
     .stApp {{
@@ -31,6 +31,13 @@ def add_bg_from_local(image_file):
         background: rgba(255, 255, 255, 0.75); /* làm mờ */
         z-index: -1;
     }}
+
+    section[data-testid="stSidebar"] {{display: none !important;}}
+    button[kind="header"] {{display: none !important;}}
+    </style>
+    <div class="overlay"></div>
+    """
+    st.markdown(css, unsafe_allow_html=True)
 
     /* Ẩn sidebar và nút mũi tên */
     section[data-testid="stSidebar"] {{display: none !important;}}
@@ -187,3 +194,4 @@ if st.button("🔄 Tra cứu lại từ đầu"):
         """,
         unsafe_allow_html=True
     )
+
