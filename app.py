@@ -12,78 +12,54 @@ df["A/C"] = df["A/C"].ffill()
 df = df.dropna(subset=["DESCRIPTION", "PART NUMBER (PN)"])
 
 # Chuẩn hóa text
-df["DESCRIPTION"] = (
-    df["DESCRIPTION"]
-    .astype(str)
-    .str.strip()
-    .str.replace(r"\s+", " ", regex=True)
-    .str.upper()
-)
-df["CATEGORY"] = (
-    df["CATEGORY"]
-    .astype(str)
-    .str.strip()
-    .str.replace(r"\s+", " ", regex=True)
-    .str.upper()
-)
-df["A/C"] = (
-    df["A/C"]
-    .astype(str)
-    .str.strip()
-    .str.replace(r"\s+", " ", regex=True)
-    .str.upper()
-)
+for col in ["DESCRIPTION", "CATEGORY", "A/C"]:
+    df[col] = (
+        df[col]
+        .astype(str)
+        .str.strip()
+        .str.replace(r"\s+", " ", regex=True)
+        .str.upper()
+    )
 
 # APP
 st.title("🔎 Tra cứu Part Number (PN)")
 
-# Nếu chưa chọn Category -> hiển thị dropdown Category
-if "category" not in st.session_state:
-    categories = sorted(df["CATEGORY"].dropna().unique())
-    category = st.selectbox("📂 Bạn muốn tra cứu gì?", categories, key="category_select")
+# Bước 1: chọn Category
+categories = sorted(df["CATEGORY"].dropna().unique())
+category = st.selectbox("📂 Bạn muốn tra cứu gì?", ["--Chọn--"] + categories)
 
-    if category:
-        st.session_state["category"] = category
-        st.rerun()
+if category != "--Chọn--":
+    # Ẩn Category khi đã chọn
+    st.write(f"✅ Bạn đã chọn Category: **{category}**")
 
-# Nếu đã chọn Category nhưng chưa chọn A/C -> hiển thị dropdown A/C
-elif "aircraft" not in st.session_state:
-    category = st.session_state["category"]
+    # Bước 2: chọn loại tàu
     aircrafts = sorted(df[df["CATEGORY"] == category]["A/C"].dropna().unique())
-    aircraft = st.selectbox("✈️ Loại tàu nào?", aircrafts, key="aircraft_select")
+    aircraft = st.selectbox("✈️ Loại tàu nào?", ["--Chọn--"] + list(aircrafts))
 
-    if aircraft:
-        st.session_state["aircraft"] = aircraft
-        st.rerun()
+    if aircraft != "--Chọn--":
+        st.write(f"✅ Bạn đã chọn A/C: **{aircraft}**")
 
-# Nếu đã chọn Category + A/C nhưng chưa chọn Description -> hiển thị dropdown Description
-elif "description" not in st.session_state:
-    category = st.session_state["category"]
-    aircraft = st.session_state["aircraft"]
-    descriptions = sorted(
-        df[(df["CATEGORY"] == category) & (df["A/C"] == aircraft)]["DESCRIPTION"].dropna().unique()
-    )
-    description = st.selectbox("📑 Bạn muốn tra cứu Item nào?", descriptions, key="desc_select")
+        # Bước 3: chọn Description
+        descriptions = sorted(
+            df[(df["CATEGORY"] == category) & (df["A/C"] == aircraft)]["DESCRIPTION"].dropna().unique()
+        )
+        description = st.selectbox("📑 Bạn muốn tra cứu Item nào?", ["--Chọn--"] + list(descriptions))
 
-    if description:
-        st.session_state["description"] = description
-        st.rerun()
+        if description != "--Chọn--":
+            st.write(f"✅ Bạn đã chọn Description: **{description}**")
 
-# Nếu đã chọn cả 3 -> hiển thị kết quả
-else:
-    category = st.session_state["category"]
-    aircraft = st.session_state["aircraft"]
-    description = st.session_state["description"]
+            # Lọc kết quả
+            result = df[
+                (df["CATEGORY"] == category)
+                & (df["A/C"] == aircraft)
+                & (df["DESCRIPTION"] == description)
+            ]
 
-    result = df[
-        (df["CATEGORY"] == category)
-        & (df["A/C"] == aircraft)
-        & (df["DESCRIPTION"] == description)
-    ]
-
-    if not result.empty:
-        st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
-        cols_to_show = ["PART NUMBER (PN)", "DESCRIPTION"]
-        if "NOTE" in df.columns:
-            cols_to_show.append("NOTE")
-        st.dataframe(result[cols_to_show].rese
+            if not result.empty:
+                st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
+                cols_to_show = ["PART NUMBER (PN)", "DESCRIPTION"]
+                if "NOTE" in df.columns:
+                    cols_to_show.append("NOTE")
+                st.dataframe(result[cols_to_show].reset_index(drop=True))
+            else:
+                st.error("Rất tiếc, dữ liệu bạn nhập chưa có")
