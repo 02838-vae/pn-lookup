@@ -18,17 +18,17 @@ if category:
     description = st.selectbox("Bạn muốn tra cứu Description nào?", descriptions)
 
     if description:
-        # Bước 3: tìm PN + Note
-        result = df[(df["CATEGORY"] == category) & (df["DESCRIPTION"] == description)]
+        # Lấy tất cả các dòng có DESCRIPTION giống nhau (không gộp unique)
+        result = df[(df["CATEGORY"] == category) & (df["DESCRIPTION"].str.strip() == description.strip())]
+
         if not result.empty:
             st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
 
-            # Chỉ lấy các cột cần thiết
+            # Hiển thị các cột quan trọng
             cols_to_show = ["PART NUMBER (PN)", "DESCRIPTION"]
             if "NOTE" in df.columns:
                 cols_to_show.append("NOTE")
 
-            # Hiển thị toàn bộ các dòng
             st.dataframe(result[cols_to_show].reset_index(drop=True))
         else:
             st.error("Rất tiếc, dữ liệu bạn nhập chưa có")
