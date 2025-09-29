@@ -6,7 +6,7 @@ import base64
 @st.cache_data
 def load_data():
     df = pd.read_excel("A787.xlsx")
-    df.columns = df.columns.str.strip().str.upper()  # Chuẩn hoá cột
+    df.columns = df.columns.str.strip().str.upper()  # Chuẩn hoá tên cột
     return df
 
 df = load_data()
@@ -114,16 +114,6 @@ st.markdown("""
 <div class="footer-text">PHAN VIỆT THẮNG</div>
 """, unsafe_allow_html=True)
 
-# ========== RESET LOGIC ==========
-if "reset" not in st.session_state:
-    st.session_state.reset = False
-
-# Nếu flag reset được bật → clear session và rerun
-if st.session_state.reset:
-    st.session_state.clear()
-    st.session_state.reset = False
-    st.rerun()
-
 # ========== INIT SESSION ==========
 if "history" not in st.session_state:
     st.session_state.history = []
@@ -190,7 +180,8 @@ st.subheader("📜 Lịch sử hội thoại")
 for sender, msg in st.session_state.history:
     st.markdown(f"<div class='chat-text'><b>{sender}:</b> {msg}</div>", unsafe_allow_html=True)
 
-# Nút reset → chỉ set flag
+# ====== NÚT RESET ======
 if st.button("🔄 Tra cứu lại từ đầu"):
-    st.session_state.reset = True
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
     st.rerun()
