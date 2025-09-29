@@ -86,7 +86,7 @@ st.markdown("""
   position: fixed;
   bottom: 10px;
   left: 10px;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: bold;
   animation: colorchange 6s infinite;
   z-index: 100;
@@ -114,6 +114,16 @@ st.markdown("""
 <div class="footer-text">PHAN VIỆT THẮNG</div>
 """, unsafe_allow_html=True)
 
+# ========== RESET LOGIC ==========
+if "reset" not in st.session_state:
+    st.session_state.reset = False
+
+# Nếu flag reset được bật → clear session và rerun
+if st.session_state.reset:
+    st.session_state.clear()
+    st.session_state.reset = False
+    st.rerun()
+
 # ========== INIT SESSION ==========
 if "history" not in st.session_state:
     st.session_state.history = []
@@ -123,11 +133,6 @@ if "aircraft" not in st.session_state:
     st.session_state.aircraft = None
 if "item" not in st.session_state:
     st.session_state.item = None
-
-# ========== RESET FUNCTION ==========
-def reset_chat():
-    st.session_state.clear()
-    st.rerun()  # reload lại app ngay
 
 # ========== CHATBOT LOGIC ==========
 if st.session_state.category is None:
@@ -185,5 +190,7 @@ st.subheader("📜 Lịch sử hội thoại")
 for sender, msg in st.session_state.history:
     st.markdown(f"<div class='chat-text'><b>{sender}:</b> {msg}</div>", unsafe_allow_html=True)
 
-# Nút reset
-st.button("🔄 Tra cứu lại từ đầu", on_click=reset_chat)
+# Nút reset → chỉ set flag
+if st.button("🔄 Tra cứu lại từ đầu"):
+    st.session_state.reset = True
+    st.rerun()
