@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd 
 import streamlit as st
 
 # Đọc dữ liệu
@@ -18,13 +18,13 @@ if category:
     description = st.selectbox("Bạn muốn tra cứu Description nào?", descriptions)
 
     if description:
-        # Bước 3: tìm PN
+        # Bước 3: tìm PN + Note
         result = df[(df["CATEGORY"] == category) & (df["DESCRIPTION"] == description)]
         if not result.empty:
-            st.success(f"✅ PN: {', '.join(result['PART NUMBER (PN)'].astype(str))}")
-            if "NOTE" in result.columns:
-                notes = result["NOTE"].dropna().astype(str).unique()
-                if len(notes) > 0:
-                    st.info(f"📌 Ghi chú: {', '.join(notes)}")
+            st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
+
+            # Chỉ hiển thị các cột quan trọng
+            cols_to_show = ["PART NUMBER (PN)", "DESCRIPTION", "NOTE"] if "NOTE" in df.columns else ["PART NUMBER (PN)", "DESCRIPTION"]
+            st.dataframe(result[cols_to_show].reset_index(drop=True))
         else:
             st.error("Rất tiếc, dữ liệu bạn nhập chưa có")
