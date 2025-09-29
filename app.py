@@ -182,15 +182,17 @@ for sender, msg in st.session_state.history:
 
 # ====== NÚT RESET ======
 if st.button("🔄 Tra cứu lại từ đầu"):
-    st.session_state.clear()
-    st.cache_data.clear()
-    st.cache_resource.clear()
+    st.session_state.reset_flag = True
+    st.rerun()
 
-    # Dùng JS ép reload trang -> đảm bảo session reset hoàn toàn
-    st.markdown("""
-        <script>
-        window.location.reload(true);
-        </script>
-        """, unsafe_allow_html=True)
+# ====== RESET CHECK ======
+if "reset_flag" in st.session_state and st.session_state.reset_flag:
+    # Xoá sạch mọi state cũ
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    # Đặt lại cờ để tránh vòng lặp
+    st.session_state.reset_flag = False
+    st.rerun()
+
 
 
