@@ -4,62 +4,96 @@ import streamlit as st
 # Đọc dữ liệu
 df = pd.read_excel("A787.xlsx")
 
-# Điền CATEGORY và A/C còn thiếu bằng giá trị trước đó
-df["CATEGORY"] = df["CATEGORY"].ffill()
-df["A/C"] = df["A/C"].ffill()
-
-# Xóa dòng không có DESCRIPTION hoặc PN
-df = df.dropna(subset=["DESCRIPTION", "PART NUMBER (PN)"])
-
-# Chuẩn hóa text
-for col in ["DESCRIPTION", "CATEGORY", "A/C"]:
+# Chuẩn hóa
+for col in ["CATEGORY", "A/C", "DESCRIPTION"]:
     df[col] = (
-        df[col]
-        .astype(str)
-        .str.strip()
-        .str.replace(r"\s+", " ", regex=True)
-        .str.upper()
+        df[col].astype(str).str.strip().str.replace(r"\s+", " ", regex=True).str.upper()
     )
 
-# APP
+# --- App ---
 st.title("🔎 Tra cứu Part Number (PN)")
 
-# Bước 1: chọn Category
-categories = sorted(df["CATEGORY"].dropna().unique())
-category = st.selectbox("📂 Bạn muốn tra cứu gì?", ["--Chọn--"] + categories)
+# Khởi tạo state
+if "step" not in st.session_state:
+    st.session_state.step = 1
+if "category" not in st.session_state:
+    st.session_state.category = None
+if "aircraft" not in st.session_state:
+    st.session_state.aircraft = None
+if "description" not in st.session_state:
+    st.session_state.description = None
 
-if category != "--Chọn--":
-    # Ẩn Category khi đã chọn
-    st.write(f"✅ Bạn đã chọn Category: **{category}**")
 
-    # Bước 2: chọn loại tàu
-    aircrafts = sorted(df[df["CATEGORY"] == category]["A/C"].dropna().unique())
-    aircraft = st.selectbox("✈️ Loại tàu nào?", ["--Chọn--"] + list(aircrafts))
+# Step 1: chọn Category
+if st.session_state.step == 1:
+    categories = sorted(df["CATEGORY"].dropna().unique())
+    category = st.selectbox("📂 Bạn muốn tra cứu gì?", categories)
 
-    if aircraft != "--Chọn--":
-        st.write(f"✅ Bạn đã chọn A/C: **{aircraft}**")
+    if st.button("Tiếp tục ➡️"):
+        st.session_state.category = category
+        st.session_state.step = 2
+        st.rerun()
 
-        # Bước 3: chọn Description
-        descriptions = sorted(
-            df[(df["CATEGORY"] == category) & (df["A/C"] == aircraft)]["DESCRIPTION"].dropna().unique()
-        )
-        description = st.selectbox("📑 Bạn muốn tra cứu Item nào?", ["--Chọn--"] + list(descriptions))
+# Step 2: chọn A/C
+elif st.session_state.step == 2:
+    st.write(f"✅ Category: **{st.session_state.category}**")
+    aircrafts = sorted(
+        df[df["CATEGORY"] == st.session_state.category]["A/C"].dropna().unique()
+    )
+    aircraft = st.selectbox("✈️ Loại tàu nào?", aircrafts)
 
-        if description != "--Chọn--":
-            st.write(f"✅ Bạn đã chọn Description: **{description}**")
+    col1, col2 = st.columns(2)
+    if col1.button("⬅️ Quay lại"):
+        st.session_state.step = 1
+        st.rerun()
+    if col2.button("Tiếp tục ➡️"):
+        st.session_state.aircraft = aircraft
+        st.session_state.step = 3
+        st.rerun()
 
-            # Lọc kết quả
-            result = df[
-                (df["CATEGORY"] == category)
-                & (df["A/C"] == aircraft)
-                & (df["DESCRIPTION"] == description)
-            ]
+# Step 3: chọn Description
+elif st.session_state.step == 3:
+    st.write(f"✅ Category: **{st.session_state.category}**")
+    st.write(f"✅ A/C: **{st.session_state.aircraft}**")
 
-            if not result.empty:
-                st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
-                cols_to_show = ["PART NUMBER (PN)", "DESCRIPTION"]
-                if "NOTE" in df.columns:
-                    cols_to_show.append("NOTE")
-                st.dataframe(result[cols_to_show].reset_index(drop=True))
-            else:
-                st.error("Rất tiếc, dữ liệu bạn nhập chưa có")
+    descriptions = sorted(
+        df[
+            (df["CATEGORY"] == st.session_state.category)
+            & (df["A/C"] == st.session_state.aircraft)
+        ]["DESCRIPTION"].dropna().unique()
+    )
+    description = st.selectbox("📑 Bạn muốn tra cứu Item nào?", descriptions)
+
+    col1, col2 = st.columns(2)
+    if col1.button("⬅️ Quay lại"):
+        st.session_state.step = 2
+        st.rerun()
+    if col2.button("Xem kết quả ✅"):
+        st.session_state.description = description
+        st.session_state.step = 4
+        st.rerun()
+
+# Step 4: Hiện kết quả
+elif st.session_state.step == 4:
+    st.write(f"✅ Category: **{st.session_state.category}**")
+    st.write(f"✅ A/C: **{st.session_state.aircraft}**")
+    st.write(f"✅ Description: **{st.session_state.description}**")
+
+    result = df[
+        (df["CATEGORY"] == st.session_state.category)
+        & (df["A/C"] == st.session_state.aircraft)
+        & (df["DESCRIPTION"] == st.session_state.description)
+    ]
+
+    if not result.empty:
+        st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
+        cols = ["PART NUMBER (PN)", "DESCRIPTION"]
+        if "NOTE" in df.columns:
+            cols.append("NOTE")
+        st.dataframe(result[cols].reset_index(drop=True))
+    else:
+        st.error("Không tìm thấy dữ liệu!")
+
+    if st.button("🔄 Tra cứu lại"):
+        st.session_state.step = 1
+        st.rerun()
