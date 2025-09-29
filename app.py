@@ -4,10 +4,16 @@ import streamlit as st
 # Đọc dữ liệu
 df = pd.read_excel("A787.xlsx")
 
-# Chuẩn hóa
+# Chuẩn hóa cột (làm sạch trước khi ép string để tránh NAN thành chữ "NAN")
 for col in ["CATEGORY", "A/C", "DESCRIPTION"]:
+    df[col] = df[col].where(df[col].notna(), None)  # giữ NaN đúng nghĩa
     df[col] = (
-        df[col].astype(str).str.strip().str.replace(r"\s+", " ", regex=True).str.upper()
+        df[col]
+        .dropna()
+        .astype(str)
+        .str.strip()
+        .str.replace(r"\s+", " ", regex=True)
+        .str.upper()
     )
 
 # --- App ---
@@ -79,7 +85,7 @@ elif st.session_state.step == 4:
     st.write(f"✅ A/C: **{st.session_state.aircraft}**")
     st.write(f"✅ Description chứa: **{st.session_state.description}**")
 
-    # Lấy tất cả Description có chứa từ khóa đã chọn
+    # Lấy tất cả Description có chứa từ khóa được chọn
     result = df[
         (df["CATEGORY"] == st.session_state.category)
         & (df["A/C"] == st.session_state.aircraft)
