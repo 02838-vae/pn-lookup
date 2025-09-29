@@ -24,8 +24,8 @@ if "category" not in st.session_state:
     st.session_state.category = None
 if "aircraft" not in st.session_state:
     st.session_state.aircraft = None
-if "keyword" not in st.session_state:
-    st.session_state.keyword = None
+if "description" not in st.session_state:
+    st.session_state.description = None
 
 # Step 1: chọn Category
 if st.session_state.step == 1:
@@ -54,42 +54,40 @@ elif st.session_state.step == 2:
         st.session_state.step = 3
         st.rerun()
 
-# Step 3: chọn từ khóa trong Description
+# Step 3: chọn Description (hiện nguyên văn)
 elif st.session_state.step == 3:
     st.write(f"✅ Category: **{st.session_state.category}**")
     st.write(f"✅ A/C: **{st.session_state.aircraft}**")
 
-    # Lấy tất cả DESCRIPTION theo category + aircraft
-    subset = df[
-        (df["CATEGORY"] == st.session_state.category)
-        & (df["A/C"] == st.session_state.aircraft)
-    ]["DESCRIPTION"].dropna()
+    descriptions = sorted(
+        df[
+            (df["CATEGORY"] == st.session_state.category)
+            & (df["A/C"] == st.session_state.aircraft)
+        ]["DESCRIPTION"].dropna().unique()
+    )
 
-    # Trích ra tất cả từ khóa duy nhất trong DESCRIPTION
-    keywords = sorted({word for desc in subset for word in desc.split()})
-
-    keyword = st.selectbox("📑 Bạn muốn tra cứu theo từ khóa nào?", keywords)
+    description = st.selectbox("📑 Bạn muốn tra cứu Item nào?", descriptions)
 
     col1, col2 = st.columns(2)
     if col1.button("⬅️ Quay lại"):
         st.session_state.step = 2
         st.rerun()
     if col2.button("Xem kết quả ✅"):
-        st.session_state.keyword = keyword
+        st.session_state.description = description
         st.session_state.step = 4
         st.rerun()
 
-# Step 4: Hiện kết quả
+# Step 4: Hiện kết quả đầy đủ
 elif st.session_state.step == 4:
     st.write(f"✅ Category: **{st.session_state.category}**")
     st.write(f"✅ A/C: **{st.session_state.aircraft}**")
-    st.write(f"✅ Từ khóa Description: **{st.session_state.keyword}**")
+    st.write(f"✅ Description: **{st.session_state.description}**")
 
-    # Lọc tất cả DESCRIPTION có chứa từ khóa đã chọn
+    # Lọc tất cả dòng có cùng Category + A/C + Description
     result = df[
         (df["CATEGORY"] == st.session_state.category)
         & (df["A/C"] == st.session_state.aircraft)
-        & (df["DESCRIPTION"].str.contains(st.session_state.keyword, na=False))
+        & (df["DESCRIPTION"] == st.session_state.description)
     ]
 
     if not result.empty:
