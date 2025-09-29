@@ -17,7 +17,7 @@ if category:
     descriptions = df[df["CATEGORY"] == category]["DESCRIPTION"].dropna().unique()
     description = st.selectbox("Bạn muốn tra cứu Description nào?", descriptions)
 
-    if description:
+   if description:
     # Bước 3: tìm PN + Note
     result = df[(df["CATEGORY"] == category) & (df["DESCRIPTION"] == description)]
     if not result.empty:
@@ -32,3 +32,4 @@ if category:
         st.dataframe(result[cols_to_show].reset_index(drop=True))
     else:
         st.error("Rất tiếc, dữ liệu bạn nhập chưa có")
+
