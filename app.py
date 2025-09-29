@@ -36,27 +36,27 @@ df["A/C"] = (
 # APP
 st.title("🔎 Tra cứu Part Number (PN)")
 
-# Bước 0: chọn loại tàu
-aircrafts = sorted(df["A/C"].dropna().unique())
-aircraft = st.selectbox("✈️ Loại tàu nào?", aircrafts)
+# Bước 1: chọn Category
+categories = sorted(df["CATEGORY"].dropna().unique())
+category = st.selectbox("📂 Bạn muốn tra cứu gì?", categories)
 
-if aircraft:
-    # Bước 1: chọn Category
-    categories = sorted(df[df["A/C"] == aircraft]["CATEGORY"].dropna().unique())
-    category = st.selectbox("📂 Bạn muốn tra cứu gì?", categories)
+if category:
+    # Bước 2: chọn loại tàu theo Category
+    aircrafts = sorted(df[df["CATEGORY"] == category]["A/C"].dropna().unique())
+    aircraft = st.selectbox("✈️ Loại tàu nào?", aircrafts)
 
-    if category:
-        # Bước 2: chọn Description theo Category
+    if aircraft:
+        # Bước 3: chọn Description theo Category + loại tàu
         descriptions = sorted(
-            df[(df["A/C"] == aircraft) & (df["CATEGORY"] == category)]["DESCRIPTION"].dropna().unique()
+            df[(df["CATEGORY"] == category) & (df["A/C"] == aircraft)]["DESCRIPTION"].dropna().unique()
         )
-        description = st.selectbox("📑 Bạn muốn tra cứu Description nào?", descriptions)
+        description = st.selectbox("📑 Bạn muốn tra cứu Item nào?", descriptions)
 
         if description:
             # Lọc kết quả
             result = df[
-                (df["A/C"] == aircraft)
-                & (df["CATEGORY"] == category)
+                (df["CATEGORY"] == category)
+                & (df["A/C"] == aircraft)
                 & (df["DESCRIPTION"] == description)
             ]
 
