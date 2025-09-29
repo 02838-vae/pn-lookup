@@ -4,8 +4,9 @@ import streamlit as st
 # Đọc dữ liệu
 df = pd.read_excel("A787.xlsx")
 
-# Điền CATEGORY còn thiếu bằng giá trị trước đó
+# Điền CATEGORY và A/C còn thiếu bằng giá trị trước đó
 df["CATEGORY"] = df["CATEGORY"].ffill()
+df["A/C"] = df["A/C"].ffill()
 
 # Xóa dòng không có DESCRIPTION hoặc PN
 df = df.dropna(subset=["DESCRIPTION", "PART NUMBER (PN)"])
