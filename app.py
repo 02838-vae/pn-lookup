@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import re
 
 # Đọc dữ liệu
 df = pd.read_excel("A787.xlsx")
@@ -62,12 +63,14 @@ elif st.session_state.step == 3:
     st.write(f"✅ Category: **{st.session_state.category}**")
     st.write(f"✅ A/C: **{st.session_state.aircraft}**")
 
+    # Lấy danh sách mô tả
     descriptions = sorted(
         df[
             (df["CATEGORY"] == st.session_state.category)
             & (df["A/C"] == st.session_state.aircraft)
         ]["DESCRIPTION"].dropna().unique()
     )
+
     description = st.selectbox("📑 Bạn muốn tra cứu Item nào?", descriptions)
 
     col1, col2 = st.columns(2)
@@ -78,18 +81,19 @@ elif st.session_state.step == 3:
         st.session_state.description = description
         st.session_state.step = 4
         st.rerun()
-
 # Step 4: Hiện kết quả
 elif st.session_state.step == 4:
     st.write(f"✅ Category: **{st.session_state.category}**")
     st.write(f"✅ A/C: **{st.session_state.aircraft}**")
     st.write(f"✅ Description chứa: **{st.session_state.description}**")
 
-    # Lọc: lấy tất cả description có chứa từ khóa được chọn
+    # Lọc bằng regex an toàn (tránh lỗi ký tự đặc biệt)
+    pattern = re.escape(st.session_state.description)
+
     result = df[
         (df["CATEGORY"] == st.session_state.category)
         & (df["A/C"] == st.session_state.aircraft)
-        & (df["DESCRIPTION"].str.contains(st.session_state.description, na=False))
+        & (df["DESCRIPTION"].str.contains(pattern, na=False, regex=True))
     ]
 
     if not result.empty:
@@ -104,3 +108,5 @@ elif st.session_state.step == 4:
     if st.button("🔄 Tra cứu lại"):
         st.session_state.step = 1
         st.rerun()
+
+
