@@ -77,12 +77,13 @@ elif st.session_state.step == 3:
 elif st.session_state.step == 4:
     st.write(f"✅ Category: **{st.session_state.category}**")
     st.write(f"✅ A/C: **{st.session_state.aircraft}**")
-    st.write(f"✅ Description: **{st.session_state.description}**")
+    st.write(f"✅ Description chứa: **{st.session_state.description}**")
 
+    # Lấy tất cả Description có chứa từ khóa đã chọn
     result = df[
         (df["CATEGORY"] == st.session_state.category)
         & (df["A/C"] == st.session_state.aircraft)
-        & (df["DESCRIPTION"] == st.session_state.description)
+        & (df["DESCRIPTION"].str.contains(st.session_state.description, na=False))
     ]
 
     if not result.empty:
