@@ -182,14 +182,15 @@ for sender, msg in st.session_state.history:
 
 # ====== NÚT RESET ======
 if st.button("🔄 Tra cứu lại từ đầu"):
-    # Xoá hết state
     st.session_state.clear()
     st.cache_data.clear()
     st.cache_resource.clear()
 
-    # Đổi query param để ép Streamlit tạo session mới
-    st.experimental_set_query_params(reset=pd.Timestamp.now().isoformat())
-
-    st.rerun()
+    # Dùng JS ép reload trang -> đảm bảo session reset hoàn toàn
+    st.markdown("""
+        <script>
+        window.location.reload(true);
+        </script>
+        """, unsafe_allow_html=True)
 
 
