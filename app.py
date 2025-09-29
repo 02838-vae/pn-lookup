@@ -5,6 +5,10 @@ import streamlit as st
 df = pd.read_excel("A787.xlsx")
 df = df.dropna(subset=["DESCRIPTION", "PART NUMBER (PN)"])
 
+# Chuẩn hóa dữ liệu để tránh lỗi trùng mà không hiện
+df["DESCRIPTION"] = df["DESCRIPTION"].astype(str).str.strip().str.upper()
+df["CATEGORY"] = df["CATEGORY"].astype(str).str.strip().str.upper()
+
 # Tiêu đề app
 st.title("🔎 Tra cứu Part Number (PN)")
 
@@ -18,13 +22,12 @@ if category:
     description = st.selectbox("Bạn muốn tra cứu Description nào?", descriptions)
 
     if description:
-        # Lấy tất cả các dòng có DESCRIPTION giống nhau (không gộp unique)
-        result = df[(df["CATEGORY"] == category) & (df["DESCRIPTION"].str.strip() == description.strip())]
+        # Lọc tất cả dòng có DESCRIPTION = description
+        result = df[(df["CATEGORY"] == category) & (df["DESCRIPTION"] == description)]
 
         if not result.empty:
             st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
 
-            # Hiển thị các cột quan trọng
             cols_to_show = ["PART NUMBER (PN)", "DESCRIPTION"]
             if "NOTE" in df.columns:
                 cols_to_show.append("NOTE")
