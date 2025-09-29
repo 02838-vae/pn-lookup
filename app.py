@@ -129,6 +129,7 @@ def reset_chat():
     st.session_state.category = None
     st.session_state.aircraft = None
     st.session_state.item = None
+    st.rerun()  # reload lại app ngay
 
 # ========== CHATBOT LOGIC ==========
 # Hỏi CATEGORY
@@ -174,10 +175,13 @@ else:
             (df["A/C"] == st.session_state.aircraft) &
             (df["DESCRIPTION"] == st.session_state.item)
         ][["PN", "NOTE"]]
+
         if results.empty:
             st.session_state.history.append(("Bot", "Rất tiếc, dữ liệu bạn nhập chưa có."))
         else:
-            st.session_state.history.append(("Bot", f"Kết quả tra cứu:\n{results.to_string(index=False)}"))
+            st.session_state.history.append(("Bot", "Kết quả tra cứu:"))
+            st.dataframe(results, use_container_width=True)
+
     except KeyError:
         st.session_state.history.append(("Bot", "⚠️ Lỗi: File Excel không có cột PN hoặc NOTE."))
 
