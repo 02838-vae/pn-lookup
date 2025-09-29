@@ -6,14 +6,10 @@ import base64
 @st.cache_data
 def load_data():
     df = pd.read_excel("A787.xlsx")
-    # chuẩn hoá tên cột: xoá khoảng trắng, viết hoa hết
-    df.columns = df.columns.str.strip().str.upper()
+    df.columns = df.columns.str.strip().str.upper()  # Chuẩn hoá cột
     return df
 
 df = load_data()
-
-# Hiển thị cột để debug
-st.sidebar.write("📌 Các cột trong file:", list(df.columns))
 
 # ========== BACKGROUND ==========
 def add_bg_from_local(image_file):
@@ -35,6 +31,11 @@ def add_bg_from_local(image_file):
         background: rgba(255, 255, 255, 0.75); /* làm mờ */
         z-index: -1;
     }}
+
+    /* Ẩn sidebar và nút mũi tên */
+    section[data-testid="stSidebar"] {{display: none !important;}}
+    button[kind="header"] {{display: none !important;}}
+
     </style>
     <div class="overlay"></div>
     """
@@ -85,7 +86,7 @@ st.markdown("""
   position: fixed;
   bottom: 10px;
   left: 10px;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: bold;
   animation: colorchange 6s infinite;
   z-index: 100;
@@ -125,14 +126,10 @@ if "item" not in st.session_state:
 
 # ========== RESET FUNCTION ==========
 def reset_chat():
-    st.session_state.history = []
-    st.session_state.category = None
-    st.session_state.aircraft = None
-    st.session_state.item = None
+    st.session_state.clear()
     st.rerun()  # reload lại app ngay
 
 # ========== CHATBOT LOGIC ==========
-# Hỏi CATEGORY
 if st.session_state.category is None:
     if not any("Category" in m for s, m in st.session_state.history if s == "Bot"):
         st.session_state.history.append(("Bot", "Bạn muốn tra cứu Category nào?"))
@@ -142,7 +139,6 @@ if st.session_state.category is None:
         st.session_state.history.append(("User", category))
         st.rerun()
 
-# Hỏi A/C
 elif st.session_state.aircraft is None:
     if not any("Loại tàu" in m for s, m in st.session_state.history if s == "Bot"):
         st.session_state.history.append(("Bot", "Loại tàu nào?"))
@@ -153,7 +149,6 @@ elif st.session_state.aircraft is None:
         st.session_state.history.append(("User", aircraft))
         st.rerun()
 
-# Hỏi Item
 elif st.session_state.item is None:
     if not any("Item nào" in m for s, m in st.session_state.history if s == "Bot"):
         st.session_state.history.append(("Bot", "Bạn muốn tra cứu Item nào?"))
@@ -167,7 +162,6 @@ elif st.session_state.item is None:
         st.session_state.history.append(("User", item))
         st.rerun()
 
-# Hiển thị kết quả
 else:
     try:
         results = df[
@@ -185,7 +179,7 @@ else:
     except KeyError:
         st.session_state.history.append(("Bot", "⚠️ Lỗi: File Excel không có cột PN hoặc NOTE."))
 
-# ========== HIỂN THỊ HỘI THOẠI ==========
+# ========== HIỂN THỊ ==========
 st.markdown("---")
 st.subheader("📜 Lịch sử hội thoại")
 for sender, msg in st.session_state.history:
