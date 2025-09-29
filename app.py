@@ -182,6 +182,12 @@ for sender, msg in st.session_state.history:
 
 # ====== NÚT RESET ======
 if st.button("🔄 Tra cứu lại từ đầu"):
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
+    # Xoá toàn bộ session_state
+    st.session_state.clear()
+    # Xoá cache nếu có
+    st.cache_data.clear()
+    st.cache_resource.clear()
+    # Tạo session_id mới để Streamlit reset session
+    st.session_state["reset_id"] = pd.Timestamp.now().isoformat()
     st.rerun()
+
