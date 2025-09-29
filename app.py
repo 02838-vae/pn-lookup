@@ -5,14 +5,26 @@ import streamlit as st
 df = pd.read_excel("A787.xlsx")
 df = df.dropna(subset=["DESCRIPTION", "PART NUMBER (PN)", "CATEGORY"])
 
-# Chuẩn hóa dữ liệu (loại khoảng trắng + viết hoa)
-df["DESCRIPTION"] = df["DESCRIPTION"].str.strip().str.upper()
-df["CATEGORY"]   = df["CATEGORY"].str.strip().str.upper()
+# Chuẩn hóa dữ liệu (xóa khoảng trắng thừa, xuống dòng ẩn, đồng bộ chữ hoa)
+df["DESCRIPTION"] = (
+    df["DESCRIPTION"]
+    .astype(str)
+    .str.strip()
+    .str.replace(r"\s+", " ", regex=True)
+    .str.upper()
+)
+df["CATEGORY"] = (
+    df["CATEGORY"]
+    .astype(str)
+    .str.strip()
+    .str.replace(r"\s+", " ", regex=True)
+    .str.upper()
+)
 
 # Tiêu đề app
 st.title("🔎 Tra cứu Part Number (PN)")
 
-# Bước 1: chọn Category (không còn NaN)
+# Bước 1: chọn Category
 categories = sorted(df["CATEGORY"].dropna().unique())
 category = st.selectbox("Bạn muốn tra cứu gì?", categories)
 
@@ -22,7 +34,7 @@ if category:
     description = st.selectbox("Bạn muốn tra cứu Description nào?", descriptions)
 
     if description:
-        # Lọc chính xác theo CATEGORY & DESCRIPTION (đã chuẩn hóa)
+        # Lọc chính xác (exact match) theo CATEGORY & DESCRIPTION
         result = df[(df["CATEGORY"] == category) & (df["DESCRIPTION"] == description)]
 
         if not result.empty:
