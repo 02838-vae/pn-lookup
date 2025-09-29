@@ -50,7 +50,7 @@ def add_bg_from_local(image_file):
 add_bg_from_local("airplane.jpg")
 
 # ========== CSS DECORATION ==========
-st.markdown("""
+st.markdown(r"""
 <style>
 @keyframes colorchange {
   0% {color: red;}
@@ -194,4 +194,5 @@ if st.button("🔄 Tra cứu lại từ đầu"):
         """,
         unsafe_allow_html=True
     )
+
 
