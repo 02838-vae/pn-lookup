@@ -1,14 +1,22 @@
 import pandas as pd
 import streamlit as st
 
+
 # ================== ĐỌC FILE EXCEL ==================
 def load_data(file_path: str) -> pd.DataFrame:
+    # Đọc tất cả sheet
     all_sheets = pd.read_excel(file_path, sheet_name=None)
+
     df_list = []
     for sheet_name, sheet_df in all_sheets.items():
-        sheet_df["CATEGORY"] = sheet_name.upper().strip()
-        df_list.append(sheet_df)
+        if not sheet_df.empty:
+            # Thêm cột CATEGORY = tên sheet
+            sheet_df["CATEGORY"] = sheet_name.upper().strip()
+            df_list.append(sheet_df)
+        else:
+            print(f"⚠️ Sheet {sheet_name} trống!")
 
+    # Ghép tất cả sheet lại
     df = pd.concat(df_list, ignore_index=True)
 
     # Chuẩn hóa text
@@ -22,6 +30,9 @@ def load_data(file_path: str) -> pd.DataFrame:
                 .str.upper()
             )
             df[col] = df[col].replace("NAN", None)
+
+    # Debug: hiển thị danh sách CATEGORY
+    st.sidebar.write("📑 Categories hiện có:", df["CATEGORY"].unique())
     return df
 
 
