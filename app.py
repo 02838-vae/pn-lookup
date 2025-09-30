@@ -1,44 +1,41 @@
 import pandas as pd
 import streamlit as st
 
-# Đọc dữ liệu
-df = pd.read_excel("A787.xlsx")
+# ================== ĐỌC FILE EXCEL ==================
+def load_data(file_path: str) -> pd.DataFrame:
+    all_sheets = pd.read_excel(file_path, sheet_name=None)
+    df_list = []
+    for sheet_name, sheet_df in all_sheets.items():
+        sheet_df["CATEGORY"] = sheet_name.upper().strip()
+        df_list.append(sheet_df)
 
-# Chuẩn hóa text
-for col in ["CATEGORY", "A/C", "DESCRIPTION"]:
-    df[col] = (
-        df[col]
-        .astype(str)
-        .str.strip()
-        .str.replace(r"\s+", " ", regex=True)
-        .str.upper()
-    )
-    df[col] = df[col].replace("NAN", None)  # bỏ chữ NAN giả
+    df = pd.concat(df_list, ignore_index=True)
 
-st.title("🔎 Tra cứu Part Number (PN)")
+    # Chuẩn hóa text
+    for col in ["CATEGORY", "A/C", "DESCRIPTION"]:
+        if col in df.columns:
+            df[col] = (
+                df[col]
+                .astype(str)
+                .str.strip()
+                .str.replace(r"\s+", " ", regex=True)
+                .str.upper()
+            )
+            df[col] = df[col].replace("NAN", None)
+    return df
 
-# Khởi tạo state
-if "step" not in st.session_state:
-    st.session_state.step = 1
-if "category" not in st.session_state:
-    st.session_state.category = None
-if "aircraft" not in st.session_state:
-    st.session_state.aircraft = None
-if "description" not in st.session_state:
-    st.session_state.description = None
 
-# Step 1: chọn Category
-if st.session_state.step == 1:
+# ================== HÀM HIỂN THỊ THEO BƯỚC ==================
+def step_category(df):
     categories = sorted(df["CATEGORY"].dropna().unique())
     category = st.selectbox("📂 Bạn muốn tra cứu gì?", categories)
-
     if st.button("Tiếp tục ➡️"):
         st.session_state.category = category
         st.session_state.step = 2
         st.rerun()
 
-# Step 2: chọn A/C
-elif st.session_state.step == 2:
+
+def step_aircraft(df):
     st.write(f"✅ Category: **{st.session_state.category}**")
     aircrafts = sorted(
         df[df["CATEGORY"] == st.session_state.category]["A/C"].dropna().unique()
@@ -54,8 +51,8 @@ elif st.session_state.step == 2:
         st.session_state.step = 3
         st.rerun()
 
-# Step 3: chọn Description (hiện nguyên văn)
-elif st.session_state.step == 3:
+
+def step_description(df):
     st.write(f"✅ Category: **{st.session_state.category}**")
     st.write(f"✅ A/C: **{st.session_state.aircraft}**")
 
@@ -65,7 +62,6 @@ elif st.session_state.step == 3:
             & (df["A/C"] == st.session_state.aircraft)
         ]["DESCRIPTION"].dropna().unique()
     )
-
     description = st.selectbox("📑 Bạn muốn tra cứu Item nào?", descriptions)
 
     col1, col2 = st.columns(2)
@@ -77,13 +73,12 @@ elif st.session_state.step == 3:
         st.session_state.step = 4
         st.rerun()
 
-# Step 4: Hiện kết quả đầy đủ
-elif st.session_state.step == 4:
+
+def step_result(df):
     st.write(f"✅ Category: **{st.session_state.category}**")
     st.write(f"✅ A/C: **{st.session_state.aircraft}**")
     st.write(f"✅ Description: **{st.session_state.description}**")
 
-    # Lọc tất cả dòng có cùng Category + A/C + Description
     result = df[
         (df["CATEGORY"] == st.session_state.category)
         & (df["A/C"] == st.session_state.aircraft)
@@ -102,3 +97,31 @@ elif st.session_state.step == 4:
     if st.button("🔄 Tra cứu lại"):
         st.session_state.step = 1
         st.rerun()
+
+
+# ================== MAIN APP ==================
+def main():
+    st.title("🔎 Tra cứu Part Number (PN)")
+
+    df = load_data("A787.xlsx")
+
+    # Khởi tạo session state
+    if "step" not in st.session_state:
+        st.session_state.step = 1
+        st.session_state.category = None
+        st.session_state.aircraft = None
+        st.session_state.description = None
+
+    # Điều hướng theo step
+    if st.session_state.step == 1:
+        step_category(df)
+    elif st.session_state.step == 2:
+        step_aircraft(df)
+    elif st.session_state.step == 3:
+        step_description(df)
+    elif st.session_state.step == 4:
+        step_result(df)
+
+
+if __name__ == "__main__":
+    main()
