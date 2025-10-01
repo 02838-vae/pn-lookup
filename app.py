@@ -2,10 +2,6 @@ import pandas as pd
 import streamlit as st
 import base64
 
-# ===== ĐỌC FILE & DANH SÁCH SHEET =====
-excel_file = "A787.xlsx"
-xls = pd.ExcelFile(excel_file)
-
 # ===== CSS: Background với hình airplane.jpg =====
 def set_background(image_file):
     with open(image_file, "rb") as f:
@@ -17,15 +13,24 @@ def set_background(image_file):
         .stApp {{
             background: url("data:image/jpg;base64,{b64}") no-repeat center center fixed;
             background-size: cover;
+            position: relative;
         }}
-        /* làm mờ background */
         .stApp::before {{
             content: "";
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: inherit;
-            filter: blur(8px) brightness(0.6);
+            background: url("data:image/jpg;base64,{b64}") no-repeat center center fixed;
+            background-size: cover;
+            filter: blur(8px) brightness(0.4);   /* mờ + tối nhẹ */
+            z-index: -2;
+        }}
+        .stApp::after {{
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255,255,255,0.6);   /* overlay trắng mờ */
             z-index: -1;
         }}
         </style>
@@ -34,6 +39,10 @@ def set_background(image_file):
     )
 
 set_background("airplane.jpg")
+
+# ===== ĐỌC FILE & DANH SÁCH SHEET =====
+excel_file = "A787.xlsx"
+xls = pd.ExcelFile(excel_file)
 
 # ===== APP =====
 st.title("🔎 Tra cứu Part Number (PN)")
@@ -126,7 +135,7 @@ if sheet_name:
                         if "NOTE" in df.columns:
                             cols.append("NOTE")
 
-                        # ✅ Style bảng: căn giữa, font đẹp, xen kẽ màu nền
+                        # ✅ Style bảng: căn giữa, font đẹp, màu nền xen kẽ, bo góc + đổ bóng
                         styled = (
                             result[cols].reset_index(drop=True)
                             .style.set_properties(
@@ -146,7 +155,12 @@ if sheet_name:
                                     {"selector": "thead th",
                                      "props": [("background-color", "#e6f2ff"),
                                                ("font-weight", "bold"),
-                                               ("text-align", "center")]}
+                                               ("text-align", "center")]},
+                                    {"selector": "table",
+                                     "props": [("border-collapse", "collapse"),
+                                               ("border-radius", "12px"),
+                                               ("box-shadow", "0 4px 12px rgba(0,0,0,0.15)"),
+                                               ("overflow", "hidden")]}
                                 ]
                             )
                         )
