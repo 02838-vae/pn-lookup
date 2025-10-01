@@ -1,19 +1,25 @@
-import pandas as pd
+iimport pandas as pd
 import streamlit as st
 
 # Đọc dữ liệu
 df = pd.read_excel("A787.xlsx")
 
-# Chuẩn hóa text
+# Chuẩn hóa tên cột
+df.columns = df.columns.str.strip().str.upper()
+
+st.write("📑 Các cột trong file:", df.columns.tolist())  # Debug: xem cột thực tế
+
+# Chuẩn hóa text ở các cột cần thiết (chỉ nếu cột có tồn tại)
 for col in ["CATEGORY", "A/C", "DESCRIPTION"]:
-    df[col] = (
-        df[col]
-        .astype(str)
-        .str.strip()
-        .str.replace(r"\s+", " ", regex=True)
-        .str.upper()
-    )
-    df[col] = df[col].replace("NAN", None)  # bỏ chữ NAN giả
+    if col in df.columns:
+        df[col] = (
+            df[col]
+            .astype(str)
+            .str.strip()
+            .str.replace(r"\s+", " ", regex=True)
+            .str.upper()
+        )
+        df[col] = df[col].replace("NAN", None)  # bỏ chữ NAN giả
 
 st.title("🔎 Tra cứu Part Number (PN)")
 
@@ -79,3 +85,4 @@ if category:
                 st.dataframe(result[cols].reset_index(drop=True))
             else:
                 st.error("Không tìm thấy dữ liệu!")
+
