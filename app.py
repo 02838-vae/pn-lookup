@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 import base64
 
-# ===== CSS: Background airplane.jpg =====
+# ===== CSS: Background airplane.jpg + Hiệu ứng =====
 def set_background(image_file):
     with open(image_file, "rb") as f:
         data = f.read()
@@ -11,32 +11,24 @@ def set_background(image_file):
         f"""
         <style>
         .stApp {{
-            background: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)),
+            background: linear-gradient(rgba(240,248,255,0.8), rgba(255,255,255,0.8)),
                         url("data:image/jpg;base64,{b64}") no-repeat center center fixed;
             background-size: cover;
+            font-family: "Segoe UI", Helvetica, Arial, sans-serif;
         }}
 
-        /* Tiêu đề phụ chạy màu */
+        /* Header glow + gradient */
         .animated-title {{
-            font-size: 32px;
+            font-size: 36px;
             font-weight: bold;
             text-align: center;
             margin-bottom: 10px;
-            background: linear-gradient(
-                -45deg,
-                #ff0000,
-                #ff7300,
-                #ffeb00,
-                #47ff00,
-                #00ffee,
-                #2b65ff,
-                #8000ff,
-                #ff0080
-            );
+            background: linear-gradient(-45deg,#ff0000,#ff7300,#ffeb00,#47ff00,#00ffee,#2b65ff,#8000ff,#ff0080);
             background-size: 600% 600%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientShift 10s ease infinite;
+            animation: gradientShift 10s ease infinite, neonPulse 2s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(255,255,255,0.6);
         }}
 
         @keyframes gradientShift {{
@@ -44,14 +36,49 @@ def set_background(image_file):
             50% {{ background-position: 100% 50%; }}
             100% {{ background-position: 0% 50%; }}
         }}
+        @keyframes neonPulse {{
+            0%, 100% {{ text-shadow: 0 0 5px #fff, 0 0 10px #0ff; }}
+            50% {{ text-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }}
+        }}
 
-        /* Tiêu đề chính hạ xuống */
+        /* Tiêu đề chính */
         .main-title {{
             margin-top: 40px;
             font-size: 28px;
             text-align: center;
             font-weight: bold;
             color: #003366;
+        }}
+
+        /* Card cho selectbox */
+        .stSelectbox {{
+            background: rgba(255,255,255,0.8);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }}
+        .stSelectbox:hover {{
+            transform: scale(1.01);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }}
+
+        /* Bảng kết quả */
+        table.dataframe {{
+            border-collapse: collapse;
+            margin: 15px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+        }}
+        table.dataframe th, table.dataframe td {{
+            text-align: center !important;
+            padding: 8px 12px;
+            vertical-align: middle;
+        }}
+        table.dataframe tbody tr:hover {{
+            background-color: #f0f8ff !important;
         }}
         </style>
         """,
@@ -65,9 +92,7 @@ excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
 # ===== APP =====
-# Tiêu đề phụ
 st.markdown('<div class="animated-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
-# Tiêu đề chính
 st.markdown('<div class="main-title">🔎 Tra cứu Part Number (PN)</div>', unsafe_allow_html=True)
 
 # --- Bước 1: chọn sheet (zone) ---
@@ -111,11 +136,7 @@ if sheet_name:
                 descriptions = sorted(
                     df[df["A/C"] == aircraft]["DESCRIPTION"].dropna().unique()
                 )
-                description = st.selectbox(
-                    "📑 Bạn muốn tra cứu phần nào?",
-                    descriptions,
-                    key="description"
-                )
+                description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", descriptions, key="description")
 
                 if description:
                     # --- Nếu có cột ITEM thì hỏi thêm ---
@@ -164,7 +185,7 @@ if sheet_name:
                         result_display.index = result_display.index + 1
                         result_display.index.name = "STT"
 
-                        # Ngắt dòng PN Interchange (nếu có nhiều giá trị)
+                        # Ngắt dòng PN Interchange
                         if "PART INTERCHANGE" in result_display.columns:
                             result_display["PART INTERCHANGE"] = (
                                 result_display["PART INTERCHANGE"]
@@ -172,14 +193,13 @@ if sheet_name:
                                 .str.replace(" ", "\n")
                             )
 
-                        # Styling: căn giữa toàn bộ
+                        # Styling cho DataFrame
                         styled = (
                             result_display.style
                             .set_properties(**{
                                 "text-align": "center",
                                 "vertical-align": "middle",
                                 "white-space": "pre-line",
-                                "font-family": "Segoe UI, Helvetica, Arial, sans-serif",
                             })
                             .set_table_styles(
                                 [{
@@ -191,7 +211,6 @@ if sheet_name:
                             )
                         )
 
-                        # Hiển thị bảng đẹp
                         st.table(styled)
 
                     else:
