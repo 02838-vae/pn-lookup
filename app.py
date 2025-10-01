@@ -111,27 +111,31 @@ if sheet_name:
                             escape=False,  # giữ nguyên <br>
                             index=False
                         )
-                        html_table = f"""
-                        <style>
-                        table {{
-                          width: 100%;
-                          border-collapse: collapse;
-                        }}
-                        th, td {{
-                          border: 1px solid #ddd;
-                          padding: 8px;
-                          text-align: center;       /* căn giữa ngang */
-                          vertical-align: middle;   /* căn giữa dọc */
-                          white-space: normal;      /* cho phép <br> xuống dòng */
-                          word-break: break-word;
-                        }}
-                        th {{
-                          background-color: #f2f2f2;
-                        }}
-                        </style>
-                        {html_table}
-                        """
-                        st.markdown(html_table, unsafe_allow_html=True)
+
+                        # ✅ DÙNG MARKDOWN để render HTML thật, KHÔNG phải st.write
+                        st.markdown(
+                            f"""
+                            <style>
+                            table {{
+                              width: 100%;
+                              border-collapse: collapse;
+                            }}
+                            th, td {{
+                              border: 1px solid #ddd;
+                              padding: 8px;
+                              text-align: center;       /* căn giữa ngang */
+                              vertical-align: middle;   /* căn giữa dọc */
+                              white-space: normal;      /* cho phép <br> xuống dòng */
+                              word-break: break-word;
+                            }}
+                            th {{
+                              background-color: #f2f2f2;
+                            }}
+                            </style>
+                            {html_table}
+                            """,
+                            unsafe_allow_html=True
+                        )
                     else:
                         st.error("Không tìm thấy dữ liệu!")
             else:
