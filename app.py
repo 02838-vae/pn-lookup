@@ -1,9 +1,39 @@
 import pandas as pd
 import streamlit as st
+import base64
 
 # ===== ĐỌC FILE & DANH SÁCH SHEET =====
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
+
+# ===== CSS: Background với hình airplane.jpg =====
+def set_background(image_file):
+    with open(image_file, "rb") as f:
+        data = f.read()
+    b64 = base64.b64encode(data).decode()
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background: url("data:image/jpg;base64,{b64}") no-repeat center center fixed;
+            background-size: cover;
+        }}
+        /* làm mờ background */
+        .stApp::before {{
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: inherit;
+            filter: blur(8px) brightness(0.6);
+            z-index: -1;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+set_background("airplane.jpg")
 
 # ===== APP =====
 st.title("🔎 Tra cứu Part Number (PN)")
@@ -96,7 +126,7 @@ if sheet_name:
                         if "NOTE" in df.columns:
                             cols.append("NOTE")
 
-                        # ✅ Style: căn giữa + font đẹp
+                        # ✅ Style bảng: căn giữa, font đẹp, xen kẽ màu nền
                         styled = (
                             result[cols].reset_index(drop=True)
                             .style.set_properties(
@@ -106,6 +136,18 @@ if sheet_name:
                                     "font-family": "'Segoe UI','Helvetica Neue',Arial,sans-serif",
                                     "font-size": "14px",
                                 }
+                            )
+                            .set_table_styles(
+                                [
+                                    {"selector": "tbody tr:nth-child(even)",
+                                     "props": [("background-color", "#f9f9f9")]},
+                                    {"selector": "tbody tr:nth-child(odd)",
+                                     "props": [("background-color", "#ffffff")]},
+                                    {"selector": "thead th",
+                                     "props": [("background-color", "#e6f2ff"),
+                                               ("font-weight", "bold"),
+                                               ("text-align", "center")]}
+                                ]
                             )
                         )
 
