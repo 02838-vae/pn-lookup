@@ -11,13 +11,12 @@ def set_background(image_file):
         f"""
         <style>
         .stApp {{
-            background: linear-gradient(rgba(240,248,255,0.8), rgba(255,255,255,0.8)),
+            background: linear-gradient(rgba(240,248,255,0.85), rgba(255,255,255,0.9)),
                         url("data:image/jpg;base64,{b64}") no-repeat center center fixed;
             background-size: cover;
             font-family: "Segoe UI", Helvetica, Arial, sans-serif;
         }}
 
-        /* Animation fade-in */
         @keyframes fadeIn {{
             from {{ opacity: 0; transform: translateY(-20px); }}
             to   {{ opacity: 1; transform: translateY(0); }}
@@ -26,8 +25,17 @@ def set_background(image_file):
             from {{ opacity: 0; }}
             to   {{ opacity: 1; }}
         }}
+        @keyframes gradientShift {{
+            0% {{ background-position: 0% 50%; }}
+            50% {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
+        }}
+        @keyframes neonPulse {{
+            0%, 100% {{ text-shadow: 0 0 5px #fff, 0 0 10px #0ff; }}
+            50% {{ text-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }}
+        }}
 
-        /* Header glow + gradient */
+        /* Tiêu đề trên cùng */
         .animated-title {{
             font-size: 36px;
             font-weight: bold;
@@ -41,16 +49,6 @@ def set_background(image_file):
             text-shadow: 0 0 10px rgba(255,255,255,0.6);
         }}
 
-        @keyframes gradientShift {{
-            0% {{ background-position: 0% 50%; }}
-            50% {{ background-position: 100% 50%; }}
-            100% {{ background-position: 0% 50%; }}
-        }}
-        @keyframes neonPulse {{
-            0%, 100% {{ text-shadow: 0 0 5px #fff, 0 0 10px #0ff; }}
-            50% {{ text-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }}
-        }}
-
         /* Tiêu đề chính */
         .main-title {{
             margin-top: 40px;
@@ -61,18 +59,13 @@ def set_background(image_file):
             animation: fadeIn 1.5s ease-out;
         }}
 
-        /* Card cho selectbox */
+        /* Card selectbox */
         .stSelectbox {{
             background: rgba(255,255,255,0.8);
             border-radius: 12px;
             padding: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
             animation: fadeIn 2s ease-out;
-        }}
-        .stSelectbox:hover {{
-            transform: scale(1.01);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
         }}
 
         /* Bảng kết quả */
@@ -82,13 +75,16 @@ def set_background(image_file):
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            width: 100%;
+            width: 100% !important;
+            font-size: 13px !important;
             animation: fadeInTable 1.2s ease-out;
+            table-layout: auto;
         }}
         table.dataframe th, table.dataframe td {{
             text-align: center !important;
-            padding: 8px 12px;
-            vertical-align: middle;
+            vertical-align: middle !important;
+            padding: 6px 10px;
+            white-space: nowrap !important;   /* không xuống dòng */
         }}
         table.dataframe tbody tr:hover {{
             background-color: #f0f8ff !important;
@@ -100,7 +96,7 @@ def set_background(image_file):
 
 set_background("airplane.jpg")
 
-# ===== ĐỌC FILE & DANH SÁCH SHEET =====
+# ===== ĐỌC FILE EXCEL =====
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
@@ -112,13 +108,13 @@ st.markdown('<div class="main-title">🔎 Tra cứu Part Number (PN)</div>', uns
 sheet_name = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="sheet")
 
 if sheet_name:
-    # Đọc dữ liệu từ sheet đã chọn
+    # Đọc dữ liệu từ sheet
     df = pd.read_excel(excel_file, sheet_name=sheet_name)
 
     # Chuẩn hóa tên cột
     df.columns = df.columns.str.strip().str.upper()
 
-    # Map tên cột không đồng nhất
+    # Map cột không đồng nhất
     rename_map = {
         "PN INTERCHANGE": "PART INTERCHANGE",
         "P/N INTERCHANGE": "PART INTERCHANGE",
@@ -179,7 +175,7 @@ if sheet_name:
                     if not result.empty:
                         st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
 
-                        # Chọn cột hiển thị
+                        # Cột hiển thị
                         cols = []
                         if "PART NUMBER (PN)" in df.columns:
                             cols.append("PART NUMBER (PN)")
@@ -198,21 +194,13 @@ if sheet_name:
                         result_display.index = result_display.index + 1
                         result_display.index.name = "STT"
 
-                        # Ngắt dòng PN Interchange
-                        if "PART INTERCHANGE" in result_display.columns:
-                            result_display["PART INTERCHANGE"] = (
-                                result_display["PART INTERCHANGE"]
-                                .astype(str)
-                                .str.replace(" ", "\n")
-                            )
-
-                        # Styling cho DataFrame
+                        # Giữ nguyên PN Interchange (không xuống dòng nữa)
+                        # Styling
                         styled = (
                             result_display.style
                             .set_properties(**{
                                 "text-align": "center",
                                 "vertical-align": "middle",
-                                "white-space": "pre-line",
                             })
                             .set_table_styles(
                                 [{
