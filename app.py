@@ -1,14 +1,14 @@
 import pandas as pd
 import streamlit as st
 
-# ============ ĐỌC FILE & LẤY DANH SÁCH SHEET ============
+# ===== ĐỌC FILE & DANH SÁCH SHEET =====
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
-# ============ APP ============
+# ===== APP =====
 st.title("🔎 Tra cứu Part Number (PN)")
 
-# --- Bước 1: chọn sheet ---
+# --- Bước 1: chọn sheet (zone) ---
 sheet_name = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="sheet")
 
 if sheet_name:
@@ -18,7 +18,7 @@ if sheet_name:
     # Chuẩn hóa tên cột
     df.columns = df.columns.str.strip().str.upper()
 
-    # Map tên cột không đồng nhất về chuẩn
+    # Map tên cột không đồng nhất
     rename_map = {
         "PN INTERCHANGE": "PART INTERCHANGE",
         "P/N INTERCHANGE": "PART INTERCHANGE",
@@ -26,7 +26,7 @@ if sheet_name:
     }
     df = df.rename(columns=lambda x: rename_map.get(x, x))
 
-    # Chuẩn hóa text các cột dạng chuỗi
+    # Chuẩn hóa dữ liệu text
     for col in df.columns:
         if df[col].dtype == "object":
             df[col] = (
@@ -83,7 +83,7 @@ if sheet_name:
                     if not result.empty:
                         st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
 
-                        # Chọn các cột cần hiển thị
+                        # Chọn cột hiển thị
                         cols = []
                         if "PART NUMBER (PN)" in df.columns:
                             cols.append("PART NUMBER (PN)")
@@ -101,10 +101,10 @@ if sheet_name:
                             result["PART INTERCHANGE"] = (
                                 result["PART INTERCHANGE"]
                                 .astype(str)
-                                .apply(lambda x: x.replace(";", "\n").replace(",", "\n").replace("/", "\n"))
+                                .apply(lambda x: "<br>".join(x.replace(";", ",").replace("/", ",").split(",")))
                             )
 
-                        # Xuất bảng HTML có CSS căn giữa & hỗ trợ xuống dòng
+                        # Xuất HTML có CSS căn giữa + xuống dòng
                         html_table = result[cols].reset_index(drop=True).to_html(
                             escape=False,
                             index=False
@@ -118,9 +118,9 @@ if sheet_name:
                         th, td {{
                           border: 1px solid #ddd;
                           padding: 8px;
-                          text-align: center;
-                          vertical-align: middle;
-                          white-space: pre-line;
+                          text-align: center;       /* căn giữa ngang */
+                          vertical-align: middle;   /* căn giữa dọc */
+                          white-space: pre-line;    /* giữ xuống dòng */
                         }}
                         th {{
                           background-color: #f2f2f2;
