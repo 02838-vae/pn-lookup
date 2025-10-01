@@ -93,13 +93,19 @@ if sheet_name:
 
     # Xử lý hiển thị xuống dòng cho PART INTERCHANGE
     if "PART INTERCHANGE" in result.columns:
-        result["PART INTERCHANGE"] = result["PART INTERCHANGE"].astype(str).str.replace(r"[;,/]", "\n", regex=True)
+        result["PART INTERCHANGE"] = (
+            result["PART INTERCHANGE"]
+            .astype(str)
+            .str.replace(r"[;,/]", "\n", regex=True)
+        )
 
-    st.dataframe(result[cols].reset_index(drop=True), use_container_width=True, hide_index=True)
-                    else:
-                        st.error("Không tìm thấy dữ liệu!")
-            else:
-                st.warning("Sheet này không có cột DESCRIPTION!")
-    else:
-        st.warning("Sheet này không có cột A/C!")
+    # Hiển thị kết quả
+    st.dataframe(
+        result[cols].reset_index(drop=True),
+        use_container_width=True,
+        hide_index=True
+    )
+else:
+    st.error("Không tìm thấy dữ liệu!")
+
 
