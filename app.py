@@ -131,12 +131,13 @@ if sheet_name:
                                 .str.replace(" ", "\n")
                             )
 
-                        # Styling: căn giữa, font, header màu nhạt
+                        # Styling: căn giữa toàn bộ
                         styled = (
                             result_display.style
                             .set_properties(**{
                                 "text-align": "center",
                                 "vertical-align": "middle",
+                                "white-space": "pre-line",  # đảm bảo xuống dòng
                                 "font-family": "Segoe UI, Helvetica, Arial, sans-serif",
                             })
                             .set_table_styles(
@@ -149,7 +150,8 @@ if sheet_name:
                             )
                         )
 
-                        st.dataframe(styled, use_container_width=True)
+                        # Dùng st.table để hiển thị full bảng (không scroll)
+                        st.table(styled)
 
                     else:
                         st.error("Không tìm thấy dữ liệu!")
