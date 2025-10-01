@@ -135,37 +135,46 @@ if sheet_name:
                         if "NOTE" in df.columns:
                             cols.append("NOTE")
 
-                        # ✅ Style bảng: căn giữa, font đẹp, màu nền xen kẽ, bo góc + đổ bóng
-                        styled = (
-                            result[cols].reset_index(drop=True)
-                            .style.set_properties(
-                                **{
-                                    "text-align": "center",
-                                    "vertical-align": "middle",
-                                    "font-family": "'Segoe UI','Helvetica Neue',Arial,sans-serif",
-                                    "font-size": "14px",
-                                }
-                            )
-                            .set_table_styles(
-                                [
-                                    {"selector": "tbody tr:nth-child(even)",
-                                     "props": [("background-color", "#f9f9f9")]},
-                                    {"selector": "tbody tr:nth-child(odd)",
-                                     "props": [("background-color", "#ffffff")]},
-                                    {"selector": "thead th",
-                                     "props": [("background-color", "#e6f2ff"),
-                                               ("font-weight", "bold"),
-                                               ("text-align", "center")]},
-                                    {"selector": "table",
-                                     "props": [("border-collapse", "collapse"),
-                                               ("border-radius", "12px"),
-                                               ("box-shadow", "0 4px 12px rgba(0,0,0,0.15)"),
-                                               ("overflow", "hidden")]}
-                                ]
-                            )
-                        )
+                        result_display = result[cols].reset_index(drop=True)
 
-                        st.dataframe(styled, use_container_width=True)
+                        # HTML + CSS đẹp
+                        html_table = result_display.to_html(index=False, escape=False)
+
+                        styled_html = f"""
+                        <style>
+                        table {{
+                            width: 100%;
+                            border-collapse: collapse;
+                            border-radius: 12px;
+                            overflow: hidden;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                            font-family: 'Segoe UI','Helvetica Neue',Arial,sans-serif;
+                            font-size: 14px;
+                        }}
+                        th, td {{
+                            border: 1px solid #ddd;
+                            padding: 8px;
+                            text-align: center;
+                            vertical-align: middle;
+                        }}
+                        th {{
+                            background-color: #e6f2ff;
+                            font-weight: bold;
+                        }}
+                        tr:nth-child(even) {{
+                            background-color: #f9f9f9;
+                        }}
+                        tr:nth-child(odd) {{
+                            background-color: #ffffff;
+                        }}
+                        tr:hover {{
+                            background-color: #d9ebff;
+                        }}
+                        </style>
+                        {html_table}
+                        """
+
+                        st.markdown(styled_html, unsafe_allow_html=True)
 
                     else:
                         st.error("Không tìm thấy dữ liệu!")
