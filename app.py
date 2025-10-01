@@ -96,39 +96,20 @@ if sheet_name:
                         if "NOTE" in df.columns:
                             cols.append("NOTE")
 
-                        # Xuất HTML bảng
-                        html_table = result[cols].reset_index(drop=True).to_html(
-                            escape=False,
-                            index=False
+                        # ✅ Style: căn giữa + font đẹp
+                        styled = (
+                            result[cols].reset_index(drop=True)
+                            .style.set_properties(
+                                **{
+                                    "text-align": "center",
+                                    "vertical-align": "middle",
+                                    "font-family": "'Segoe UI','Helvetica Neue',Arial,sans-serif",
+                                    "font-size": "14px",
+                                }
+                            )
                         )
 
-                        # CSS căn giữa + đổi font
-                        styled_table = f"""
-                        <style>
-                        table {{
-                          width: 100%;
-                          border-collapse: collapse;
-                          font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-                          font-size: 14px;
-                        }}
-                        th, td {{
-                          border: 1px solid #ddd;
-                          padding: 8px;
-                          text-align: center;       /* căn giữa ngang */
-                          vertical-align: middle;   /* căn giữa dọc */
-                        }}
-                        th {{
-                          background-color: #f8f8f8;
-                          font-weight: 600;
-                        }}
-                        tr:nth-child(even) {{
-                          background-color: #fafafa;
-                        }}
-                        </style>
-                        {html_table}
-                        """
-
-                        st.markdown(styled_table, unsafe_allow_html=True)
+                        st.dataframe(styled, use_container_width=True)
 
                     else:
                         st.error("Không tìm thấy dữ liệu!")
