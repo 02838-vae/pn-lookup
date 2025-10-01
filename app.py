@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-# ===== ĐỌC FILE & DANH SÁCH SHEET =====
+# ===== ĐỌC FILE EXCEL =====
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
@@ -96,7 +96,7 @@ if sheet_name:
                         if "NOTE" in df.columns:
                             cols.append("NOTE")
 
-                        # FIX: thay , ; / thành <br> để HTML xuống dòng
+                        # ✅ Sửa PART INTERCHANGE: xuống dòng HTML thật
                         if "PART INTERCHANGE" in result.columns:
                             result["PART INTERCHANGE"] = (
                                 result["PART INTERCHANGE"]
@@ -106,7 +106,7 @@ if sheet_name:
                                 ))
                             )
 
-                        # Xuất HTML có CSS căn giữa + hỗ trợ xuống dòng bằng <br>
+                        # Xuất HTML có CSS căn giữa + hiển thị <br> thành xuống dòng
                         html_table = result[cols].reset_index(drop=True).to_html(
                             escape=False,  # giữ nguyên <br>
                             index=False
@@ -122,6 +122,8 @@ if sheet_name:
                           padding: 8px;
                           text-align: center;       /* căn giữa ngang */
                           vertical-align: middle;   /* căn giữa dọc */
+                          white-space: normal;      /* cho phép <br> xuống dòng */
+                          word-break: break-word;
                         }}
                         th {{
                           background-color: #f2f2f2;
