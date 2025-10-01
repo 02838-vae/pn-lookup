@@ -17,6 +17,16 @@ def set_background(image_file):
             font-family: "Segoe UI", Helvetica, Arial, sans-serif;
         }}
 
+        /* Animation fade-in */
+        @keyframes fadeIn {{
+            from {{ opacity: 0; transform: translateY(-20px); }}
+            to   {{ opacity: 1; transform: translateY(0); }}
+        }}
+        @keyframes fadeInTable {{
+            from {{ opacity: 0; }}
+            to   {{ opacity: 1; }}
+        }}
+
         /* Header glow + gradient */
         .animated-title {{
             font-size: 36px;
@@ -27,7 +37,7 @@ def set_background(image_file):
             background-size: 600% 600%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientShift 10s ease infinite, neonPulse 2s ease-in-out infinite;
+            animation: gradientShift 10s ease infinite, neonPulse 2s ease-in-out infinite, fadeIn 1.2s ease-out;
             text-shadow: 0 0 10px rgba(255,255,255,0.6);
         }}
 
@@ -48,6 +58,7 @@ def set_background(image_file):
             text-align: center;
             font-weight: bold;
             color: #003366;
+            animation: fadeIn 1.5s ease-out;
         }}
 
         /* Card cho selectbox */
@@ -57,6 +68,7 @@ def set_background(image_file):
             padding: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: fadeIn 2s ease-out;
         }}
         .stSelectbox:hover {{
             transform: scale(1.01);
@@ -71,6 +83,7 @@ def set_background(image_file):
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             width: 100%;
+            animation: fadeInTable 1.2s ease-out;
         }}
         table.dataframe th, table.dataframe td {{
             text-align: center !important;
