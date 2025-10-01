@@ -15,6 +15,44 @@ def set_background(image_file):
                         url("data:image/jpg;base64,{b64}") no-repeat center center fixed;
             background-size: cover;
         }}
+
+        /* Tiêu đề phụ chạy màu */
+        .animated-title {{
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(
+                -45deg,
+                #ff0000,
+                #ff7300,
+                #ffeb00,
+                #47ff00,
+                #00ffee,
+                #2b65ff,
+                #8000ff,
+                #ff0080
+            );
+            background-size: 600% 600%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 10s ease infinite;
+        }}
+
+        @keyframes gradientShift {{
+            0% {{ background-position: 0% 50%; }}
+            50% {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
+        }}
+
+        /* Tiêu đề chính hạ xuống */
+        .main-title {{
+            margin-top: 40px;
+            font-size: 28px;
+            text-align: center;
+            font-weight: bold;
+            color: #003366;
+        }}
         </style>
         """,
         unsafe_allow_html=True
@@ -27,7 +65,10 @@ excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
 # ===== APP =====
-st.title("🔎 Tra cứu Part Number (PN)")
+# Tiêu đề phụ
+st.markdown('<div class="animated-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+# Tiêu đề chính
+st.markdown('<div class="main-title">🔎 Tra cứu Part Number (PN)</div>', unsafe_allow_html=True)
 
 # --- Bước 1: chọn sheet (zone) ---
 sheet_name = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="sheet")
@@ -137,7 +178,7 @@ if sheet_name:
                             .set_properties(**{
                                 "text-align": "center",
                                 "vertical-align": "middle",
-                                "white-space": "pre-line",  # đảm bảo xuống dòng
+                                "white-space": "pre-line",
                                 "font-family": "Segoe UI, Helvetica, Arial, sans-serif",
                             })
                             .set_table_styles(
@@ -150,7 +191,7 @@ if sheet_name:
                             )
                         )
 
-                        # Dùng st.table để hiển thị full bảng (không scroll)
+                        # Hiển thị bảng đẹp
                         st.table(styled)
 
                     else:
