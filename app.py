@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-# ===== ĐỌC FILE EXCEL =====
+# ===== ĐỌC FILE & DANH SÁCH SHEET =====
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
@@ -96,46 +96,8 @@ if sheet_name:
                         if "NOTE" in df.columns:
                             cols.append("NOTE")
 
-                        # ✅ Sửa PART INTERCHANGE: xuống dòng HTML thật
-                        if "PART INTERCHANGE" in result.columns:
-                            result["PART INTERCHANGE"] = (
-                                result["PART INTERCHANGE"]
-                                .astype(str)
-                                .apply(lambda x: "<br>".join(
-                                    [val.strip() for val in x.replace(";", ",").replace("/", ",").split(",") if val.strip()]
-                                ))
-                            )
-
-                        # Xuất HTML có CSS căn giữa + hiển thị <br> thành xuống dòng
-                        html_table = result[cols].reset_index(drop=True).to_html(
-                            escape=False,  # giữ nguyên <br>
-                            index=False
-                        )
-
-                        # ✅ DÙNG MARKDOWN để render HTML thật, KHÔNG phải st.write
-                        st.markdown(
-                            f"""
-                            <style>
-                            table {{
-                              width: 100%;
-                              border-collapse: collapse;
-                            }}
-                            th, td {{
-                              border: 1px solid #ddd;
-                              padding: 8px;
-                              text-align: center;       /* căn giữa ngang */
-                              vertical-align: middle;   /* căn giữa dọc */
-                              white-space: normal;      /* cho phép <br> xuống dòng */
-                              word-break: break-word;
-                            }}
-                            th {{
-                              background-color: #f2f2f2;
-                            }}
-                            </style>
-                            {html_table}
-                            """,
-                            unsafe_allow_html=True
-                        )
+                        # Hiển thị bảng dữ liệu
+                        st.dataframe(result[cols].reset_index(drop=True))
                     else:
                         st.error("Không tìm thấy dữ liệu!")
             else:
