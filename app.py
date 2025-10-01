@@ -104,10 +104,16 @@ if sheet_name:
                                 .str.replace(r"[;,/]", "\n", regex=True)
                             )
 
-                        st.dataframe(
-                            result[cols].reset_index(drop=True),
-                            use_container_width=True,
-                            hide_index=True
+                        # Xuống dòng trong PART INTERCHANGE cho dễ đọc
+if "PART INTERCHANGE" in result.columns:
+    result["PART INTERCHANGE"] = (
+        result["PART INTERCHANGE"]
+        .astype(str)
+        .str.replace(r"[;,/]", "\n", regex=True)
+    )
+
+# Hiển thị dạng table, hỗ trợ xuống dòng
+st.table(result[cols].reset_index(drop=True))
                         )
                     else:
                         st.error("Không tìm thấy dữ liệu!")
@@ -115,3 +121,4 @@ if sheet_name:
                 st.warning("Sheet này không có cột DESCRIPTION!")
     else:
         st.warning("Sheet này không có cột A/C!")
+
