@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 import base64
 
-# ===== CSS: Background với hình airplane.jpg =====
+# ===== CSS: Background airplane.jpg =====
 def set_background(image_file):
     with open(image_file, "rb") as f:
         data = f.read()
@@ -11,27 +11,9 @@ def set_background(image_file):
         f"""
         <style>
         .stApp {{
-            background: url("data:image/jpg;base64,{b64}") no-repeat center center fixed;
+            background: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)),
+                        url("data:image/jpg;base64,{b64}") no-repeat center center fixed;
             background-size: cover;
-            position: relative;
-        }}
-        .stApp::before {{
-            content: "";
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: url("data:image/jpg;base64,{b64}") no-repeat center center fixed;
-            background-size: cover;
-            filter: blur(8px) brightness(0.4);   /* mờ + tối nhẹ */
-            z-index: -2;
-        }}
-        .stApp::after {{
-            content: "";
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(255,255,255,0.6);   /* overlay trắng mờ */
-            z-index: -1;
         }}
         </style>
         """,
@@ -136,6 +118,14 @@ if sheet_name:
                             cols.append("NOTE")
 
                         result_display = result[cols].reset_index(drop=True)
+
+                        # Ngắt dòng PN Interchange (nếu có nhiều giá trị)
+                        if "PART INTERCHANGE" in result_display.columns:
+                            result_display["PART INTERCHANGE"] = (
+                                result_display["PART INTERCHANGE"]
+                                .astype(str)
+                                .str.replace(" ", "<br>")
+                            )
 
                         # HTML + CSS đẹp
                         html_table = result_display.to_html(index=False, escape=False)
