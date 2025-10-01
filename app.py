@@ -1,4 +1,4 @@
-iimport pandas as pd
+import pandas as pd
 import streamlit as st
 
 # Đọc dữ liệu
@@ -85,4 +85,5 @@ if category:
                 st.dataframe(result[cols].reset_index(drop=True))
             else:
                 st.error("Không tìm thấy dữ liệu!")
+
 
