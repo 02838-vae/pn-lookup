@@ -18,6 +18,14 @@ if sheet_name:
     # Chuẩn hóa tên cột
     df.columns = df.columns.str.strip().str.upper()
 
+    # Map các tên cột về chuẩn
+    rename_map = {
+        "PN INTERCHANGE": "PART INTERCHANGE",
+        "INTERCHANGE": "PART INTERCHANGE",
+        "P/N INTERCHANGE": "PART INTERCHANGE",
+    }
+    df = df.rename(columns=lambda x: rename_map.get(x, x))
+
     # Chuẩn hóa text các cột dạng chuỗi
     for col in df.columns:
         if df[col].dtype == "object":
