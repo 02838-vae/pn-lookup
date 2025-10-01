@@ -124,47 +124,28 @@ if sheet_name:
                             result_display["PART INTERCHANGE"] = (
                                 result_display["PART INTERCHANGE"]
                                 .astype(str)
-                                .str.replace(" ", "<br>")
+                                .str.replace(" ", "\n")
                             )
 
-                        # HTML + CSS đẹp
-                        html_table = result_display.to_html(index=False, escape=False)
+                        # Styling: căn giữa, font, header màu nhạt
+                        styled = (
+                            result_display.style
+                            .set_properties(**{
+                                "text-align": "center",
+                                "vertical-align": "middle",
+                                "font-family": "Segoe UI, Helvetica, Arial, sans-serif",
+                            })
+                            .set_table_styles(
+                                [{
+                                    "selector": "th",
+                                    "props": [("background-color", "#e6f2ff"),
+                                              ("font-weight", "bold"),
+                                              ("text-align", "center")]
+                                }]
+                            )
+                        )
 
-                        styled_html = f"""
-                        <style>
-                        table {{
-                            width: 100%;
-                            border-collapse: collapse;
-                            border-radius: 12px;
-                            overflow: hidden;
-                            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                            font-family: 'Segoe UI','Helvetica Neue',Arial,sans-serif;
-                            font-size: 14px;
-                        }}
-                        th, td {{
-                            border: 1px solid #ddd;
-                            padding: 8px;
-                            text-align: center;
-                            vertical-align: middle;
-                        }}
-                        th {{
-                            background-color: #e6f2ff;
-                            font-weight: bold;
-                        }}
-                        tr:nth-child(even) {{
-                            background-color: #f9f9f9;
-                        }}
-                        tr:nth-child(odd) {{
-                            background-color: #ffffff;
-                        }}
-                        tr:hover {{
-                            background-color: #d9ebff;
-                        }}
-                        </style>
-                        {html_table}
-                        """
-
-                        st.markdown(styled_html, unsafe_allow_html=True)
+                        st.dataframe(styled, use_container_width=True)
 
                     else:
                         st.error("Không tìm thấy dữ liệu!")
