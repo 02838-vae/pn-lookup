@@ -9,7 +9,7 @@ xls = pd.ExcelFile(excel_file)
 st.title("🔎 Tra cứu Part Number (PN)")
 
 # --- Bước 1: chọn sheet ---
-sheet_name = st.selectbox("📂 Bạn muốn tra cứu gì?", xls.sheet_names, key="sheet")
+sheet_name = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="sheet")
 
 if sheet_name:
     # Đọc dữ liệu từ sheet đã chọn
@@ -18,23 +18,7 @@ if sheet_name:
     # Chuẩn hóa tên cột
     df.columns = df.columns.str.strip().str.upper()
 
-    # Map các cột cần thiết
-    col_map = {}
-    if "DESCRIPTION" in df.columns:
-        col_map = {
-            "A/C": "A/C",
-            "DESCRIPTION": "DESCRIPTION",
-        }
-    elif "ITEM" in df.columns:
-        col_map = {
-            "A/C": "A/C",
-            "ITEM": "DESCRIPTION",   # ép ITEM thành DESCRIPTION để xử lý chung
-        }
-
-    # Đổi tên cột theo chuẩn
-    df = df.rename(columns=col_map)
-
-    # Chuẩn hóa text
+    # Chuẩn hóa text các cột dạng chuỗi
     for col in df.columns:
         if df[col].dtype == "object":
             df[col] = (
@@ -49,26 +33,53 @@ if sheet_name:
     # --- Bước 2: chọn A/C ---
     if "A/C" in df.columns:
         aircrafts = sorted(df["A/C"].dropna().unique())
-        aircraft = st.selectbox("✈️ Loại tàu nào?", aircrafts, key="aircraft")
+        aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts, key="aircraft")
 
         if aircraft:
-            # --- Bước 3: chọn Description / Item ---
+            # --- Bước 3: chọn Description ---
             if "DESCRIPTION" in df.columns:
                 descriptions = sorted(
                     df[df["A/C"] == aircraft]["DESCRIPTION"].dropna().unique()
                 )
-                description = st.selectbox("📑 Bạn muốn tra cứu Item nào?", descriptions, key="description")
+                description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", descriptions, key="description")
 
                 if description:
-                    result = df[(df["A/C"] == aircraft) & (df["DESCRIPTION"] == description)]
+                    # --- Nếu có cột ITEM thì hỏi thêm ---
+                    if "ITEM" in df.columns:
+                        items = sorted(
+                            df[
+                                (df["A/C"] == aircraft)
+                                & (df["DESCRIPTION"] == description)
+                            ]["ITEM"].dropna().unique()
+                        )
+                        if items:
+                            item = st.selectbox("📌 Bạn muốn tra cứu Item nào?", items, key="item")
+                        else:
+                            item = None
+                    else:
+                        item = None
+
+                    # --- Lọc kết quả ---
+                    result = df[
+                        (df["A/C"] == aircraft)
+                        & (df["DESCRIPTION"] == description)
+                    ]
+                    if item:
+                        result = result[result["ITEM"] == item]
 
                     if not result.empty:
                         st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
+
+                        # Chọn các cột cần hiển thị
                         cols = []
                         if "PART NUMBER (PN)" in df.columns:
                             cols.append("PART NUMBER (PN)")
+                        if "PART INTERCHANGE" in df.columns:
+                            cols.append("PART INTERCHANGE")
                         if "DESCRIPTION" in df.columns:
                             cols.append("DESCRIPTION")
+                        if "ITEM" in df.columns and item:
+                            cols.append("ITEM")
                         if "NOTE" in df.columns:
                             cols.append("NOTE")
 
@@ -76,6 +87,6 @@ if sheet_name:
                     else:
                         st.error("Không tìm thấy dữ liệu!")
             else:
-                st.warning("Sheet này không có cột DESCRIPTION hoặc ITEM!")
+                st.warning("Sheet này không có cột DESCRIPTION!")
     else:
         st.warning("Sheet này không có cột A/C!")
