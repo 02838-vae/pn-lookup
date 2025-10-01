@@ -119,6 +119,10 @@ if sheet_name:
 
                         result_display = result[cols].reset_index(drop=True)
 
+                        # Đánh số dòng từ 1 thay vì 0
+                        result_display.index = result_display.index + 1
+                        result_display.index.name = "STT"
+
                         # Ngắt dòng PN Interchange (nếu có nhiều giá trị)
                         if "PART INTERCHANGE" in result_display.columns:
                             result_display["PART INTERCHANGE"] = (
