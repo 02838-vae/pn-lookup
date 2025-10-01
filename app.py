@@ -101,14 +101,34 @@ if sheet_name:
                             result["PART INTERCHANGE"] = (
                                 result["PART INTERCHANGE"]
                                 .astype(str)
-                                .apply(lambda x: "<br>".join(x.replace(";", ",").replace("/", ",").split(",")))
+                                .apply(lambda x: x.replace(";", "\n").replace(",", "\n").replace("/", "\n"))
                             )
 
-                        # Xuất bảng HTML để hỗ trợ xuống dòng
-                        st.markdown(
-                            result[cols].reset_index(drop=True).to_html(escape=False, index=False),
-                            unsafe_allow_html=True
+                        # Xuất bảng HTML có CSS căn giữa & hỗ trợ xuống dòng
+                        html_table = result[cols].reset_index(drop=True).to_html(
+                            escape=False,
+                            index=False
                         )
+                        html_table = f"""
+                        <style>
+                        table {{
+                          width: 100%;
+                          border-collapse: collapse;
+                        }}
+                        th, td {{
+                          border: 1px solid #ddd;
+                          padding: 8px;
+                          text-align: center;
+                          vertical-align: middle;
+                          white-space: pre-line;
+                        }}
+                        th {{
+                          background-color: #f2f2f2;
+                        }}
+                        </style>
+                        {html_table}
+                        """
+                        st.markdown(html_table, unsafe_allow_html=True)
                     else:
                         st.error("Không tìm thấy dữ liệu!")
             else:
