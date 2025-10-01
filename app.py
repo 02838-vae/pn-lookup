@@ -17,14 +17,6 @@ def set_background(image_file):
             font-family: "Segoe UI", Helvetica, Arial, sans-serif;
         }}
 
-        @keyframes fadeIn {{
-            from {{ opacity: 0; transform: translateY(-20px); }}
-            to   {{ opacity: 1; transform: translateY(0); }}
-        }}
-        @keyframes fadeInTable {{
-            from {{ opacity: 0; }}
-            to   {{ opacity: 1; }}
-        }}
         @keyframes gradientShift {{
             0% {{ background-position: 0% 50%; }}
             50% {{ background-position: 100% 50%; }}
@@ -45,8 +37,7 @@ def set_background(image_file):
             background-size: 600% 600%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientShift 10s ease infinite, neonPulse 2s ease-in-out infinite, fadeIn 1.2s ease-out;
-            text-shadow: 0 0 10px rgba(255,255,255,0.6);
+            animation: gradientShift 10s ease infinite, neonPulse 2s ease-in-out infinite;
         }}
 
         /* Tiêu đề chính */
@@ -56,19 +47,12 @@ def set_background(image_file):
             text-align: center;
             font-weight: bold;
             color: #003366;
-            animation: fadeIn 1.5s ease-out;
-        }}
-
-        /* Card selectbox */
-        .stSelectbox {{
-            background: rgba(255,255,255,0.8);
-            border-radius: 12px;
-            padding: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            animation: fadeIn 2s ease-out;
         }}
 
         /* Bảng kết quả */
+        .scroll-container {{
+            overflow-x: auto;
+        }}
         table.dataframe {{
             border-collapse: collapse;
             margin: 15px auto;
@@ -77,14 +61,13 @@ def set_background(image_file):
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             width: 100% !important;
             font-size: 13px !important;
-            animation: fadeInTable 1.2s ease-out;
             table-layout: auto;
         }}
         table.dataframe th, table.dataframe td {{
             text-align: center !important;
             vertical-align: middle !important;
             padding: 6px 10px;
-            white-space: nowrap !important;   /* luôn hiển thị full text, không ngắt dòng */
+            white-space: nowrap !important;   /* luôn hiển thị đầy đủ, không ngắt dòng */
         }}
         table.dataframe thead th {{
             background-color: #e6f2ff !important;
@@ -92,11 +75,6 @@ def set_background(image_file):
         }}
         table.dataframe tbody tr:hover {{
             background-color: #f0f8ff !important;
-        }}
-
-        /* Cho phép scroll ngang nếu bảng quá rộng */
-        .scroll-container {{
-            overflow-x: auto;
         }}
         </style>
         """,
@@ -117,10 +95,7 @@ st.markdown('<div class="main-title">🔎 Tra cứu Part Number (PN)</div>', uns
 sheet_name = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="sheet")
 
 if sheet_name:
-    # Đọc dữ liệu từ sheet
     df = pd.read_excel(excel_file, sheet_name=sheet_name)
-
-    # Chuẩn hóa tên cột
     df.columns = df.columns.str.strip().str.upper()
 
     # Map cột không đồng nhất
@@ -151,9 +126,7 @@ if sheet_name:
         if aircraft:
             # --- Bước 3: chọn Description ---
             if "DESCRIPTION" in df.columns:
-                descriptions = sorted(
-                    df[df["A/C"] == aircraft]["DESCRIPTION"].dropna().unique()
-                )
+                descriptions = sorted(df[df["A/C"] == aircraft]["DESCRIPTION"].dropna().unique())
                 description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", descriptions, key="description")
 
                 if description:
@@ -173,10 +146,7 @@ if sheet_name:
                         item = None
 
                     # --- Lọc kết quả ---
-                    result = df[
-                        (df["A/C"] == aircraft)
-                        & (df["DESCRIPTION"] == description)
-                    ]
+                    result = df[(df["A/C"] == aircraft) & (df["DESCRIPTION"] == description)]
                     if item:
                         result = result[result["ITEM"] == item]
 
@@ -184,7 +154,6 @@ if sheet_name:
                     if not result.empty:
                         st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
 
-                        # Cột hiển thị
                         cols = []
                         if "PART NUMBER (PN)" in df.columns:
                             cols.append("PART NUMBER (PN)")
@@ -198,12 +167,9 @@ if sheet_name:
                             cols.append("NOTE")
 
                         result_display = result[cols].reset_index(drop=True)
-
-                        # Đánh số dòng từ 1 thay vì 0
                         result_display.index = result_display.index + 1
                         result_display.index.name = "STT"
 
-                        # Styling
                         styled = (
                             result_display.style
                             .set_properties(**{
