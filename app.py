@@ -18,11 +18,11 @@ if sheet_name:
     # Chuẩn hóa tên cột
     df.columns = df.columns.str.strip().str.upper()
 
-    # Map các tên cột về chuẩn
+    # Map tên cột không đồng nhất về chuẩn
     rename_map = {
         "PN INTERCHANGE": "PART INTERCHANGE",
-        "INTERCHANGE": "PART INTERCHANGE",
         "P/N INTERCHANGE": "PART INTERCHANGE",
+        "INTERCHANGE": "PART INTERCHANGE",
     }
     df = df.rename(columns=lambda x: rename_map.get(x, x))
 
@@ -49,7 +49,11 @@ if sheet_name:
                 descriptions = sorted(
                     df[df["A/C"] == aircraft]["DESCRIPTION"].dropna().unique()
                 )
-                description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", descriptions, key="description")
+                description = st.selectbox(
+                    "📑 Bạn muốn tra cứu phần nào?",
+                    descriptions,
+                    key="description"
+                )
 
                 if description:
                     # --- Nếu có cột ITEM thì hỏi thêm ---
@@ -75,37 +79,39 @@ if sheet_name:
                     if item:
                         result = result[result["ITEM"] == item]
 
+                    # --- Hiển thị kết quả ---
                     if not result.empty:
-    st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
+                        st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
 
-    # Chọn các cột cần hiển thị
-    cols = []
-    if "PART NUMBER (PN)" in df.columns:
-        cols.append("PART NUMBER (PN)")
-    if "PART INTERCHANGE" in df.columns:
-        cols.append("PART INTERCHANGE")
-    if "DESCRIPTION" in df.columns:
-        cols.append("DESCRIPTION")
-    if "ITEM" in df.columns and item:
-        cols.append("ITEM")
-    if "NOTE" in df.columns:
-        cols.append("NOTE")
+                        # Chọn các cột cần hiển thị
+                        cols = []
+                        if "PART NUMBER (PN)" in df.columns:
+                            cols.append("PART NUMBER (PN)")
+                        if "PART INTERCHANGE" in df.columns:
+                            cols.append("PART INTERCHANGE")
+                        if "DESCRIPTION" in df.columns:
+                            cols.append("DESCRIPTION")
+                        if "ITEM" in df.columns and item:
+                            cols.append("ITEM")
+                        if "NOTE" in df.columns:
+                            cols.append("NOTE")
 
-    # Xử lý hiển thị xuống dòng cho PART INTERCHANGE
-    if "PART INTERCHANGE" in result.columns:
-        result["PART INTERCHANGE"] = (
-            result["PART INTERCHANGE"]
-            .astype(str)
-            .str.replace(r"[;,/]", "\n", regex=True)
-        )
+                        # Xuống dòng trong PART INTERCHANGE cho dễ đọc
+                        if "PART INTERCHANGE" in result.columns:
+                            result["PART INTERCHANGE"] = (
+                                result["PART INTERCHANGE"]
+                                .astype(str)
+                                .str.replace(r"[;,/]", "\n", regex=True)
+                            )
 
-    # Hiển thị kết quả
-    st.dataframe(
-        result[cols].reset_index(drop=True),
-        use_container_width=True,
-        hide_index=True
-    )
-else:
-    st.error("Không tìm thấy dữ liệu!")
-
-
+                        st.dataframe(
+                            result[cols].reset_index(drop=True),
+                            use_container_width=True,
+                            hide_index=True
+                        )
+                    else:
+                        st.error("Không tìm thấy dữ liệu!")
+            else:
+                st.warning("Sheet này không có cột DESCRIPTION!")
+    else:
+        st.warning("Sheet này không có cột A/C!")
