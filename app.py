@@ -84,10 +84,19 @@ def set_background(image_file):
             text-align: center !important;
             vertical-align: middle !important;
             padding: 6px 10px;
-            white-space: nowrap !important;   /* không xuống dòng */
+            white-space: nowrap !important;   /* luôn hiển thị full text, không ngắt dòng */
+        }}
+        table.dataframe thead th {{
+            background-color: #e6f2ff !important;
+            font-weight: bold !important;
         }}
         table.dataframe tbody tr:hover {{
             background-color: #f0f8ff !important;
+        }}
+
+        /* Cho phép scroll ngang nếu bảng quá rộng */
+        .scroll-container {{
+            overflow-x: auto;
         }}
         </style>
         """,
@@ -194,25 +203,20 @@ if sheet_name:
                         result_display.index = result_display.index + 1
                         result_display.index.name = "STT"
 
-                        # Giữ nguyên PN Interchange (không xuống dòng nữa)
                         # Styling
                         styled = (
                             result_display.style
                             .set_properties(**{
                                 "text-align": "center",
                                 "vertical-align": "middle",
+                                "white-space": "nowrap"
                             })
-                            .set_table_styles(
-                                [{
-                                    "selector": "th",
-                                    "props": [("background-color", "#e6f2ff"),
-                                              ("font-weight", "bold"),
-                                              ("text-align", "center")]
-                                }]
-                            )
                         )
 
+                        # Hiển thị bảng trong container scroll
+                        st.markdown('<div class="scroll-container">', unsafe_allow_html=True)
                         st.table(styled)
+                        st.markdown('</div>', unsafe_allow_html=True)
 
                     else:
                         st.error("Không tìm thấy dữ liệu!")
