@@ -96,17 +96,19 @@ if sheet_name:
                         if "NOTE" in df.columns:
                             cols.append("NOTE")
 
-                        # Xử lý xuống dòng trong PART INTERCHANGE
+                        # FIX: thay , ; / thành <br> để HTML xuống dòng
                         if "PART INTERCHANGE" in result.columns:
                             result["PART INTERCHANGE"] = (
                                 result["PART INTERCHANGE"]
                                 .astype(str)
-                                .apply(lambda x: "<br>".join(x.replace(";", ",").replace("/", ",").split(",")))
+                                .apply(lambda x: "<br>".join(
+                                    [val.strip() for val in x.replace(";", ",").replace("/", ",").split(",") if val.strip()]
+                                ))
                             )
 
-                        # Xuất HTML có CSS căn giữa + xuống dòng
+                        # Xuất HTML có CSS căn giữa + hỗ trợ xuống dòng bằng <br>
                         html_table = result[cols].reset_index(drop=True).to_html(
-                            escape=False,
+                            escape=False,  # giữ nguyên <br>
                             index=False
                         )
                         html_table = f"""
@@ -120,7 +122,6 @@ if sheet_name:
                           padding: 8px;
                           text-align: center;       /* căn giữa ngang */
                           vertical-align: middle;   /* căn giữa dọc */
-                          white-space: pre-line;    /* giữ xuống dòng */
                         }}
                         th {{
                           background-color: #f2f2f2;
