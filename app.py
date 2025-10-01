@@ -76,25 +76,30 @@ if sheet_name:
                         result = result[result["ITEM"] == item]
 
                     if not result.empty:
-                        st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
+    st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
 
-                        # Chọn các cột cần hiển thị
-                        cols = []
-                        if "PART NUMBER (PN)" in df.columns:
-                            cols.append("PART NUMBER (PN)")
-                        if "PART INTERCHANGE" in df.columns:
-                            cols.append("PART INTERCHANGE")
-                        if "DESCRIPTION" in df.columns:
-                            cols.append("DESCRIPTION")
-                        if "ITEM" in df.columns and item:
-                            cols.append("ITEM")
-                        if "NOTE" in df.columns:
-                            cols.append("NOTE")
+    # Chọn các cột cần hiển thị
+    cols = []
+    if "PART NUMBER (PN)" in df.columns:
+        cols.append("PART NUMBER (PN)")
+    if "PART INTERCHANGE" in df.columns:
+        cols.append("PART INTERCHANGE")
+    if "DESCRIPTION" in df.columns:
+        cols.append("DESCRIPTION")
+    if "ITEM" in df.columns and item:
+        cols.append("ITEM")
+    if "NOTE" in df.columns:
+        cols.append("NOTE")
 
-                        st.dataframe(result[cols].reset_index(drop=True))
+    # Xử lý hiển thị xuống dòng cho PART INTERCHANGE
+    if "PART INTERCHANGE" in result.columns:
+        result["PART INTERCHANGE"] = result["PART INTERCHANGE"].astype(str).str.replace(r"[;,/]", "\n", regex=True)
+
+    st.dataframe(result[cols].reset_index(drop=True), use_container_width=True, hide_index=True)
                     else:
                         st.error("Không tìm thấy dữ liệu!")
             else:
                 st.warning("Sheet này không có cột DESCRIPTION!")
     else:
         st.warning("Sheet này không có cột A/C!")
+
