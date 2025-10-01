@@ -96,16 +96,19 @@ if sheet_name:
                         if "NOTE" in df.columns:
                             cols.append("NOTE")
 
-                        # Xuống dòng trong PART INTERCHANGE cho dễ đọc
+                        # Xử lý xuống dòng trong PART INTERCHANGE
                         if "PART INTERCHANGE" in result.columns:
                             result["PART INTERCHANGE"] = (
                                 result["PART INTERCHANGE"]
                                 .astype(str)
-                                .str.replace(r"[;,/]", "\n", regex=True)
+                                .apply(lambda x: "<br>".join(x.replace(";", ",").replace("/", ",").split(",")))
                             )
 
-                        # Hiển thị bảng (hỗ trợ xuống dòng trong cell)
-                        st.table(result[cols].reset_index(drop=True))
+                        # Xuất bảng HTML để hỗ trợ xuống dòng
+                        st.markdown(
+                            result[cols].reset_index(drop=True).to_html(escape=False, index=False),
+                            unsafe_allow_html=True
+                        )
                     else:
                         st.error("Không tìm thấy dữ liệu!")
             else:
