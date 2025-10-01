@@ -1,76 +1,81 @@
 import pandas as pd
 import streamlit as st
 
-# ============ ĐỌC & XỬ LÝ DỮ LIỆU ============
-df = pd.read_excel("A787.xlsx")
-
-# Ép cột đầu tiên, thứ hai, thứ ba thành chuẩn
-col_map = {
-    df.columns[0]: "CATEGORY",
-    df.columns[1]: "A/C",
-    df.columns[2]: "DESCRIPTION",
-}
-df = df.rename(columns=col_map)
-
-# Chuẩn hóa text trong các cột chính
-for col in ["CATEGORY", "A/C", "DESCRIPTION"]:
-    if col in df.columns:
-        df[col] = (
-            df[col]
-            .astype(str)
-            .str.strip()
-            .str.replace(r"\s+", " ", regex=True)
-            .str.upper()
-        )
-        df[col] = df[col].replace("NAN", None)
+# ============ ĐỌC FILE & LẤY DANH SÁCH SHEET ============
+excel_file = "A787.xlsx"
+xls = pd.ExcelFile(excel_file)
 
 # ============ APP ============
 st.title("🔎 Tra cứu Part Number (PN)")
 
-# Nút reset
-if st.button("🔄 Tra cứu lại"):
-    st.session_state.clear()
-    st.rerun()
+# --- Bước 1: chọn sheet ---
+sheet_name = st.selectbox("📂 Bạn muốn tra cứu gì?", xls.sheet_names, key="sheet")
 
-# --- Step 1: chọn Category ---
-categories = sorted(df["CATEGORY"].dropna().unique())
-category = st.selectbox("📂 Bạn muốn tra cứu gì?", categories, key="category")
+if sheet_name:
+    # Đọc dữ liệu từ sheet đã chọn
+    df = pd.read_excel(excel_file, sheet_name=sheet_name)
 
-if category:
-    # --- Step 2: chọn A/C ---
-    aircrafts = sorted(
-        df[df["CATEGORY"] == category]["A/C"].dropna().unique()
-    )
-    aircraft = st.selectbox("✈️ Loại tàu nào?", aircrafts, key="aircraft")
+    # Chuẩn hóa tên cột
+    df.columns = df.columns.str.strip().str.upper()
 
-    if aircraft:
-        # --- Step 3: chọn Description ---
-        descriptions = sorted(
-            df[
-                (df["CATEGORY"] == category)
-                & (df["A/C"] == aircraft)
-            ]["DESCRIPTION"].dropna().unique()
-        )
+    # Map các cột cần thiết
+    col_map = {}
+    if "DESCRIPTION" in df.columns:
+        col_map = {
+            "A/C": "A/C",
+            "DESCRIPTION": "DESCRIPTION",
+        }
+    elif "ITEM" in df.columns:
+        col_map = {
+            "A/C": "A/C",
+            "ITEM": "DESCRIPTION",   # ép ITEM thành DESCRIPTION để xử lý chung
+        }
 
-        description = st.selectbox(
-            "📑 Bạn muốn tra cứu Item nào?",
-            descriptions,
-            key="description",
-        )
+    # Đổi tên cột theo chuẩn
+    df = df.rename(columns=col_map)
 
-        if description:
-            # --- Step 4: Hiện kết quả ---
-            result = df[
-                (df["CATEGORY"] == category)
-                & (df["A/C"] == aircraft)
-                & (df["DESCRIPTION"] == description)
-            ]
+    # Chuẩn hóa text
+    for col in df.columns:
+        if df[col].dtype == "object":
+            df[col] = (
+                df[col]
+                .astype(str)
+                .str.strip()
+                .str.replace(r"\s+", " ", regex=True)
+                .str.upper()
+            )
+            df[col] = df[col].replace("NAN", None)
 
-            if not result.empty:
-                st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
-                cols = ["PART NUMBER (PN)", "DESCRIPTION"]
-                if "NOTE" in df.columns:
-                    cols.append("NOTE")
-                st.dataframe(result[cols].reset_index(drop=True))
+    # --- Bước 2: chọn A/C ---
+    if "A/C" in df.columns:
+        aircrafts = sorted(df["A/C"].dropna().unique())
+        aircraft = st.selectbox("✈️ Loại tàu nào?", aircrafts, key="aircraft")
+
+        if aircraft:
+            # --- Bước 3: chọn Description / Item ---
+            if "DESCRIPTION" in df.columns:
+                descriptions = sorted(
+                    df[df["A/C"] == aircraft]["DESCRIPTION"].dropna().unique()
+                )
+                description = st.selectbox("📑 Bạn muốn tra cứu Item nào?", descriptions, key="description")
+
+                if description:
+                    result = df[(df["A/C"] == aircraft) & (df["DESCRIPTION"] == description)]
+
+                    if not result.empty:
+                        st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
+                        cols = []
+                        if "PART NUMBER (PN)" in df.columns:
+                            cols.append("PART NUMBER (PN)")
+                        if "DESCRIPTION" in df.columns:
+                            cols.append("DESCRIPTION")
+                        if "NOTE" in df.columns:
+                            cols.append("NOTE")
+
+                        st.dataframe(result[cols].reset_index(drop=True))
+                    else:
+                        st.error("Không tìm thấy dữ liệu!")
             else:
-                st.error("Không tìm thấy dữ liệu!")
+                st.warning("Sheet này không có cột DESCRIPTION hoặc ITEM!")
+    else:
+        st.warning("Sheet này không có cột A/C!")
