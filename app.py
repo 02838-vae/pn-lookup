@@ -17,9 +17,9 @@ def load_and_clean(sheet):
 # ===== CSS Trang trí =====
 st.markdown("""
     <style>
-    /* Background với ảnh */
+    /* Background ảnh máy bay */
     .stApp {
-        background: url('airplane.jpg') no-repeat center center fixed;
+        background: url("airplane.jpg") no-repeat center center fixed;
         background-size: cover;
     }
     .stApp::before {
@@ -29,7 +29,7 @@ st.markdown("""
         left:0;
         width:100%;
         height:100%;
-        background: rgba(255,255,255,0.65); /* làm nhạt ảnh */
+        background: rgba(255,255,255,0.55); /* làm nhạt ảnh nhưng vẫn nhìn rõ */
         z-index: -1;
     }
 
@@ -145,7 +145,7 @@ if zone:
 
                 df_result = df_result[cols_to_show]
 
-                # Thêm STT bắt đầu từ 1
+                # Thêm STT bắt đầu từ 1 (ở header dòng 1)
                 df_result.index = df_result.index + 1
                 df_result.index.name = "STT"
 
