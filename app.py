@@ -51,9 +51,8 @@ st.markdown(f"""
         font-weight: bold;
         text-align: center;
         animation: colorchange 5s infinite alternate;
-        padding: 5px 10px;
-        border-radius: 8px;
-        display: inline-block;
+        display: block;
+        margin: 15px auto;
     }}
     @keyframes colorchange {{
         0% {{color: #e74c3c;}}
@@ -63,18 +62,19 @@ st.markdown(f"""
         100% {{color: #9b59b6;}}
     }}
 
-    /* Tiêu đề chính */
+    /* Tiêu đề chính Tra cứu PN */
     .main-title {{
-        font-size: 38px;
+        font-size: 36px;
         font-weight: 900;
         text-align: center;
         color: #2c3e50;
-        margin-top: 15px;
+        margin-top: 10px;
         margin-bottom: 20px;
         text-shadow: 1px 1px 3px rgba(255,255,255,0.9);
-        background: rgba(255,255,255,0.8);
-        padding: 10px;
-        border-radius: 10px;
+        background: rgba(255,255,255,0.9);
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: 2px solid #2c3e50;
         display: inline-block;
     }}
 
@@ -108,6 +108,18 @@ st.markdown(f"""
     tbody tr:hover td {{
         background: #ffeaa7;
         transition: 0.2s ease-in-out;
+    }}
+
+    /* Thông báo tìm thấy dữ liệu */
+    .highlight-msg {{
+        font-size: 18px;
+        font-weight: bold;
+        color: #1a5276; /* xanh đậm */
+        background: #d6eaf8;
+        padding: 10px 15px;
+        border-left: 6px solid #154360;
+        border-radius: 6px;
+        margin: 15px 0;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -166,7 +178,7 @@ if zone:
                 # Thêm cột STT
                 df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
-                st.success(f"Tìm thấy {len(df_result)} dòng dữ liệu:")
+                st.markdown(f'<div class="highlight-msg">✅ Tìm thấy {len(df_result)} dòng dữ liệu</div>', unsafe_allow_html=True)
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
