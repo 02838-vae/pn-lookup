@@ -98,7 +98,7 @@ st.markdown(f"""
         padding: 8px !important;
         font-size: 14px;
         color: #2c3e50;
-        border: 1.5px solid #2c3e50 !important;   /* viền đậm hơn */
+        border: 1.5px solid #2c3e50 !important;
     }}
     table.dataframe tbody tr:nth-child(even) td {{
         background: #f8f9fa !important;
@@ -108,7 +108,7 @@ st.markdown(f"""
         transition: 0.2s ease-in-out;
     }}
 
-    /* Thông báo tìm thấy dữ liệu với icon động */
+    /* Thông báo tìm thấy dữ liệu */
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
@@ -141,11 +141,11 @@ st.markdown(f"""
         100% {{ transform: translate(1px, -2px) rotate(-1deg); }}
     }}
 
-    /* Label của selectbox (câu hỏi) */
-    label {{
-        font-weight: bold !important;
-        font-size: 16px !important;
-        color: #1a5276 !important;
+    /* Label câu hỏi trong selectbox */
+    .stSelectbox label {{
+        font-weight: 900 !important;
+        font-size: 18px !important;
+        color: #000000 !important;  /* Đổi sang đen cho nổi bật */
     }}
     </style>
 """, unsafe_allow_html=True)
