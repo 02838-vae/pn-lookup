@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import base64
 import glob
+import os
 
 # ===== Đọc file Excel =====
 excel_file = "A787.xlsx"
@@ -20,31 +21,45 @@ def get_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
+# Tìm tất cả file airplane*
 bg_files = sorted(
     glob.glob("airplane*.jpg") +
     glob.glob("airplane*.jpeg") +
     glob.glob("airplane*.png")
 )
 
+# Nếu không có → fallback 1 ảnh mặc định
+if not bg_files and os.path.exists("airplane.jpg"):
+    bg_files = ["airplane.jpg"]
+
 bg64 = [get_base64(f) for f in bg_files]
 
-# Tạo keyframes đổi ảnh nền
+# Nếu có nhiều ảnh → tạo keyframes slideshow
 keyframes = ""
-step = 100 // len(bg64) if bg64 else 100
-for i, img in enumerate(bg64):
-    pct1 = i * step
-    pct2 = (i + 1) * step
-    keyframes += f"""
-    {pct1}% {{ background-image: url("data:image/jpeg;base64,{img}"); }}
-    {pct2}% {{ background-image: url("data:image/jpeg;base64,{img}"); }}
+if len(bg64) > 1:
+    step = 100 // len(bg64)
+    for i, img in enumerate(bg64):
+        pct1 = i * step
+        pct2 = (i + 1) * step
+        keyframes += f"""
+        {pct1}% {{ background-image: url("data:image/jpeg;base64,{img}"); opacity: 0; }}
+        {pct1+5}% {{ background-image: url("data:image/jpeg;base64,{img}"); opacity: 1; }}
+        {pct2-5}% {{ background-image: url("data:image/jpeg;base64,{img}"); opacity: 1; }}
+        {pct2}% {{ background-image: url("data:image/jpeg;base64,{img}"); opacity: 0; }}
+        """
+else:
+    # Nếu chỉ có 1 ảnh → giữ nguyên
+    keyframes = f"""
+    0% {{ background-image: url("data:image/jpeg;base64,{bg64[0]}"); opacity:1; }}
+    100% {{ background-image: url("data:image/jpeg;base64,{bg64[0]}"); opacity:1; }}
     """
 
-# ===== CSS Slideshow + Vintage =====
+# ===== CSS =====
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-    /* Dùng ::before để slideshow */
+    /* Background slideshow */
     .stApp::before {{
         content: "";
         position: fixed;
@@ -52,7 +67,7 @@ st.markdown(f"""
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
-        animation: bgslide {len(bg64)*10 if bg64 else 30}s infinite;
+        animation: bgslide {len(bg64)*10 if len(bg64)>1 else 60}s infinite;
         z-index: -2;
     }}
 
@@ -60,19 +75,21 @@ st.markdown(f"""
         {keyframes}
     }}
 
-    /* Overlay làm mờ ảnh */
+    /* Overlay làm mờ */
     .stApp::after {{
         content: "";
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(255,255,255,0.65);
+        background: rgba(255,255,255,0.7);
         z-index: -1;
     }}
 
+    /* Font vintage */
     .stApp {{
         font-family: 'Special Elite', cursive !important;
     }}
 
+    /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
         font-size: 36px;
         font-weight: bold;
@@ -88,6 +105,7 @@ st.markdown(f"""
         100% {{color: #9b59b6;}}
     }}
 
+    /* Tiêu đề chính */
     .main-title {{
         font-size: 28px;
         font-weight: 900;
