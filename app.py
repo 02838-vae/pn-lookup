@@ -74,79 +74,84 @@ if sheet_name:
     df = df.dropna(how="all").fillna("")
     df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)  # loại bỏ khoảng trắng
 
+    # --- Loại máy bay ---
+    ac_select = None
     if "A/C" in df.columns:
         ac_list = sorted([x for x in df["A/C"].unique() if x not in ["", "nan", "NaN"]])
         ac_select = st.selectbox("👉 Loại máy bay?", ac_list)
-    else:
-        ac_select = None
 
     if ac_select:
-        df_ac = df[df["A/C"] == ac_select] if "A/C" in df.columns else df
+        df_ac = df[df["A/C"] == ac_select]
 
+        # --- Description ---
+        desc_select = None
         if "Description" in df_ac.columns:
             desc_list = sorted([x for x in df_ac["Description"].unique() if x not in ["", "nan", "NaN"]])
             desc_select = st.selectbox("👉 Bạn muốn tra cứu phần nào?", desc_list)
-        else:
-            desc_select = None
 
+        # --- Item (nếu có) ---
+        item_select = None
         if desc_select:
-            df_desc = df_ac[df_ac["Description"] == desc_select] if "Description" in df_ac.columns else df_ac
-
+            df_desc = df_ac[df_ac["Description"] == desc_select]
             if "Item" in df_desc.columns:
                 item_list = sorted([x for x in df_desc["Item"].unique() if x not in ["", "nan", "NaN"]])
                 item_select = st.selectbox("👉 Bạn muốn tra cứu Item nào?", item_list)
-                result = df_desc[df_desc["Item"] == item_select]
+
+                result = df_desc[df_desc["Item"] == item_select] if item_select else pd.DataFrame()
             else:
                 result = df_desc
+        else:
+            result = pd.DataFrame()
 
-            if not result.empty:
-                result = result.reset_index(drop=True)
-                result.index = result.index + 1  # STT từ 1
+        # --- Show result table ---
+        if not result.empty:
+            result = result.reset_index(drop=True)
+            result.index = result.index + 1  # STT từ 1
 
-                cols_to_show = [c for c in ["PART NUMBER (PN)", "PN interchange", "Note"] if c in result.columns]
-                result_display = result[cols_to_show].copy()
-                result_display.index.name = "STT"
+            cols_to_show = [c for c in ["PART NUMBER (PN)", "PN interchange", "Note"] if c in result.columns]
+            result_display = result[cols_to_show].copy()
+            result_display.index.name = "STT"
 
-                st.markdown(
-                    "<div style='font-size:20px;font-weight:bold;color:#ff1e56;animation:blink 1s infinite;text-align:center;'>✅ Tìm thấy {} dòng dữ liệu:</div>".format(
-                        len(result_display)
-                    ),
-                    unsafe_allow_html=True,
-                )
+            st.markdown(
+                "<div style='font-size:20px;font-weight:bold;color:#ff1e56;animation:blink 1s infinite;text-align:center;'>✅ Tìm thấy {} dòng dữ liệu:</div>".format(
+                    len(result_display)
+                ),
+                unsafe_allow_html=True,
+            )
 
-                # Custom CSS for table
-                st.markdown(
-                    """
-                    <style>
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin: 20px 0;
-                        font-size: 14px;
-                        text-align: center;
-                        background-color: #ffffff;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                        border-radius: 10px;
-                        overflow: hidden;
-                    }
-                    thead th {
-                        background-color: #004080;
-                        color: white !important;
-                        font-weight: bold;
-                        padding: 10px;
-                        border: 2px solid #333333;
-                    }
-                    tbody td {
-                        border: 1px solid #444444;
-                        padding: 8px;
-                        color: #000000;
-                    }
-                    </style>
-                    """,
-                    unsafe_allow_html=True,
-                )
+            # Custom CSS for table
+            st.markdown(
+                """
+                <style>
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                    font-size: 14px;
+                    text-align: center;
+                    background-color: #ffffff;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+                thead th {
+                    background-color: #004080;
+                    color: white !important;
+                    font-weight: bold;
+                    padding: 10px;
+                    border: 2px solid #333333;
+                }
+                tbody td {
+                    border: 1px solid #444444;
+                    padding: 8px;
+                    color: #000000;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
 
-                st.markdown(result_display.to_html(escape=False), unsafe_allow_html=True)
+            st.markdown(result_display.to_html(escape=False), unsafe_allow_html=True)
 
 # ===== CSS for dropdown labels (câu hỏi nổi hơn) =====
 st.markdown(
