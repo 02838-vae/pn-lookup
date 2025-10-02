@@ -20,7 +20,7 @@ bg_files = ["airplane.jpg", "airplane1.jpg", "airplane2.jpg"]
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         data = f.read()
-    return base64.b64encode(f.read()).decode()
+    return base64.b64encode(data).decode()   # ✅ fix
 
 bg_base64 = [get_base64_of_bin_file(f) for f in bg_files]
 
@@ -49,7 +49,7 @@ st.markdown(f"""
         content: "";
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(255,255,255,0.7);
+        background: rgba(255,255,255,0.7); /* nền mờ */
         z-index: -1;
     }}
 
