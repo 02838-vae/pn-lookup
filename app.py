@@ -16,8 +16,8 @@ def load_and_clean(sheet):
     return df
 
 # ===== Load nhiều ảnh background =====
-def get_base64(bin_file):
-    with open(bin_file, "rb") as f:
+def get_base64(path):
+    with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
 bg_files = sorted(
@@ -26,64 +26,52 @@ bg_files = sorted(
     glob.glob("airplane*.png")
 )
 
-bg_base64_list = [get_base64(f) for f in bg_files]
+bg64 = [get_base64(f) for f in bg_files]
 
-# ===== Nhúng Google Fonts vintage =====
-st.markdown("""
-    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
-""", unsafe_allow_html=True)
+# Tạo keyframes đổi ảnh nền
+keyframes = ""
+step = 100 // len(bg64)
+for i, img in enumerate(bg64):
+    pct1 = i * step
+    pct2 = (i + 1) * step
+    keyframes += f"""
+    {pct1}% {{ background-image: url("data:image/jpeg;base64,{img}"); }}
+    {pct2}% {{ background-image: url("data:image/jpeg;base64,{img}"); }}
+    """
 
-# ===== CSS Slideshow =====
-css_images = ""
-for i, img64 in enumerate(bg_base64_list):
-    delay = i * 10
-    css_images += f"""
-    .bg-{i} {{
-        background-image: url("data:image/jpeg;base64,{img64}");
+# ===== CSS Slideshow + Vintage =====
+st.markdown(f"""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+
+    .stApp {{
+        animation: bgslide {len(bg64)*10}s infinite;
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
-        position: fixed;
-        top:0; left:0; right:0; bottom:0;
-        opacity: 0;
-        animation: fadeinout {len(bg_base64_list)*10}s infinite;
-        animation-delay: {delay}s;
-        z-index: -9999;
-    }}
-    """
-
-st.markdown(f"""
-    <style>
-    {css_images}
-    @keyframes fadeinout {{
-        0% {{ opacity: 0; }}
-        10% {{ opacity: 1; }}
-        30% {{ opacity: 1; }}
-        40% {{ opacity: 0; }}
-        100% {{ opacity: 0; }}
+        font-family: 'Special Elite', cursive !important;
+        position: relative;
     }}
 
-    /* Overlay làm chữ dễ đọc */
-    .bg-overlay {{
+    @keyframes bgslide {{
+        {keyframes}
+    }}
+
+    /* Overlay để chữ rõ hơn */
+    .stApp::after {{
+        content: "";
         position: fixed;
         top:0; left:0; right:0; bottom:0;
         background: rgba(255,255,255,0.65);
-        z-index: -9998;
+        z-index: -1;
     }}
 
-    /* Font vintage */
-    html, body, [class*="css"]  {{
-        font-family: 'Special Elite', cursive !important;
-    }}
-
-    /* Header */
     .top-title {{
-        font-size: 32px;
+        font-size: 36px;
         font-weight: bold;
         text-align: center;
         animation: colorchange 5s infinite alternate;
         margin: 15px auto;
-        white-space: nowrap;
     }}
     @keyframes colorchange {{
         0% {{color: #e74c3c;}}
@@ -100,15 +88,16 @@ st.markdown(f"""
         color: #2c3e50;
         text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
         margin-bottom: 20px;
-        white-space: nowrap;
+    }}
+
+    /* Label câu hỏi */
+    .stSelectbox label {{
+        font-weight: 900 !important;
+        font-size: 18px !important;
+        color: #000 !important;
     }}
     </style>
 """, unsafe_allow_html=True)
-
-# Render background layers
-for i in range(len(bg_base64_list)):
-    st.markdown(f'<div class="bg-{i}"></div>', unsafe_allow_html=True)
-st.markdown('<div class="bg-overlay"></div>', unsafe_allow_html=True)
 
 # ===== Header =====
 st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
