@@ -39,7 +39,7 @@ st.markdown(f"""
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(255,255,255,0.85); /* mờ hơn */
+        background: rgba(255,255,255,0.75); /* nền chung mờ */
         z-index: -1;
     }}
 
@@ -83,14 +83,30 @@ st.markdown(f"""
         white-space: nowrap;
     }}
 
+    /* ===== Vùng câu hỏi (selectbox) ===== */
+    div[data-baseweb="select"] {{
+        background: rgba(255,255,255,0.95) !important; /* trắng rõ hơn */
+        border-radius: 12px !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
+        padding: 4px !important;
+    }}
+
+    /* Label câu hỏi */
+    .stSelectbox label {{
+        font-weight: 900 !important;
+        font-size: 18px !important;
+        color: #0b3d91 !important; /* xanh đậm nổi bật */
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    }}
+
     /* Bảng kết quả */
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        background: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        background: rgba(255,255,255,0.98); /* nền trắng rõ hơn */
     }}
     table.dataframe thead th {{
         background: #2c3e50 !important;
@@ -105,7 +121,7 @@ st.markdown(f"""
         text-align: center !important;
         padding: 8px !important;
         font-size: 14px;
-        color: #2c3e50;
+        color: #2c3e50 !important;
         border: 1.5px solid #2c3e50 !important;
     }}
     table.dataframe tbody tr:nth-child(even) td {{
@@ -147,13 +163,6 @@ st.markdown(f"""
         80% {{ transform: translate(-1px, -1px) rotate(1deg); }}
         90% {{ transform: translate(1px, 2px) rotate(0deg); }}
         100% {{ transform: translate(1px, -2px) rotate(-1deg); }}
-    }}
-
-    /* Label câu hỏi trong selectbox */
-    .stSelectbox label {{
-        font-weight: 900 !important;
-        font-size: 18px !important;
-        color: #0b3d91 !important;  /* xanh đậm nổi bật */
     }}
     </style>
 """, unsafe_allow_html=True)
