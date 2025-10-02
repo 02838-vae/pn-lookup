@@ -17,10 +17,11 @@ def load_and_clean(sheet):
 # ===== CSS Trang trí =====
 st.markdown("""
     <style>
-    /* Background ảnh máy bay với lớp mờ nhẹ */
+    /* Background ảnh máy bay rõ ràng với lớp phủ mờ nhẹ */
     .stApp {
-        background: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)), 
-                    url("airplane.jpg") no-repeat center center fixed;
+        background: 
+            linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)),
+            url("airplane.jpg") no-repeat center center fixed;
         background-size: cover;
     }
 
@@ -94,7 +95,7 @@ if zone:
 
     # ===== Dropdown 2: A/C =====
     if "A/C" in df.columns:
-        aircrafts = sorted(df["A/C"].dropna().unique().tolist())
+        aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac and ac != "NAN"])
         aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts, key="aircraft")
     else:
         aircraft = None
@@ -104,7 +105,7 @@ if zone:
 
         # ===== Dropdown 3: Description =====
         if "DESCRIPTION" in df_ac.columns:
-            desc_list = sorted(df_ac["DESCRIPTION"].dropna().unique().tolist())
+            desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d and d != "NAN"])
             description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list, key="desc")
         else:
             description = None
@@ -114,7 +115,7 @@ if zone:
 
             # Nếu có cột ITEM thì hỏi thêm
             if "ITEM" in df_desc.columns:
-                items = sorted(df_desc["ITEM"].dropna().unique().tolist())
+                items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i and i != "NAN"])
                 if items:
                     item = st.selectbox("🔢 Bạn muốn tra cứu Item nào?", items, key="item")
                     df_desc = df_desc[df_desc["ITEM"] == item]
