@@ -66,46 +66,45 @@ st.markdown(f"""
         font-size: 26px;
         font-weight: 900;
         text-align: center;
-        background: linear-gradient(90deg, #1e3c72, #2a5298);
+        background: linear-gradient(90deg, #ff6a00, #ff8c00, #ffd700);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-top: 5px;
         margin-bottom: 20px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
         white-space: nowrap;
     }}
 
     /* Bảng kết quả */
-    table {{
+    table.dataframe {{
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: collapse !important;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         background: white;
     }}
-    thead th {{
-        background: #2c3e50;
+    table.dataframe thead th {{
+        background: #2c3e50 !important;
         color: white !important;
         font-weight: bold;
         text-align: center;
-        padding: 10px;
+        padding: 10px !important;
         font-size: 15px;
-        border-bottom: 2px solid #34495e;
+        border: 2px solid #2c3e50 !important;
     }}
-    tbody td {{
-        background: white;
-        text-align: center;
-        padding: 8px;
+    table.dataframe tbody td {{
+        text-align: center !important;
+        padding: 8px !important;
         font-size: 14px;
         color: #2c3e50;
-        border: 1px dotted #bbb;   /* kẻ ô chấm mảnh */
+        border: 1.5px solid #2c3e50 !important;   /* viền đậm hơn */
     }}
-    tbody tr:nth-child(even) td {{
-        background: #f8f9fa;
+    table.dataframe tbody tr:nth-child(even) td {{
+        background: #f8f9fa !important;
     }}
-    tbody tr:hover td {{
-        background: #ffeaa7;
+    table.dataframe tbody tr:hover td {{
+        background: #ffeaa7 !important;
         transition: 0.2s ease-in-out;
     }}
 
@@ -140,6 +139,13 @@ st.markdown(f"""
         80% {{ transform: translate(-1px, -1px) rotate(1deg); }}
         90% {{ transform: translate(1px, 2px) rotate(0deg); }}
         100% {{ transform: translate(1px, -2px) rotate(-1deg); }}
+    }}
+
+    /* Label của selectbox (câu hỏi) */
+    label {{
+        font-weight: bold !important;
+        font-size: 16px !important;
+        color: #1a5276 !important;
     }}
     </style>
 """, unsafe_allow_html=True)
