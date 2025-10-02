@@ -4,8 +4,8 @@ import pandas as pd
 import streamlit as st
 
 # ====== Cấu hình ======
-excel_file = "A787.xlsx"   # file Excel của bạn (giữ nguyên)
-bg_image_file = "airplane.jpg"  # nền (phải có)
+excel_file = "A787.xlsx"      # file Excel
+bg_image_file = "airplane.jpg"  # ảnh nền
 
 # ====== Hàm đọc và dọn dữ liệu ======
 def load_and_clean(sheet):
@@ -16,224 +16,165 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ====== Hàm encode ảnh thành base64 ======
-def get_base64_of_bin_file(bin_file):
+# ====== Encode ảnh nền ======
+def get_base64(bin_file):
     if not os.path.exists(bin_file):
         return None
     with open(bin_file, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# ====== Tạo SVG noise (base64) để dùng offline, tránh image not found ======
-def generate_noise_data_uri(opacity=0.12, base_freq=0.9):
-    # SVG nhỏ sinh nhiễu (feTurbulence). Sẽ base64 encode để an toàn.
-    svg = f"""
-    <svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'>
-      <filter id='noise'>
-        <feTurbulence type='fractalNoise' baseFrequency='{base_freq}' numOctaves='1' stitchTiles='stitch'/>
-        <feColorMatrix type='saturate' values='0'/>
-        <feComponentTransfer>
-          <feFuncA type='table' tableValues='0 {opacity}'/>
-        </feComponentTransfer>
-      </filter>
-      <rect width='100%' height='100%' filter='url(#noise)' />
-    </svg>
-    """.strip()
-    svg_b64 = base64.b64encode(svg.encode("utf-8")).decode("ascii")
-    return f"data:image/svg+xml;base64,{svg_b64}"
+img_base64 = get_base64(bg_image_file)
+if img_base64:
+    bg_css = f"url('data:image/jpg;base64,{img_base64}')"
+else:
+    bg_css = "linear-gradient(#e8d8b9, #d6c49d)"  # fallback sepia
 
-# ====== Chuẩn bị dữ liệu base64 ======
-# Excel
+# ====== Load Excel ======
 if not os.path.exists(excel_file):
-    st.error(f"⚠️ Không tìm thấy file Excel: {excel_file}. Xin kiểm tra lại.")
+    st.error(f"⚠️ Không tìm thấy file {excel_file}")
     st.stop()
 
 xls = pd.ExcelFile(excel_file)
 
-# Background image
-img_base64 = get_base64_of_bin_file(bg_image_file)
-if img_base64 is None:
-    st.warning(f"⚠️ Không tìm thấy '{bg_image_file}' trong thư mục. Ứng dụng vẫn chạy nhưng nền mặc định sẽ trống.")
-    img_url_css = ""
-else:
-    img_url_css = f'url("data:image/jpg;base64,{img_base64}")'
-
-# Noise SVG data URI (offline)
-noise_data_uri = generate_noise_data_uri(opacity=0.12, base_freq=0.9)
-
-# ====== CSS (vintage + noise offline) ======
+# ====== CSS vintage ======
 st.markdown(f"""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-    /* Toàn trang - vintage sepia blend */
-    .stApp {{
-        background:
-            linear-gradient(rgba(94,38,18,0.55), rgba(250,240,202,0.7)),
-            {img_url_css if img_url_css else 'none'};
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        background-blend-mode: multiply;
-        font-family: 'Special Elite', cursive !important;
-        position: relative;
-        overflow: visible;
-    }}
+.stApp {{
+    background: {bg_css};
+    background-size: cover;
+    background-attachment: fixed;
+    font-family: 'Special Elite', cursive !important;
+    position: relative;
+}}
 
-    /* Grain/noise overlay (SVG base64 nhúng) - offline */
-    .stApp::after {{
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background-image: url("{noise_data_uri}");
-        background-size: 100% 100%;
-        opacity: 0.12; /* bạn có thể chỉnh nhỏ hơn/nhiều hơn */
-        pointer-events: none;
-        z-index: 0;
-        mix-blend-mode: overlay;
-    }}
+/* Noise grain tạo bằng radial-gradient lặp */
+.stApp::after {{
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px);
+    background-size: 3px 3px;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+}}
 
-    /* Nội dung nổi trên noise */
-    .block-container {{
-        position: relative;
-        z-index: 1;
-        padding-top: 0.5rem !important;
-    }}
+.block-container {{
+    position: relative;
+    z-index: 1;
+}}
 
-    header[data-testid="stHeader"] {{ display: none; }}
+header[data-testid="stHeader"] {{display: none;}}
 
-    /* Tiêu đề */
-    .top-title {{
-        font-size: 34px;
-        font-weight: 900;
-        text-align: center;
-        margin: 18px auto 6px auto;
-        color: #3e2723;
-        text-shadow: 1px 1px 0px #fff;
-        font-family: 'Special Elite', cursive !important;
-    }}
+.top-title {{
+    font-size: 32px;
+    text-align: center;
+    margin: 15px 0 5px 0;
+    color: #3e2723;
+    text-shadow: 1px 1px #fff;
+}}
+.main-title {{
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #5d4037;
+}}
 
-    .main-title {{
-        font-size: 24px;
-        font-weight: 800;
-        text-align: center;
-        color: #5d4037;
-        margin: 6px 0 18px 0;
-        font-family: 'Special Elite', cursive !important;
-    }}
+/* Label câu hỏi */
+label, div[role="group"] label {{
+    font-family: 'Special Elite', cursive !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #2c1a0c !important;
+    text-shadow: 0.5px 0.5px 0.8px #fff;
+}}
 
-    /* Label câu hỏi (bắt chặt selector để chắc chắn áp dụng) */
-    div[role="group"] label, label[data-testid="stWidgetLabel"], div[data-testid="stMarkdownContainer"] > p {{
-        font-family: 'Special Elite', cursive !important;
-        font-size: 18px !important;
-        font-weight: 700 !important;
-        color: #2c1a0c !important;
-        text-shadow: 0.6px 0.6px 0.8px #fff !important;
-    }}
+/* Dropdown + menu */
+.stSelectbox div[data-baseweb="select"],
+.stSelectbox div[data-baseweb="popover"] {{
+    font-family: 'Special Elite', cursive !important;
+    font-size: 15px !important;
+    color: #2c1a0c !important;
+    background: #fdf6e3 !important;
+    border: 1px solid #5d4037 !important;
+    border-radius: 6px !important;
+}}
 
-    /* Hộp selectbox - nội dung + dropdown */
-    .stSelectbox div[data-baseweb="select"],
-    .stSelectbox div[data-baseweb="popover"] {{
-        font-family: 'Special Elite', cursive !important;
-        font-size: 15px !important;
-        color: #2c1a0c !important;
-        background: #fdf6e3 !important;
-        border: 1.2px dashed #5d4037 !important;
-        border-radius: 6px !important;
-    }}
+/* Bảng vintage */
+table.dataframe {{
+    border-collapse: collapse;
+    width: 100%;
+    background: #fffaf0;
+    font-family: 'Special Elite', cursive !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}}
+table.dataframe thead th {{
+    background: #5d4037 !important;
+    color: #f8f1df !important;
+    padding: 8px;
+}}
+table.dataframe tbody td {{
+    padding: 6px;
+    border: 1px solid #d9cbb5;
+    color: #3e2723;
+}}
+table.dataframe tbody tr:nth-child(even) td {{
+    background: #f6efe0 !important;
+}}
+table.dataframe tbody tr:hover td {{
+    background: #fceec8 !important;
+}}
 
-    /* Bảng vintage */
-    table.dataframe {{
-        width: 100%;
-        border-collapse: collapse !important;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-        background: #fffaf0;
-        font-family: 'Special Elite', cursive !important;
-    }}
-    table.dataframe thead th {{
-        background: #5d4037 !important;
-        color: #f8f1df !important;
-        font-weight: 800;
-        text-align: center;
-        padding: 10px !important;
-        font-size: 15px;
-        border: 2px solid #3e2723 !important;
-    }}
-    table.dataframe tbody td {{
-        text-align: center !important;
-        padding: 8px !important;
-        font-size: 14px;
-        color: #3e2723 !important;
-        border: 1px solid #e6d7c4 !important;
-    }}
-    table.dataframe tbody tr:nth-child(even) td {{ background: #f6efe0 !important; }}
-    table.dataframe tbody tr:hover td {{ background: #fceec8 !important; transition: 0.2s ease-in-out; }}
-
-    /* Thông báo */
-    .highlight-msg {{
-        font-size: 18px;
-        font-weight: 800;
-        color: #3e2723;
-        background: #e9decf;
-        padding: 10px 14px;
-        border-left: 6px solid #3e2723;
-        border-radius: 6px;
-        margin: 14px 0;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-family: 'Special Elite', cursive !important;
-    }}
-
-    .shake {{ display: inline-block; animation: shake 1s infinite; }}
-    @keyframes shake {{
-        0% {{ transform: translate(1px, 1px) rotate(0deg); }}
-        25% {{ transform: translate(-1px, -1px) rotate(-1deg); }}
-        50% {{ transform: translate(-2px, 2px) rotate(1deg); }}
-        75% {{ transform: translate(2px, -2px) rotate(1deg); }}
-        100% {{ transform: translate(1px, 1px) rotate(0deg); }}
-    }}
-    </style>
+/* Thông báo */
+.highlight-msg {{
+    font-size: 18px;
+    font-weight: bold;
+    color: #3e2723;
+    background: #e9decf;
+    padding: 10px;
+    border-left: 6px solid #3e2723;
+    border-radius: 5px;
+    margin: 12px 0;
+}}
+</style>
 """, unsafe_allow_html=True)
 
 # ====== Header ======
 st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
-# ====== Logic dropdowns & result display ======
-zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
+# ====== Dropdown logic ======
+zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names)
 if zone:
     df = load_and_clean(zone)
 
     if "A/C" in df.columns:
-        aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac and ac.upper() != "NAN"])
-        aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts, key="aircraft")
+        aircrafts = sorted(df["A/C"].dropna().unique().tolist())
+        aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts)
     else:
         aircraft = None
 
     if aircraft:
         df_ac = df[df["A/C"] == aircraft]
-
         if "DESCRIPTION" in df_ac.columns:
-            desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d and d.upper() != "NAN"])
-            description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list, key="desc")
+            desc_list = sorted(df_ac["DESCRIPTION"].dropna().unique().tolist())
+            description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list)
         else:
             description = None
 
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
-
             if "ITEM" in df_desc.columns:
-                items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i and i.upper() != "NAN"])
+                items = sorted(df_desc["ITEM"].dropna().unique().tolist())
                 if items:
-                    item = st.selectbox("🔢 Bạn muốn tra cứu Item nào?", items, key="item")
+                    item = st.selectbox("🔢 Item nào?", items)
                     df_desc = df_desc[df_desc["ITEM"] == item]
 
             if not df_desc.empty:
-                df_result = df_desc.copy().reset_index(drop=True)
+                df_result = df_desc.reset_index(drop=True)
 
-                # các cột hiển thị
                 cols_to_show = ["PART NUMBER (PN)"]
                 for alt_col in ["PART INTERCHANGE", "PN INTERCHANGE"]:
                     if alt_col in df_result.columns:
@@ -243,9 +184,9 @@ if zone:
                     cols_to_show.append("NOTE")
 
                 df_result = df_result[cols_to_show]
-                df_result.insert(0, "STT", range(1, len(df_result) + 1))
+                df_result.insert(0, "STT", range(1, len(df_result)+1))
 
-                st.markdown(f'<div class="highlight-msg"><span class="shake">✅</span> Tìm thấy {len(df_result)} dòng dữ liệu</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="highlight-msg">✅ Tìm thấy {len(df_result)} dòng dữ liệu</div>', unsafe_allow_html=True)
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
-                st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
+                st.error("❌ Không tìm thấy dữ liệu.")
