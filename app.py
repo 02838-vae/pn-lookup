@@ -54,29 +54,44 @@ def set_background(image_file):
             overflow-x: auto;
         }}
         table.dataframe {{
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             margin: 15px auto;
             border-radius: 12px;
+            border: 2px solid #336699;   /* Viền đậm hơn */
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             width: 100% !important;
             font-size: 13px !important;
             table-layout: auto;
-            color: #000000 !important; /* Màu chữ đen rõ nét */
+            color: #000000 !important;
         }}
         table.dataframe th, table.dataframe td {{
             text-align: center !important;
             vertical-align: middle !important;
-            padding: 6px 10px;
-            white-space: nowrap !important;   /* luôn hiển thị đầy đủ, không ngắt dòng */
+            padding: 8px 12px;
+            white-space: nowrap !important;
             color: #000000 !important;
         }}
         table.dataframe thead th {{
-            background-color: #e6f2ff !important;
+            background-color: #336699 !important;  /* Header đậm hơn */
+            color: white !important;               /* Chữ trắng nổi bật */
             font-weight: bold !important;
         }}
         table.dataframe tbody tr:hover {{
             background-color: #f0f8ff !important;
+        }}
+        table.dataframe tr:first-child th:first-child {{
+            border-top-left-radius: 12px;
+        }}
+        table.dataframe tr:first-child th:last-child {{
+            border-top-right-radius: 12px;
+        }}
+        table.dataframe tr:last-child td:first-child {{
+            border-bottom-left-radius: 12px;
+        }}
+        table.dataframe tr:last-child td:last-child {{
+            border-bottom-right-radius: 12px;
         }}
         </style>
         """,
@@ -181,7 +196,6 @@ if sheet_name:
                             })
                         )
 
-                        # Hiển thị bảng trong container scroll
                         st.markdown('<div class="scroll-container">', unsafe_allow_html=True)
                         st.table(styled)
                         st.markdown('</div>', unsafe_allow_html=True)
