@@ -14,7 +14,7 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Load background airplane.jpg =====
+# ===== Load background =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         data = f.read()
@@ -27,7 +27,6 @@ st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-    /* Toàn trang */
     .stApp {{
         font-family: 'Special Elite', cursive !important;
         background: 
@@ -46,10 +45,10 @@ st.markdown(f"""
         z-index: -1;
     }}
 
-    .block-container {{ padding-top: 0rem !important; }}
-    header[data-testid="stHeader"] {{ display: none; }}
+    /* Ẩn header mặc định */
+    header[data-testid="stHeader"] {{display: none;}}
 
-    /* Dòng chữ Tổ bảo dưỡng số 1 */
+    /* Tiêu đề */
     .top-title {{
         font-size: 34px;
         font-weight: bold;
@@ -59,8 +58,6 @@ st.markdown(f"""
         text-shadow: 1px 1px 0px #fff;
         font-family: 'Special Elite', cursive !important;
     }}
-
-    /* Tiêu đề chính */
     .main-title {{
         font-size: 26px;
         font-weight: 900;
@@ -72,12 +69,11 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
     }}
 
-    /* Đồng bộ font cho toàn bộ label + text câu hỏi */
-    .stSelectbox label, .stRadio label, .stCheckbox label, .stMultiSelect label,
-    div[data-baseweb="select"] span, .stMarkdown p {{
+    /* CÂU HỎI (label của selectbox/radio/checkbox) */
+    [data-testid="stWidgetLabel"] > label {{
         font-family: 'Special Elite', cursive !important;
         font-size: 18px !important;
-        color: #4e342e !important;
+        color: #2d1b14 !important;
         font-weight: bold !important;
     }}
 
@@ -90,7 +86,6 @@ st.markdown(f"""
         border: 1.5px dashed #5d4037 !important;
         border-radius: 6px !important;
     }}
-
     .stSelectbox div[data-baseweb="popover"] {{
         font-family: 'Special Elite', cursive !important;
         font-size: 15px !important;
@@ -123,7 +118,7 @@ st.markdown(f"""
         color: #3e2723 !important;
         border: 1.5px dashed #5d4037 !important;
     }}
-    table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec !important; }}
+    table.dataframe tbody tr:nth-child(even) td {{background: #f8f4ec !important;}}
     table.dataframe tbody tr:hover td {{
         background: #f1e0c6 !important;
         transition: 0.3s ease-in-out;
@@ -162,11 +157,10 @@ st.markdown(f"""
 st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
-# ===== Dropdowns và logic =====
+# ===== Dropdowns =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
 if zone:
     df = load_and_clean(zone)
-
     if "A/C" in df.columns:
         aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac and ac.upper() != "NAN"])
         aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts, key="aircraft")
@@ -175,7 +169,6 @@ if zone:
 
     if aircraft:
         df_ac = df[df["A/C"] == aircraft]
-
         if "DESCRIPTION" in df_ac.columns:
             desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d and d.upper() != "NAN"])
             description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list, key="desc")
@@ -184,7 +177,6 @@ if zone:
 
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
-
             if "ITEM" in df_desc.columns:
                 items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i and i.upper() != "NAN"])
                 if items:
@@ -193,7 +185,6 @@ if zone:
 
             if not df_desc.empty:
                 df_result = df_desc.copy().reset_index(drop=True)
-
                 cols_to_show = ["PART NUMBER (PN)"]
                 for alt_col in ["PART INTERCHANGE", "PN INTERCHANGE"]:
                     if alt_col in df_result.columns:
@@ -203,7 +194,7 @@ if zone:
                     cols_to_show.append("NOTE")
 
                 df_result = df_result[cols_to_show]
-                df_result.insert(0, "STT", range(1, len(df_result) + 1))
+                df_result.insert(0, "STT", range(1, len(df_result)+1))
 
                 st.markdown(
                     f'<div class="highlight-msg"><span class="shake">✅</span> Tìm thấy {len(df_result)} dòng dữ liệu</div>',
