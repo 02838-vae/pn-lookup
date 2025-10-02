@@ -70,8 +70,8 @@ def set_background(image_file):
             width: 100% !important;
             font-size: 13px !important;
             table-layout: auto;
-            background-color: #ffffff !important;  /* Nền trắng */
-            color: #000000 !important;              /* Chữ đen */
+            background-color: #ffffff !important;
+            color: #000000 !important;
         }}
         table.dataframe th, table.dataframe td {{
             text-align: center !important;
@@ -79,12 +79,13 @@ def set_background(image_file):
             padding: 8px 12px;
             white-space: nowrap !important;
             color: #000000 !important;
-            background-color: #ffffff !important;  /* Nền trắng từng ô */
+            background-color: #ffffff !important;
         }}
         table.dataframe thead th {{
-            background-color: #003366 !important;
-            color: #FFD700 !important;
-            font-weight: bold !important;
+            background-color: #002244 !important;  /* Xanh đậm hơn */
+            color: #ffffff !important;             /* Chữ trắng nổi bật */
+            font-weight: 900 !important;           /* Đậm hẳn */
+            font-size: 14px !important;            /* To hơn một chút */
         }}
         table.dataframe tbody tr:hover {{
             background-color: #f0f8ff !important;
@@ -176,14 +177,12 @@ if sheet_name:
                     if not result.empty:
                         st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
 
-                        # Xác định cột cần hiển thị (bỏ DESCRIPTION)
+                        # Chỉ hiển thị PN, PN Interchange, Note
                         cols = []
                         if "PART NUMBER (PN)" in df.columns:
                             cols.append("PART NUMBER (PN)")
                         if "PART INTERCHANGE" in df.columns:
                             cols.append("PART INTERCHANGE")
-                        if "ITEM" in df.columns and item:
-                            cols.append("ITEM")
                         if "NOTE" in df.columns:
                             cols.append("NOTE")
 
