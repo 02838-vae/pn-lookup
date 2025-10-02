@@ -27,12 +27,13 @@ st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-    /* Nền vintage với overlay mờ */
+    /* Nền vintage với overlay sepia */
     .stApp {{
         background: 
-            linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)), 
+            linear-gradient(rgba(94, 38, 18, 0.55), rgba(250, 240, 202, 0.7)), 
             url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
+        background-blend-mode: multiply;
         font-family: 'Special Elite', cursive !important;
     }}
 
@@ -55,11 +56,11 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
     }}
     @keyframes colorchange {{
-        0% {{color: #8B0000;}}
-        25% {{color: #2F4F4F;}}
-        50% {{color: #006400;}}
-        75% {{color: #8B4513;}}
-        100% {{color: #483D8B;}}
+        0% {{color: #5d4037;}}
+        25% {{color: #6d4c41;}}
+        50% {{color: #8d6e63;}}
+        75% {{color: #a1887f;}}
+        100% {{color: #3e2723;}}
     }}
 
     /* Tiêu đề chính */
@@ -67,7 +68,7 @@ st.markdown(f"""
         font-size: 28px;
         font-weight: 900;
         text-align: center;
-        background: linear-gradient(90deg, #5d4037, #8d6e63, #d7ccc8);
+        background: linear-gradient(90deg, #5d4037, #a1887f, #d7ccc8);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-top: 10px;
@@ -77,13 +78,13 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
     }}
 
-    /* Label câu hỏi (selectbox, radio...) */
+    /* Label câu hỏi */
     div[role="group"] label, label[data-testid="stWidgetLabel"] {{
         font-family: 'Special Elite', cursive !important;
         font-size: 19px !important;
         font-weight: bold !important;
         color: #2c1a0c !important;
-        text-shadow: 1px 1px 2px #fff !important;
+        text-shadow: 1px 1px 2px #fdf6e3 !important;
     }}
 
     /* Hộp selectbox */
@@ -91,14 +92,14 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
         font-size: 15px !important;
         color: #2c1a0c !important;
-        background: #fdfbf2 !important;
+        background: #fdf6e3 !important;
         border: 1.5px dashed #5d4037 !important;
         border-radius: 6px !important;
     }}
     .stSelectbox div[data-baseweb="popover"] {{
         font-family: 'Special Elite', cursive !important;
         font-size: 15px !important;
-        background: #fdfbf2 !important;
+        background: #fdf6e3 !important;
         color: #2c1a0c !important;
         border: 1.5px dashed #5d4037 !important;
     }}
@@ -114,8 +115,8 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
     }}
     table.dataframe thead th {{
-        background: #3e2723 !important;
-        color: #fdfbf2 !important;
+        background: #5d4037 !important;
+        color: #fdf6e3 !important;
         font-weight: bold;
         text-align: center;
         padding: 10px !important;
@@ -130,7 +131,7 @@ st.markdown(f"""
         border: 1.5px solid #3e2723 !important;
     }}
     table.dataframe tbody tr:nth-child(even) td {{
-        background: #f5f5dc !important;
+        background: #f8f1df !important;
     }}
     table.dataframe tbody tr:hover td {{
         background: #ffeaa7 !important;
