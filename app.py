@@ -45,7 +45,6 @@ st.markdown(f"""
         z-index: -1;
     }}
 
-    /* Ẩn header mặc định */
     header[data-testid="stHeader"] {{display: none;}}
 
     /* Tiêu đề */
@@ -54,43 +53,42 @@ st.markdown(f"""
         font-weight: bold;
         text-align: center;
         margin: 20px auto 10px auto;
-        color: #3e2723;
+        color: #2c1a0c;
         text-shadow: 1px 1px 0px #fff;
-        font-family: 'Special Elite', cursive !important;
     }}
     .main-title {{
         font-size: 26px;
         font-weight: 900;
         text-align: center;
-        color: #5d4037;
+        color: #4b2e1f;
         margin-top: 5px;
         margin-bottom: 20px;
-        text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-        font-family: 'Special Elite', cursive !important;
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
     }}
 
-    /* CÂU HỎI (label của selectbox/radio/checkbox) */
-    [data-testid="stWidgetLabel"] > label {{
+    /* LABEL câu hỏi (selectbox, radio, checkbox) */
+    div[data-testid="stWidgetLabel"] label {{
         font-family: 'Special Elite', cursive !important;
-        font-size: 18px !important;
-        color: #2d1b14 !important;
+        font-size: 19px !important;
         font-weight: bold !important;
+        color: #1a0d00 !important;   /* đậm hơn, dễ đọc */
+        text-shadow: 0.5px 0.5px 1px #ffffff;
     }}
 
     /* Ô dropdown */
     .stSelectbox div[data-baseweb="select"] {{
         font-family: 'Special Elite', cursive !important;
         font-size: 15px !important;
-        color: #3e2723 !important;
-        background: #fdfbf5 !important;
+        color: #2c1a0c !important;
+        background: #fdfbf2 !important;
         border: 1.5px dashed #5d4037 !important;
         border-radius: 6px !important;
     }}
     .stSelectbox div[data-baseweb="popover"] {{
         font-family: 'Special Elite', cursive !important;
         font-size: 15px !important;
-        background: #fdfbf5 !important;
-        color: #3e2723 !important;
+        background: #fdfbf2 !important;
+        color: #2c1a0c !important;
         border: 1.5px dashed #5d4037 !important;
     }}
 
@@ -137,18 +135,6 @@ st.markdown(f"""
         align-items: center;
         justify-content: center;
         gap: 8px;
-        font-family: 'Special Elite', cursive !important;
-    }}
-    .shake {{
-        display: inline-block;
-        animation: shake 1s infinite;
-    }}
-    @keyframes shake {{
-        0% {{ transform: translate(1px, 1px) rotate(0deg); }}
-        25% {{ transform: translate(-1px, -1px) rotate(-1deg); }}
-        50% {{ transform: translate(-2px, 2px) rotate(1deg); }}
-        75% {{ transform: translate(2px, -2px) rotate(1deg); }}
-        100% {{ transform: translate(1px, 1px) rotate(0deg); }}
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -197,7 +183,7 @@ if zone:
                 df_result.insert(0, "STT", range(1, len(df_result)+1))
 
                 st.markdown(
-                    f'<div class="highlight-msg"><span class="shake">✅</span> Tìm thấy {len(df_result)} dòng dữ liệu</div>',
+                    f'<div class="highlight-msg">✅ Tìm thấy {len(df_result)} dòng dữ liệu</div>',
                     unsafe_allow_html=True
                 )
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
