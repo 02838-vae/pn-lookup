@@ -39,7 +39,7 @@ st.markdown(f"""
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(255,255,255,0.85); /* nền chung mờ */
+        background: rgba(255,255,255,0.85); /* mờ hơn để text nổi bật */
         z-index: -1;
     }}
 
@@ -85,7 +85,7 @@ st.markdown(f"""
 
     /* ===== Vùng câu hỏi (selectbox) ===== */
     div[data-baseweb="select"] {{
-        background: rgba(255,255,255,0.95) !important; /* trắng rõ hơn */
+        background: rgba(255,255,255,0.98) !important; /* trắng rõ hẳn */
         border-radius: 12px !important;
         box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
         padding: 4px !important;
@@ -106,7 +106,7 @@ st.markdown(f"""
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        background: rgba(255,255,255,0.98); /* nền trắng rõ hơn */
+        background: rgba(255,255,255,1); /* nền trắng hoàn toàn */
     }}
     table.dataframe thead th {{
         background: #2c3e50 !important;
@@ -228,5 +228,3 @@ if zone:
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
-
-
