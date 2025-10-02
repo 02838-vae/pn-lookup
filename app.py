@@ -21,18 +21,16 @@ def set_background(bg_file, cloud_file):
 
     page_bg = f"""
     <style>
-    /* Layer 1: Ảnh máy bay */
-    .stApp {{
-        background-image: url("data:image/jpg;base64,{bg_encoded}");
+    /* Background base */
+    body {{
+        background: url("data:image/jpg;base64,{bg_encoded}") no-repeat center center fixed;
         background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        position: relative;
-        z-index: 0;
+        margin: 0;
+        padding: 0;
     }}
 
-    /* Layer 2: Mây bay ngang */
-    .stApp::before {{
+    /* Layer: Clouds */
+    body::before {{
         content: "";
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
@@ -43,15 +41,21 @@ def set_background(bg_file, cloud_file):
         z-index: -2;
     }}
 
-    /* Layer 3: Gradient động */
-    .stApp::after {{
+    /* Layer: Gradient overlay */
+    body::after {{
         content: "";
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+        background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.15));
         opacity: 0.6;
         animation: moveGradient 25s ease-in-out infinite;
         z-index: -1;
+    }}
+
+    /* Nội dung app nằm nổi lên */
+    .block-container {{
+        position: relative;
+        z-index: 1;
     }}
 
     @keyframes moveClouds {{
@@ -82,12 +86,13 @@ def set_background(bg_file, cloud_file):
 
     /* Tiêu đề chính */
     .main-title {{
-        font-size: 28px;
+        font-size: 24px;
         font-weight: bold;
         text-align: center;
         color: #ffe600;
         margin-top: -10px;
         margin-bottom: 20px;
+        text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
     }}
 
     /* Kết quả tìm thấy */
@@ -120,10 +125,10 @@ def set_background(bg_file, cloud_file):
         color: white;
         font-weight: bold;
         padding: 10px;
-        border: 1px solid #333333;
+        border: 2px solid #333333;
     }}
     tbody td {{
-        border: 1px solid #666666;
+        border: 1px solid #444444;
         padding: 8px;
         color: #000000;
     }}
