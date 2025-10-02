@@ -22,7 +22,7 @@ def get_base64_of_bin_file(bin_file):
 
 img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-# ===== CSS Trang trí =====
+# ===== CSS =====
 st.markdown(f"""
     <style>
     /* Nền trang */
@@ -32,8 +32,6 @@ st.markdown(f"""
         background-position: center;
         background-attachment: fixed;
     }}
-
-    /* Overlay trắng mờ để chữ rõ */
     .stApp::after {{
         content: "";
         position: fixed;
@@ -53,6 +51,7 @@ st.markdown(f"""
         animation: colorchange 5s infinite alternate;
         display: block;
         margin: 15px auto;
+        white-space: nowrap;
     }}
     @keyframes colorchange {{
         0% {{color: #e74c3c;}}
@@ -64,13 +63,14 @@ st.markdown(f"""
 
     /* Tiêu đề chính Tra cứu Part number */
     .main-title {{
-        font-size: 36px;
+        font-size: 38px;
         font-weight: 900;
         text-align: center;
         color: #2c3e50;
-        margin-top: 10px;
+        margin-top: 5px;
         margin-bottom: 20px;
         text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+        white-space: nowrap; /* giữ 1 hàng */
     }}
 
     /* Bảng kết quả */
@@ -105,7 +105,7 @@ st.markdown(f"""
         transition: 0.2s ease-in-out;
     }}
 
-    /* Thông báo tìm thấy dữ liệu - blink */
+    /* Thông báo tìm thấy dữ liệu với icon động */
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
@@ -115,12 +115,27 @@ st.markdown(f"""
         border-left: 6px solid #154360;
         border-radius: 6px;
         margin: 15px 0;
-        animation: blink 1.2s infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
     }}
-    @keyframes blink {{
-        0% {{ opacity: 1; }}
-        50% {{ opacity: 0.4; }}
-        100% {{ opacity: 1; }}
+    .shake {{
+        display: inline-block;
+        animation: shake 1s infinite;
+    }}
+    @keyframes shake {{
+        0% {{ transform: translate(1px, 1px) rotate(0deg); }}
+        10% {{ transform: translate(-1px, -2px) rotate(-1deg); }}
+        20% {{ transform: translate(-3px, 0px) rotate(1deg); }}
+        30% {{ transform: translate(3px, 2px) rotate(0deg); }}
+        40% {{ transform: translate(1px, -1px) rotate(1deg); }}
+        50% {{ transform: translate(-1px, 2px) rotate(-1deg); }}
+        60% {{ transform: translate(-3px, 1px) rotate(0deg); }}
+        70% {{ transform: translate(3px, 1px) rotate(-1deg); }}
+        80% {{ transform: translate(-1px, -1px) rotate(1deg); }}
+        90% {{ transform: translate(1px, 2px) rotate(0deg); }}
+        100% {{ transform: translate(1px, -2px) rotate(-1deg); }}
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -179,7 +194,10 @@ if zone:
                 # Thêm cột STT
                 df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
-                st.markdown(f'<div class="highlight-msg">✅ Tìm thấy {len(df_result)} dòng dữ liệu</div>', unsafe_allow_html=True)
+                st.markdown(
+                    f'<div class="highlight-msg"><span class="shake">✅</span> Tìm thấy {len(df_result)} dòng dữ liệu</div>',
+                    unsafe_allow_html=True
+                )
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
