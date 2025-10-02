@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 import base64
 
-# ===== CSS: Background airplane.jpg + Hiệu ứng =====
+# ===== CSS: Background airplane.jpg + hiệu ứng =====
 def set_background(image_file):
     with open(image_file, "rb") as f:
         data = f.read()
@@ -49,60 +49,56 @@ def set_background(image_file):
             color: #003366;
         }}
 
-        /* Style cho label (câu hỏi) */
+        /* Label (câu hỏi) */
         .stSelectbox label, .stMarkdown p {{
             font-weight: bold !important;
             color: #111111 !important;
         }}
 
         /* Bảng kết quả */
-        .scroll-container {{
-            overflow-x: auto;
-        }}
-        table.dataframe {{
+        .custom-table {{
             border-collapse: separate;
             border-spacing: 0;
-            margin: 15px auto;
+            margin: 20px auto;
             border-radius: 12px;
-            border: 3px solid #003366;
-            overflow: hidden;
-            box-shadow: 0 4px 25px rgba(0,0,0,0.15);
-            width: 100% !important;
-            font-size: 13px !important;
-            table-layout: auto;
-            background-color: #ffffff !important;
-            color: #000000 !important;
+            border: 2px solid #003366;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            width: 100%;
+            font-size: 14px;
+            background-color: #ffffff;
+            color: #000000;
         }}
-        table.dataframe thead th {{
-            background-color: #003366 !important;  /* xanh đậm hơn */
-            color: #ffffff !important;             /* chữ trắng */
-            font-weight: 900 !important;           /* đậm */
-            font-size: 15px !important;            /* to hơn */
-            text-align: center !important;
-            border-bottom: 3px solid #001122 !important;
+        .custom-table th {{
+            background-color: #003366;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 10px;
+            text-align: center;
+            border-bottom: 2px solid #001122;
+            font-size: 15px;
         }}
-        table.dataframe th, table.dataframe td {{
-            text-align: center !important;
-            vertical-align: middle !important;
+        .custom-table td {{
+            text-align: center;
+            vertical-align: middle;
             padding: 8px 12px;
-            white-space: nowrap !important;
-            color: #000000 !important;
-            background-color: #ffffff !important;
-            border: 1px solid #cccccc !important;
+            border: 1px solid #cccccc;
+            white-space: nowrap;
+            color: #000000;
+            background-color: #ffffff;
         }}
-        table.dataframe tbody tr:hover {{
-            background-color: #f0f8ff !important;
+        .custom-table tr:hover td {{
+            background-color: #f0f8ff;
         }}
-        table.dataframe tr:first-child th:first-child {{
+        .custom-table tr:first-child th:first-child {{
             border-top-left-radius: 12px;
         }}
-        table.dataframe tr:first-child th:last-child {{
+        .custom-table tr:first-child th:last-child {{
             border-top-right-radius: 12px;
         }}
-        table.dataframe tr:last-child td:first-child {{
+        .custom-table tr:last-child td:first-child {{
             border-bottom-left-radius: 12px;
         }}
-        table.dataframe tr:last-child td:last-child {{
+        .custom-table tr:last-child td:last-child {{
             border-bottom-right-radius: 12px;
         }}
         </style>
@@ -127,7 +123,7 @@ if sheet_name:
     df = pd.read_excel(excel_file, sheet_name=sheet_name)
     df.columns = df.columns.str.strip().str.upper()
 
-    # Map cột không đồng nhất
+    # Map tên cột đồng nhất
     rename_map = {
         "PN INTERCHANGE": "PART INTERCHANGE",
         "P/N INTERCHANGE": "PART INTERCHANGE",
@@ -135,7 +131,7 @@ if sheet_name:
     }
     df = df.rename(columns=lambda x: rename_map.get(x, x))
 
-    # Chuẩn hóa dữ liệu text
+    # Chuẩn hóa text + loại NAN
     for col in df.columns:
         if df[col].dtype == "object":
             df[col] = (
@@ -145,7 +141,7 @@ if sheet_name:
                 .str.replace(r"\s+", " ", regex=True)
                 .str.upper()
             )
-            df[col] = df[col].replace(["NAN", "NaN", "nan", "NONE"], None)
+            df[col] = df[col].replace(["NAN", "NaN", "nan", "NONE"], "")
 
     # --- Bước 2: chọn A/C ---
     if "A/C" in df.columns:
@@ -176,11 +172,10 @@ if sheet_name:
                     if item:
                         result = result[result["ITEM"] == item]
 
-                    # --- Hiển thị kết quả ---
                     if not result.empty:
                         st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
 
-                        # Chỉ hiển thị PN, PN Interchange, Note
+                        # Chỉ giữ các cột cần hiển thị
                         cols = []
                         if "PART NUMBER (PN)" in df.columns:
                             cols.append("PART NUMBER (PN)")
@@ -193,23 +188,9 @@ if sheet_name:
                         result_display.index = result_display.index + 1
                         result_display.index.name = "STT"
 
-                        # Bỏ NAN trong bảng kết quả
-                        result_display = result_display.replace(["NAN", "NaN", "nan", "NONE"], "")
-
-                        styled = (
-                            result_display.style
-                            .set_properties(**{
-                                "text-align": "center",
-                                "vertical-align": "middle",
-                                "white-space": "nowrap",
-                                "color": "black",
-                                "background-color": "white"
-                            })
-                        )
-
-                        st.markdown('<div class="scroll-container">', unsafe_allow_html=True)
-                        st.table(styled)
-                        st.markdown('</div>', unsafe_allow_html=True)
+                        # Xuất bảng HTML (đảm bảo style header hiển thị)
+                        table_html = result_display.to_html(classes="custom-table", escape=False)
+                        st.markdown(table_html, unsafe_allow_html=True)
 
                     else:
                         st.error("Không tìm thấy dữ liệu!")
