@@ -36,7 +36,7 @@ st.markdown(f"""
         background-size: cover;
     }}
 
-    /* Hiệu ứng giấy cũ overlay */
+    /* Overlay giấy cũ */
     .stApp::after {{
         content: "";
         position: fixed;
@@ -63,6 +63,7 @@ st.markdown(f"""
         margin: 20px auto 10px auto;
         color: #3e2723;
         text-shadow: 1px 1px 0px #fff;
+        font-family: 'Special Elite', cursive !important;
     }}
 
     /* Tiêu đề chính */
@@ -74,6 +75,7 @@ st.markdown(f"""
         margin-top: 5px;
         margin-bottom: 20px;
         text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        font-family: 'Special Elite', cursive !important;
     }}
 
     /* Label câu hỏi */
@@ -81,9 +83,29 @@ st.markdown(f"""
         font-weight: bold !important;
         font-size: 18px !important;
         color: #4e342e !important;
+        font-family: 'Special Elite', cursive !important;
     }}
 
-    /* Bảng kết quả kiểu vintage */
+    /* Ô dropdown */
+    .stSelectbox div[data-baseweb="select"] {{
+        font-family: 'Special Elite', cursive !important;
+        font-size: 15px !important;
+        color: #3e2723 !important;
+        background: #fdfbf5 !important;
+        border: 1.5px dashed #5d4037 !important;
+        border-radius: 6px !important;
+    }}
+
+    /* Các lựa chọn trong dropdown */
+    .stSelectbox div[data-baseweb="popover"] {{
+        font-family: 'Special Elite', cursive !important;
+        font-size: 15px !important;
+        background: #fdfbf5 !important;
+        color: #3e2723 !important;
+        border: 1.5px dashed #5d4037 !important;
+    }}
+
+    /* Bảng kết quả */
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
