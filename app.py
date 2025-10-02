@@ -1,8 +1,6 @@
 import pandas as pd
 import streamlit as st
 import base64
-import glob
-import os
 
 # ===== Đọc file Excel =====
 excel_file = "A787.xlsx"
@@ -16,86 +14,41 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Load nhiều ảnh background =====
-def get_base64(path):
-    with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
+# ===== Load background airplane.jpg =====
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
-# Tìm tất cả file airplane*
-bg_files = sorted(
-    glob.glob("airplane*.jpg") +
-    glob.glob("airplane*.jpeg") +
-    glob.glob("airplane*.png")
-)
-
-# Nếu không có → fallback 1 ảnh mặc định
-if not bg_files and os.path.exists("airplane.jpg"):
-    bg_files = ["airplane.jpg"]
-
-bg64 = [get_base64(f) for f in bg_files]
-
-# Nếu có nhiều ảnh → tạo keyframes slideshow
-keyframes = ""
-if len(bg64) > 1:
-    step = 100 // len(bg64)
-    for i, img in enumerate(bg64):
-        pct1 = i * step
-        pct2 = (i + 1) * step
-        keyframes += f"""
-        {pct1}% {{ background-image: url("data:image/jpeg;base64,{img}"); opacity: 0; }}
-        {pct1+5}% {{ background-image: url("data:image/jpeg;base64,{img}"); opacity: 1; }}
-        {pct2-5}% {{ background-image: url("data:image/jpeg;base64,{img}"); opacity: 1; }}
-        {pct2}% {{ background-image: url("data:image/jpeg;base64,{img}"); opacity: 0; }}
-        """
-else:
-    # Nếu chỉ có 1 ảnh → giữ nguyên
-    keyframes = f"""
-    0% {{ background-image: url("data:image/jpeg;base64,{bg64[0]}"); opacity:1; }}
-    100% {{ background-image: url("data:image/jpeg;base64,{bg64[0]}"); opacity:1; }}
-    """
+img_base64 = get_base64_of_bin_file("airplane.jpg")
 
 # ===== CSS =====
 st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
-
-    /* Background slideshow */
-    .stApp::before {{
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        animation: bgslide {len(bg64)*10 if len(bg64)>1 else 60}s infinite;
-        z-index: -2;
-    }}
-
-    @keyframes bgslide {{
-        {keyframes}
-    }}
-
-    /* Overlay làm mờ */
-    .stApp::after {{
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(255,255,255,0.7);
-        z-index: -1;
-    }}
-
-    /* Font vintage */
+    /* Nền trang với overlay trắng mờ */
     .stApp {{
-        font-family: 'Special Elite', cursive !important;
+        background: 
+            linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)), 
+            url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
+        background-size: cover;
+    }}
+
+    .block-container {{
+        padding-top: 0rem !important;
+    }}
+
+    header[data-testid="stHeader"] {{
+        display: none;
     }}
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
-        font-size: 36px;
-        font-weight: bold;
+        font-size: 32px;   /* tăng size */
+        font-weight: 900;
         text-align: center;
         animation: colorchange 5s infinite alternate;
-        margin: 15px auto;
+        margin: 20px auto 10px auto;
+        white-space: nowrap;
     }}
     @keyframes colorchange {{
         0% {{color: #e74c3c;}}
@@ -107,19 +60,83 @@ st.markdown(f"""
 
     /* Tiêu đề chính */
     .main-title {{
-        font-size: 28px;
+        font-size: 28px;  /* tăng size */
         font-weight: 900;
         text-align: center;
-        color: #2c3e50;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        background: linear-gradient(90deg, #ff6a00, #ff8c00, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-top: 10px;
         margin-bottom: 20px;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.4); /* giảm đổ bóng */
+        white-space: nowrap;
     }}
 
     /* Label câu hỏi */
     .stSelectbox label {{
         font-weight: 900 !important;
         font-size: 18px !important;
-        color: #000 !important;
+        color: #0b3d91 !important;
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
+    }}
+
+    /* Bảng kết quả */
+    table.dataframe {{
+        width: 100%;
+        border-collapse: collapse !important;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        background: white;
+    }}
+    table.dataframe thead th {{
+        background: #2c3e50 !important;
+        color: white !important;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px !important;
+        font-size: 15px;
+        border: 2px solid #2c3e50 !important;
+    }}
+    table.dataframe tbody td {{
+        text-align: center !important;
+        padding: 8px !important;
+        font-size: 14px;
+        color: #2c3e50 !important;
+        border: 1.5px solid #2c3e50 !important;
+    }}
+    table.dataframe tbody tr:nth-child(even) td {{
+        background: #f8f9fa !important;
+    }}
+    table.dataframe tbody tr:hover td {{
+        background: #ffeaa7 !important;
+        transition: 0.2s ease-in-out;
+    }}
+
+    .highlight-msg {{
+        font-size: 18px;
+        font-weight: bold;
+        color: #154360;
+        background: #d6eaf8;
+        padding: 10px 15px;
+        border-left: 6px solid #154360;
+        border-radius: 6px;
+        margin: 15px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }}
+    .shake {{
+        display: inline-block;
+        animation: shake 1s infinite;
+    }}
+    @keyframes shake {{
+        0% {{ transform: translate(1px, 1px) rotate(0deg); }}
+        25% {{ transform: translate(-1px, -1px) rotate(-1deg); }}
+        50% {{ transform: translate(-2px, 2px) rotate(1deg); }}
+        75% {{ transform: translate(2px, -2px) rotate(1deg); }}
+        100% {{ transform: translate(1px, 1px) rotate(0deg); }}
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -128,7 +145,7 @@ st.markdown(f"""
 st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
-# ===== Dropdown Zone =====
+# ===== Dropdowns và logic =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
 if zone:
     df = load_and_clean(zone)
@@ -159,6 +176,7 @@ if zone:
 
             if not df_desc.empty:
                 df_result = df_desc.copy().reset_index(drop=True)
+
                 cols_to_show = ["PART NUMBER (PN)"]
                 for alt_col in ["PART INTERCHANGE", "PN INTERCHANGE"]:
                     if alt_col in df_result.columns:
@@ -170,7 +188,10 @@ if zone:
                 df_result = df_result[cols_to_show]
                 df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
-                st.success(f"✅ Tìm thấy {len(df_result)} dòng dữ liệu")
-                st.dataframe(df_result, use_container_width=True)
+                st.markdown(
+                    f'<div class="highlight-msg"><span class="shake">✅</span> Tìm thấy {len(df_result)} dòng dữ liệu</div>',
+                    unsafe_allow_html=True
+                )
+                st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
