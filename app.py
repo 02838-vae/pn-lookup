@@ -39,17 +39,7 @@ st.markdown(f"""
     background: {bg_css};
     background-size: cover;
     font-family: 'Special+Elite', cursive !important;
-    position: relative;
-}}
-
-/* Nếu có ảnh → phủ filter sepia */
-.stApp::before {{
-    content: "";
-    position: fixed;
-    top:0; left:0; right:0; bottom:0;
-    background: rgba(255,255,240,0.35);
-    backdrop-filter: sepia(0.6) contrast(1.05) brightness(1.1);
-    z-index: 0;
+    filter: sepia(0.4) contrast(1.1) brightness(1.05); /* vintage effect trực tiếp trên nền */
 }}
 
 .block-container {{
