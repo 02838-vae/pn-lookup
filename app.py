@@ -1,200 +1,122 @@
-import pandas as pd
 import streamlit as st
-import base64
+import pandas as pd
 
-# ===== CSS: Background airplane.jpg + hiệu ứng =====
-def set_background(image_file):
-    with open(image_file, "rb") as f:
-        data = f.read()
-    b64 = base64.b64encode(data).decode()
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background: linear-gradient(rgba(240,248,255,0.85), rgba(255,255,255,0.9)),
-                        url("data:image/jpg;base64,{b64}") no-repeat center center fixed;
-            background-size: cover;
-            font-family: "Segoe UI", Helvetica, Arial, sans-serif;
-        }}
-
-        @keyframes gradientShift {{
-            0% {{ background-position: 0% 50%; }}
-            50% {{ background-position: 100% 50%; }}
-            100% {{ background-position: 0% 50%; }}
-        }}
-        @keyframes neonPulse {{
-            0%, 100% {{ text-shadow: 0 0 5px #fff, 0 0 10px #0ff; }}
-            50% {{ text-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }}
-        }}
-
-        /* Tiêu đề trên cùng */
-        .animated-title {{
-            font-size: 36px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 10px;
-            background: linear-gradient(-45deg,#ff0000,#ff7300,#ffeb00,#47ff00,#00ffee,#2b65ff,#8000ff,#ff0080);
-            background-size: 600% 600%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientShift 10s ease infinite, neonPulse 2s ease-in-out infinite;
-        }}
-
-        /* Tiêu đề chính */
-        .main-title {{
-            margin-top: 40px;
-            font-size: 28px;
-            text-align: center;
-            font-weight: bold;
-            color: #003366;
-        }}
-
-        /* Label (câu hỏi) */
-        .stSelectbox label, .stMarkdown p {{
-            font-weight: bold !important;
-            color: #111111 !important;
-        }}
-
-        /* Bảng kết quả */
-        .custom-table {{
-            border-collapse: separate;
-            border-spacing: 0;
-            margin: 20px auto;
-            border-radius: 12px;
-            border: 2px solid #003366;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            width: 100%;
-            font-size: 14px;
-            background-color: #ffffff;
-            color: #000000;
-        }}
-        .custom-table th {{
-            background-color: #003366;
-            color: #ffffff;
-            font-weight: bold;
-            padding: 10px;
-            text-align: center;
-            border-bottom: 2px solid #001122;
-            font-size: 15px;
-        }}
-        .custom-table td {{
-            text-align: center;
-            vertical-align: middle;
-            padding: 8px 12px;
-            border: 1px solid #cccccc;
-            white-space: nowrap;
-            color: #000000;
-            background-color: #ffffff;
-        }}
-        .custom-table tr:hover td {{
-            background-color: #f0f8ff;
-        }}
-        .custom-table tr:first-child th:first-child {{
-            border-top-left-radius: 12px;
-        }}
-        .custom-table tr:first-child th:last-child {{
-            border-top-right-radius: 12px;
-        }}
-        .custom-table tr:last-child td:first-child {{
-            border-bottom-left-radius: 12px;
-        }}
-        .custom-table tr:last-child td:last-child {{
-            border-bottom-right-radius: 12px;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-set_background("airplane.jpg")
-
-# ===== ĐỌC FILE EXCEL =====
-excel_file = "A787.xlsx"
+# Đọc toàn bộ file Excel
+excel_file = "data.xlsx"
 xls = pd.ExcelFile(excel_file)
 
-# ===== APP =====
-st.markdown('<div class="animated-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
-st.markdown('<div class="main-title">🔎 Tra cứu Part Number (PN)</div>', unsafe_allow_html=True)
+# CSS tuỳ chỉnh
+st.markdown("""
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .main-title {
+            font-size: 26px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .sub-title {
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            animation: color-change 4s infinite;
+        }
+        @keyframes color-change {
+            0% {color: #ff4d4d;}
+            25% {color: #ffa64d;}
+            50% {color: #4dff4d;}
+            75% {color: #4da6ff;}
+            100% {color: #ff4dff;}
+        }
+        table.dataframe {
+            width: 100% !important;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+        }
+        table.dataframe th {
+            background-color: #2c3e50;
+            color: white !important;
+            font-weight: bold;
+            text-align: center !important;
+            padding: 10px;
+            font-size: 14px;
+        }
+        table.dataframe td {
+            text-align: center !important;
+            padding: 8px;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-# --- Bước 1: chọn sheet (zone) ---
-sheet_name = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="sheet")
+# Tiêu đề động
+st.markdown('<div class="sub-title">✈️ Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🔎 Tra cứu Part number (PN)</div>', unsafe_allow_html=True)
+
+# Dropdown chọn sheet
+sheet_name = st.selectbox("🌍 Bạn muốn tra cứu zone nào?", xls.sheet_names)
 
 if sheet_name:
     df = pd.read_excel(excel_file, sheet_name=sheet_name)
-    df.columns = df.columns.str.strip().str.upper()
 
-    # Map tên cột đồng nhất
-    rename_map = {
-        "PN INTERCHANGE": "PART INTERCHANGE",
-        "P/N INTERCHANGE": "PART INTERCHANGE",
-        "INTERCHANGE": "PART INTERCHANGE",
-    }
-    df = df.rename(columns=lambda x: rename_map.get(x, x))
+    # Bỏ NaN
+    df = df.fillna("")
 
-    # Chuẩn hóa text + loại NAN
-    for col in df.columns:
-        if df[col].dtype == "object":
-            df[col] = (
-                df[col]
-                .astype(str)
-                .str.strip()
-                .str.replace(r"\s+", " ", regex=True)
-                .str.upper()
-            )
-            df[col] = df[col].replace(["NAN", "NaN", "nan", "NONE"], "")
+    # Dropdown chọn A/C
+    ac_list = sorted(df["A/C"].unique().tolist())
+    ac_list = [x for x in ac_list if x != ""]
+    selected_ac = st.selectbox("🛫 Loại máy bay?", ac_list)
 
-    # --- Bước 2: chọn A/C ---
-    if "A/C" in df.columns:
-        aircrafts = sorted([x for x in df["A/C"].dropna().unique() if str(x).strip() != ""])
-        aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts, key="aircraft")
+    if selected_ac:
+        df_ac = df[df["A/C"] == selected_ac]
 
-        if aircraft:
-            # --- Bước 3: chọn Description ---
-            if "DESCRIPTION" in df.columns:
-                descriptions = sorted([x for x in df[df["A/C"] == aircraft]["DESCRIPTION"].dropna().unique() if str(x).strip() != ""])
-                description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", descriptions, key="description")
+        # Dropdown chọn Description
+        desc_list = sorted(df_ac["Description"].unique().tolist())
+        desc_list = [x for x in desc_list if x != ""]
+        selected_desc = st.selectbox("📘 Bạn muốn tra cứu phần nào?", desc_list)
 
-                if description:
-                    # --- Nếu có cột ITEM thì hỏi thêm ---
-                    if "ITEM" in df.columns:
-                        items = sorted(
-                            [x for x in df[(df["A/C"] == aircraft) & (df["DESCRIPTION"] == description)]["ITEM"].dropna().unique() if str(x).strip() != ""]
-                        )
-                        if items:
-                            item = st.selectbox("📌 Bạn muốn tra cứu Item nào?", items, key="item")
-                        else:
-                            item = None
-                    else:
-                        item = None
+        if selected_desc:
+            df_desc = df_ac[df_ac["Description"] == selected_desc]
 
-                    # --- Lọc kết quả ---
-                    result = df[(df["A/C"] == aircraft) & (df["DESCRIPTION"] == description)]
-                    if item:
-                        result = result[result["ITEM"] == item]
-
-                    if not result.empty:
-                        st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
-
-                        # Chỉ giữ các cột cần hiển thị
-                        cols = []
-                        if "PART NUMBER (PN)" in df.columns:
-                            cols.append("PART NUMBER (PN)")
-                        if "PART INTERCHANGE" in df.columns:
-                            cols.append("PART INTERCHANGE")
-                        if "NOTE" in df.columns:
-                            cols.append("NOTE")
-
-                        result_display = result[cols].reset_index(drop=True)
-                        result_display.index = result_display.index + 1
-                        result_display.index.name = "STT"
-
-                        # Xuất bảng HTML (đảm bảo style header hiển thị)
-                        table_html = result_display.to_html(classes="custom-table", escape=False)
-                        st.markdown(table_html, unsafe_allow_html=True)
-
-                    else:
-                        st.error("Không tìm thấy dữ liệu!")
+            # Nếu có cột Item thì hỏi tiếp
+            if "Item" in df_desc.columns:
+                item_list = sorted(df_desc["Item"].unique().tolist())
+                item_list = [x for x in item_list if x != ""]
+                if item_list:
+                    selected_item = st.selectbox("📌 Bạn muốn tra cứu Item nào?", item_list)
+                    result = df_desc[df_desc["Item"] == selected_item]
+                else:
+                    result = df_desc
             else:
-                st.warning("Sheet này không có cột DESCRIPTION!")
-    else:
-        st.warning("Sheet này không có cột A/C!")
+                result = df_desc
+
+            if not result.empty:
+                st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
+
+                # Chỉ giữ cột PN, PN interchange, Note
+                cols_to_show = ["PART NUMBER (PN)", "PART INTERCHANGE", "NOTE"]
+                available_cols = [c for c in cols_to_show if c in result.columns]
+                result = result[available_cols]
+
+                # Reset index để thêm STT bắt đầu từ 1
+                result = result.reset_index(drop=True)
+                result.index = result.index + 1
+                result.index.name = "STT"
+
+                # Xuống dòng PN interchange nếu có nhiều
+                if "PART INTERCHANGE" in result.columns:
+                    result["PART INTERCHANGE"] = result["PART INTERCHANGE"].apply(
+                        lambda x: "<br>".join([s.strip() for s in str(x).split("/")])
+                    )
+
+                # Xuất bảng
+                st.markdown(result.to_html(escape=False), unsafe_allow_html=True)
+            else:
+                st.error("Không tìm thấy dữ liệu phù hợp.")
