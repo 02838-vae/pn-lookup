@@ -22,12 +22,12 @@ def get_base64_of_bin_file(bin_file):
 
 img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-# ===== CSS Vintage =====
+# ===== CSS Vintage + Film Grain =====
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-    /* Nền vintage với overlay sepia */
+    /* Nền vintage với overlay sepia và film grain */
     .stApp {{
         background: 
             linear-gradient(rgba(94, 38, 18, 0.55), rgba(250, 240, 202, 0.7)), 
@@ -35,10 +35,43 @@ st.markdown(f"""
         background-size: cover;
         background-blend-mode: multiply;
         font-family: 'Special Elite', cursive !important;
+        position: relative;
+        overflow: hidden;
+    }}
+
+    /* Lớp noise overlay giả lập film grain */
+    .stApp::after {{
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("https://i.ibb.co/8c4tDvc/noise.png"); /* pattern noise */
+        opacity: 0.15;
+        pointer-events: none;
+        z-index: 0;
+        animation: grain 8s steps(10) infinite;
+    }}
+
+    @keyframes grain {{
+        0% {{ transform: translate(0, 0); }}
+        10% {{ transform: translate(-5%, -5%); }}
+        20% {{ transform: translate(-10%, 5%); }}
+        30% {{ transform: translate(5%, -10%); }}
+        40% {{ transform: translate(-5%, 15%); }}
+        50% {{ transform: translate(-10%, 5%); }}
+        60% {{ transform: translate(15%, 0); }}
+        70% {{ transform: translate(0, 10%); }}
+        80% {{ transform: translate(-15%, 0); }}
+        90% {{ transform: translate(10%, 5%); }}
+        100% {{ transform: translate(5%, 0); }}
     }}
 
     .block-container {{
         padding-top: 0rem !important;
+        position: relative;
+        z-index: 1; /* giữ nội dung nổi trên noise */
     }}
 
     header[data-testid="stHeader"] {{
@@ -54,6 +87,8 @@ st.markdown(f"""
         margin: 20px auto 10px auto;
         white-space: nowrap;
         font-family: 'Special Elite', cursive !important;
+        position: relative;
+        z-index: 2;
     }}
     @keyframes colorchange {{
         0% {{color: #5d4037;}}
@@ -76,6 +111,7 @@ st.markdown(f"""
         text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
         white-space: nowrap;
         font-family: 'Special Elite', cursive !important;
+        z-index: 2;
     }}
 
     /* Label câu hỏi */
