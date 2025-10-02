@@ -63,22 +63,23 @@ st.markdown(f"""
 
     /* Tiêu đề chính Tra cứu Part number */
     .main-title {{
-        font-size: 26px;              /* nhỏ hơn để vừa màn hình điện thoại */
+        font-size: 26px;
         font-weight: 900;
         text-align: center;
-        background: linear-gradient(90deg, #1e3c72, #2a5298); /* xanh dương gradient */
+        background: linear-gradient(90deg, #1e3c72, #2a5298);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-top: 5px;
         margin-bottom: 20px;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        white-space: nowrap; /* giữ 1 hàng */
+        white-space: nowrap;
     }}
 
     /* Bảng kết quả */
     table {{
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -91,6 +92,7 @@ st.markdown(f"""
         text-align: center;
         padding: 10px;
         font-size: 15px;
+        border: 1px solid #34495e;
     }}
     tbody td {{
         background: white;
@@ -98,6 +100,7 @@ st.markdown(f"""
         padding: 8px;
         font-size: 14px;
         color: #2c3e50;
+        border: 1px solid #dcdcdc;
     }}
     tbody tr:nth-child(even) td {{
         background: #f8f9fa;
