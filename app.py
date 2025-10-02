@@ -3,11 +3,11 @@ import base64
 import pandas as pd
 import streamlit as st
 
-# ====== Cấu hình ======
-excel_file = "A787.xlsx"      # file Excel
-bg_image_file = "airplane.jpg"  # ảnh nền
+# ====== File ======
+excel_file = "A787.xlsx"
+bg_image_file = "airplane.jpg"   # đổi tên nếu cần
 
-# ====== Hàm đọc và dọn dữ liệu ======
+# ====== Load & clean Excel ======
 def load_and_clean(sheet):
     df = pd.read_excel(excel_file, sheet_name=sheet)
     df.columns = df.columns.str.strip().str.upper()
@@ -17,26 +17,20 @@ def load_and_clean(sheet):
     return df
 
 # ====== Encode ảnh nền ======
-def get_base64(bin_file):
-    if not os.path.exists(bin_file):
-        return None
-    with open(bin_file, "rb") as f:
-        return base64.b64encode(f.read()).decode()
+def get_base64(path):
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    return None
 
 img_base64 = get_base64(bg_image_file)
+
+# ====== CSS ======
 if img_base64:
-    bg_css = f"url('data:image/jpg;base64,{img_base64}')"
+    bg_css = f"url('data:image/jpg;base64,{img_base64}') no-repeat center center fixed"
 else:
-    bg_css = "linear-gradient(#e8d8b9, #d6c49d)"  # fallback sepia
+    bg_css = "linear-gradient(#e8d8b9, #d6c49d)"  # fallback vintage
 
-# ====== Load Excel ======
-if not os.path.exists(excel_file):
-    st.error(f"⚠️ Không tìm thấy file {excel_file}")
-    st.stop()
-
-xls = pd.ExcelFile(excel_file)
-
-# ====== CSS vintage ======
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -44,20 +38,17 @@ st.markdown(f"""
 .stApp {{
     background: {bg_css};
     background-size: cover;
-    background-attachment: fixed;
-    font-family: 'Special Elite', cursive !important;
+    font-family: 'Special+Elite', cursive !important;
     position: relative;
 }}
 
-/* Noise grain tạo bằng radial-gradient lặp */
-.stApp::after {{
+/* Nếu có ảnh → phủ filter sepia */
+.stApp::before {{
     content: "";
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px);
-    background-size: 3px 3px;
-    opacity: 0.25;
-    pointer-events: none;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(255,255,240,0.35);
+    backdrop-filter: sepia(0.6) contrast(1.05) brightness(1.1);
     z-index: 0;
 }}
 
@@ -68,8 +59,10 @@ st.markdown(f"""
 
 header[data-testid="stHeader"] {{display: none;}}
 
+/* Tiêu đề */
 .top-title {{
-    font-size: 32px;
+    font-size: 34px;
+    font-weight: 900;
     text-align: center;
     margin: 15px 0 5px 0;
     color: #3e2723;
@@ -145,27 +138,33 @@ table.dataframe tbody tr:hover td {{
 st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
-# ====== Dropdown logic ======
+# ====== App logic ======
+if not os.path.exists(excel_file):
+    st.error(f"⚠️ Không tìm thấy file {excel_file}")
+    st.stop()
+
+xls = pd.ExcelFile(excel_file)
+
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names)
 if zone:
     df = load_and_clean(zone)
 
+    aircraft = None
     if "A/C" in df.columns:
         aircrafts = sorted(df["A/C"].dropna().unique().tolist())
         aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts)
-    else:
-        aircraft = None
 
     if aircraft:
         df_ac = df[df["A/C"] == aircraft]
+
+        description = None
         if "DESCRIPTION" in df_ac.columns:
             desc_list = sorted(df_ac["DESCRIPTION"].dropna().unique().tolist())
             description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list)
-        else:
-            description = None
 
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
+
             if "ITEM" in df_desc.columns:
                 items = sorted(df_desc["ITEM"].dropna().unique().tolist())
                 if items:
