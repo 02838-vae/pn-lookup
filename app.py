@@ -30,7 +30,7 @@ bg64 = [get_base64(f) for f in bg_files]
 
 # Tạo keyframes đổi ảnh nền
 keyframes = ""
-step = 100 // len(bg64)
+step = 100 // len(bg64) if bg64 else 100
 for i, img in enumerate(bg64):
     pct1 = i * step
     pct2 = (i + 1) * step
@@ -44,26 +44,33 @@ st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-    .stApp {{
-        animation: bgslide {len(bg64)*10}s infinite;
+    /* Dùng ::before để slideshow */
+    .stApp::before {{
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
-        font-family: 'Special Elite', cursive !important;
-        position: relative;
+        animation: bgslide {len(bg64)*10 if bg64 else 30}s infinite;
+        z-index: -2;
     }}
 
     @keyframes bgslide {{
         {keyframes}
     }}
 
-    /* Overlay để chữ rõ hơn */
+    /* Overlay làm mờ ảnh */
     .stApp::after {{
         content: "";
         position: fixed;
-        top:0; left:0; right:0; bottom:0;
+        top: 0; left: 0; right: 0; bottom: 0;
         background: rgba(255,255,255,0.65);
         z-index: -1;
+    }}
+
+    .stApp {{
+        font-family: 'Special Elite', cursive !important;
     }}
 
     .top-title {{
