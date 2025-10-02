@@ -9,7 +9,7 @@ xls = pd.ExcelFile(excel_file)
 # ======= Set page config =======
 st.set_page_config(page_title="PN Lookup", layout="wide")
 
-# ======= Background with airplane =======
+# ======= Background with airplane (mờ hơn) =======
 def set_background(bg_file):
     with open(bg_file, "rb") as f:
         bg_data = f.read()
@@ -20,6 +20,18 @@ def set_background(bg_file):
     .stApp {{
         background: url("data:image/jpg;base64,{bg_encoded}") no-repeat center center fixed;
         background-size: cover;
+        position: relative;
+    }}
+    .stApp::before {{
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(255,255,255,0.6); /* nền mờ hơn */
+        z-index: 0;
+    }}
+    .stApp > div {{
+        position: relative;
+        z-index: 1;
     }}
     </style>
     """
@@ -50,7 +62,7 @@ st.markdown(
 
 # ======= Main title =======
 st.markdown(
-    "<div style='font-size:22px;font-weight:bold;text-align:center;color:#ffe600;margin-top:5px;margin-bottom:20px;text-shadow:2px 2px 6px rgba(0,0,0,0.7);'>Tra cứu Part number</div>",
+    "<div style='font-size:22px;font-weight:bold;text-align:center;color:#004080;margin-top:5px;margin-bottom:20px;text-shadow:2px 2px 6px rgba(255,255,255,0.8);'>Tra cứu Part number</div>",
     unsafe_allow_html=True,
 )
 
@@ -60,6 +72,7 @@ sheet_name = st.selectbox("👉 Bạn muốn tra cứu zone nào?", xls.sheet_na
 if sheet_name:
     df = pd.read_excel(xls, sheet_name=sheet_name)
     df = df.dropna(how="all").fillna("")
+    df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)  # loại bỏ khoảng trắng
 
     if "A/C" in df.columns:
         ac_list = sorted([x for x in df["A/C"].unique() if x not in ["", "nan", "NaN"]])
@@ -118,7 +131,7 @@ if sheet_name:
                     }
                     thead th {
                         background-color: #004080;
-                        color: white;
+                        color: white !important;
                         font-weight: bold;
                         padding: 10px;
                         border: 2px solid #333333;
@@ -134,3 +147,17 @@ if sheet_name:
                 )
 
                 st.markdown(result_display.to_html(escape=False), unsafe_allow_html=True)
+
+# ===== CSS for dropdown labels (câu hỏi nổi hơn) =====
+st.markdown(
+    """
+    <style>
+    label[data-testid="stWidgetLabel"] > div {
+        font-weight: bold;
+        color: #000000 !important;
+        font-size: 16px !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
