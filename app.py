@@ -17,9 +17,9 @@ def load_and_clean(sheet):
 # ===== CSS Trang trí =====
 st.markdown("""
     <style>
-    /* Background ảnh máy bay với overlay mờ */
+    /* Background ảnh máy bay với lớp mờ nhẹ */
     .stApp {
-        background: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), 
+        background: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)), 
                     url("airplane.jpg") no-repeat center center fixed;
         background-size: cover;
     }
@@ -56,6 +56,7 @@ st.markdown("""
         border-collapse: collapse;
         border-radius: 12px;
         overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
     thead th {
         background: #2c3e50;
@@ -73,17 +74,11 @@ st.markdown("""
         color: #2c3e50;
     }
     tbody tr:nth-child(even) td {
-        background: #f2f2f2;
+        background: #f8f9fa;
     }
     tbody tr:hover td {
         background: #ffeaa7;
         transition: 0.2s ease-in-out;
-    }
-
-    /* Dropdown + button */
-    .stSelectbox, .stButton>button {
-        border-radius: 12px !important;
-        font-weight: 600 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -130,14 +125,16 @@ if zone:
 
                 # Giữ cột mong muốn
                 cols_to_show = ["PART NUMBER (PN)"]
-                if "PART INTERCHANGE" in df_result.columns:
-                    cols_to_show.append("PART INTERCHANGE")
+                for alt_col in ["PART INTERCHANGE", "PN INTERCHANGE"]:
+                    if alt_col in df_result.columns:
+                        cols_to_show.append(alt_col)
+                        break
                 if "NOTE" in df_result.columns:
                     cols_to_show.append("NOTE")
 
                 df_result = df_result[cols_to_show]
 
-                # Thêm cột STT (thay vì index.name)
+                # Thêm cột STT
                 df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
                 st.success(f"Tìm thấy {len(df_result)} dòng dữ liệu:")
