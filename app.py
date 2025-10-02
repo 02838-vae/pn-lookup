@@ -45,7 +45,7 @@ st.markdown(f"""
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
-        font-size: 26px;
+        font-size: 24px;
         font-weight: bold;
         text-align: center;
         animation: colorchange 5s infinite alternate;
@@ -63,13 +63,15 @@ st.markdown(f"""
 
     /* Tiêu đề chính Tra cứu Part number */
     .main-title {{
-        font-size: 38px;
+        font-size: 26px;              /* nhỏ hơn để vừa màn hình điện thoại */
         font-weight: 900;
         text-align: center;
-        color: #2c3e50;
+        background: linear-gradient(90deg, #1e3c72, #2a5298); /* xanh dương gradient */
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin-top: 5px;
         margin-bottom: 20px;
-        text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         white-space: nowrap; /* giữ 1 hàng */
     }}
 
