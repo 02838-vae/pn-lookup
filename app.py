@@ -9,7 +9,7 @@ xls = pd.ExcelFile(excel_file)
 # ======= Set page config =======
 st.set_page_config(page_title="PN Lookup", layout="wide")
 
-# ======= Background with airplane only =======
+# ======= Background with airplane =======
 def set_background(bg_file):
     with open(bg_file, "rb") as f:
         bg_data = f.read()
@@ -18,7 +18,6 @@ def set_background(bg_file):
     page_bg = f"""
     <style>
     .stApp {{
-        position: relative;
         background: url("data:image/jpg;base64,{bg_encoded}") no-repeat center center fixed;
         background-size: cover;
     }}
@@ -28,39 +27,11 @@ def set_background(bg_file):
 
 set_background("airplane.jpg")
 
-# ======= Cloud layer =======
-def set_cloud_layer(cloud_file):
-    with open(cloud_file, "rb") as f:
-        cloud_data = f.read()
-    cloud_encoded = base64.b64encode(cloud_data).decode()
-
-    cloud_css = f"""
-    <style>
-    .clouds {{
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: url("data:image/jpg;base64,{cloud_encoded}") repeat-x;
-        background-size: contain;
-        opacity: 0.35;
-        animation: moveClouds 60s linear infinite;
-        z-index: -1;
-    }}
-    @keyframes moveClouds {{
-        from {{ background-position: 0 0; }}
-        to   {{ background-position: 10000px 0; }}
-    }}
-    </style>
-    <div class="clouds"></div>
-    """
-    st.markdown(cloud_css, unsafe_allow_html=True)
-
-set_cloud_layer("cloud.jpg")
-
-# ======= Animated title =======
-st.markdown("<div style='font-size:28px;font-weight:bold;text-align:center;animation:colorchange 6s infinite alternate;'>Tổ bảo dưỡng số 1</div>", unsafe_allow_html=True)
+# ======= Animated header =======
+st.markdown(
+    "<div style='font-size:28px;font-weight:bold;text-align:center;animation:colorchange 6s infinite alternate;'>Tổ bảo dưỡng số 1</div>",
+    unsafe_allow_html=True,
+)
 
 st.markdown(
     """
@@ -78,15 +49,17 @@ st.markdown(
 )
 
 # ======= Main title =======
-st.markdown("<div style='font-size:22px;font-weight:bold;text-align:center;color:#ffe600;margin-top:-5px;margin-bottom:20px;text-shadow:2px 2px 6px rgba(0,0,0,0.7);'>Tra cứu Part number</div>", unsafe_allow_html=True)
+st.markdown(
+    "<div style='font-size:22px;font-weight:bold;text-align:center;color:#ffe600;margin-top:5px;margin-bottom:20px;text-shadow:2px 2px 6px rgba(0,0,0,0.7);'>Tra cứu Part number</div>",
+    unsafe_allow_html=True,
+)
 
 # ======= Dropdown logic =======
 sheet_name = st.selectbox("👉 Bạn muốn tra cứu zone nào?", xls.sheet_names)
 
 if sheet_name:
     df = pd.read_excel(xls, sheet_name=sheet_name)
-    df = df.dropna(how="all")
-    df = df.fillna("")
+    df = df.dropna(how="all").fillna("")
 
     if "A/C" in df.columns:
         ac_list = sorted([x for x in df["A/C"].unique() if x not in ["", "nan", "NaN"]])
