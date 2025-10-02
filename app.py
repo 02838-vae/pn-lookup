@@ -1,11 +1,13 @@
+import os
+import base64
 import pandas as pd
 import streamlit as st
-import base64
 
-# ===== Đọc file Excel =====
-excel_file = "A787.xlsx"
-xls = pd.ExcelFile(excel_file)
+# ====== Cấu hình ======
+excel_file = "A787.xlsx"   # file Excel của bạn (giữ nguyên)
+bg_image_file = "airplane.jpg"  # nền (phải có)
 
+# ====== Hàm đọc và dọn dữ liệu ======
 def load_and_clean(sheet):
     df = pd.read_excel(excel_file, sheet_name=sheet)
     df.columns = df.columns.str.strip().str.upper()
@@ -14,146 +16,145 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Load background airplane.jpg =====
+# ====== Hàm encode ảnh thành base64 ======
 def get_base64_of_bin_file(bin_file):
+    if not os.path.exists(bin_file):
+        return None
     with open(bin_file, "rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
+        return base64.b64encode(f.read()).decode()
 
-img_base64 = get_base64_of_bin_file("airplane.jpg")
+# ====== Tạo SVG noise (base64) để dùng offline, tránh image not found ======
+def generate_noise_data_uri(opacity=0.12, base_freq=0.9):
+    # SVG nhỏ sinh nhiễu (feTurbulence). Sẽ base64 encode để an toàn.
+    svg = f"""
+    <svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'>
+      <filter id='noise'>
+        <feTurbulence type='fractalNoise' baseFrequency='{base_freq}' numOctaves='1' stitchTiles='stitch'/>
+        <feColorMatrix type='saturate' values='0'/>
+        <feComponentTransfer>
+          <feFuncA type='table' tableValues='0 {opacity}'/>
+        </feComponentTransfer>
+      </filter>
+      <rect width='100%' height='100%' filter='url(#noise)' />
+    </svg>
+    """.strip()
+    svg_b64 = base64.b64encode(svg.encode("utf-8")).decode("ascii")
+    return f"data:image/svg+xml;base64,{svg_b64}"
 
-# ===== CSS Vintage + Film Grain =====
+# ====== Chuẩn bị dữ liệu base64 ======
+# Excel
+if not os.path.exists(excel_file):
+    st.error(f"⚠️ Không tìm thấy file Excel: {excel_file}. Xin kiểm tra lại.")
+    st.stop()
+
+xls = pd.ExcelFile(excel_file)
+
+# Background image
+img_base64 = get_base64_of_bin_file(bg_image_file)
+if img_base64 is None:
+    st.warning(f"⚠️ Không tìm thấy '{bg_image_file}' trong thư mục. Ứng dụng vẫn chạy nhưng nền mặc định sẽ trống.")
+    img_url_css = ""
+else:
+    img_url_css = f'url("data:image/jpg;base64,{img_base64}")'
+
+# Noise SVG data URI (offline)
+noise_data_uri = generate_noise_data_uri(opacity=0.12, base_freq=0.9)
+
+# ====== CSS (vintage + noise offline) ======
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-    /* Nền vintage với overlay sepia và film grain */
+    /* Toàn trang - vintage sepia blend */
     .stApp {{
-        background: 
-            linear-gradient(rgba(94, 38, 18, 0.55), rgba(250, 240, 202, 0.7)), 
-            url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
+        background:
+            linear-gradient(rgba(94,38,18,0.55), rgba(250,240,202,0.7)),
+            {img_url_css if img_url_css else 'none'};
         background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
         background-blend-mode: multiply;
         font-family: 'Special Elite', cursive !important;
         position: relative;
-        overflow: hidden;
+        overflow: visible;
     }}
 
-    /* Lớp noise overlay giả lập film grain */
+    /* Grain/noise overlay (SVG base64 nhúng) - offline */
     .stApp::after {{
         content: "";
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url("https://i.ibb.co/8c4tDvc/noise.png"); /* pattern noise */
-        opacity: 0.15;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: url("{noise_data_uri}");
+        background-size: 100% 100%;
+        opacity: 0.12; /* bạn có thể chỉnh nhỏ hơn/nhiều hơn */
         pointer-events: none;
         z-index: 0;
-        animation: grain 8s steps(10) infinite;
+        mix-blend-mode: overlay;
     }}
 
-    @keyframes grain {{
-        0% {{ transform: translate(0, 0); }}
-        10% {{ transform: translate(-5%, -5%); }}
-        20% {{ transform: translate(-10%, 5%); }}
-        30% {{ transform: translate(5%, -10%); }}
-        40% {{ transform: translate(-5%, 15%); }}
-        50% {{ transform: translate(-10%, 5%); }}
-        60% {{ transform: translate(15%, 0); }}
-        70% {{ transform: translate(0, 10%); }}
-        80% {{ transform: translate(-15%, 0); }}
-        90% {{ transform: translate(10%, 5%); }}
-        100% {{ transform: translate(5%, 0); }}
-    }}
-
+    /* Nội dung nổi trên noise */
     .block-container {{
-        padding-top: 0rem !important;
         position: relative;
-        z-index: 1; /* giữ nội dung nổi trên noise */
+        z-index: 1;
+        padding-top: 0.5rem !important;
     }}
 
-    header[data-testid="stHeader"] {{
-        display: none;
-    }}
+    header[data-testid="stHeader"] {{ display: none; }}
 
-    /* Dòng chữ Tổ bảo dưỡng số 1 */
+    /* Tiêu đề */
     .top-title {{
-        font-size: 32px;
+        font-size: 34px;
         font-weight: 900;
         text-align: center;
-        animation: colorchange 5s infinite alternate;
-        margin: 20px auto 10px auto;
-        white-space: nowrap;
+        margin: 18px auto 6px auto;
+        color: #3e2723;
+        text-shadow: 1px 1px 0px #fff;
         font-family: 'Special Elite', cursive !important;
-        position: relative;
-        z-index: 2;
-    }}
-    @keyframes colorchange {{
-        0% {{color: #5d4037;}}
-        25% {{color: #6d4c41;}}
-        50% {{color: #8d6e63;}}
-        75% {{color: #a1887f;}}
-        100% {{color: #3e2723;}}
     }}
 
-    /* Tiêu đề chính */
     .main-title {{
-        font-size: 28px;
-        font-weight: 900;
+        font-size: 24px;
+        font-weight: 800;
         text-align: center;
-        background: linear-gradient(90deg, #5d4037, #a1887f, #d7ccc8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-top: 10px;
-        margin-bottom: 20px;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
-        white-space: nowrap;
+        color: #5d4037;
+        margin: 6px 0 18px 0;
         font-family: 'Special Elite', cursive !important;
-        z-index: 2;
     }}
 
-    /* Label câu hỏi */
-    div[role="group"] label, label[data-testid="stWidgetLabel"] {{
+    /* Label câu hỏi (bắt chặt selector để chắc chắn áp dụng) */
+    div[role="group"] label, label[data-testid="stWidgetLabel"], div[data-testid="stMarkdownContainer"] > p {{
         font-family: 'Special Elite', cursive !important;
-        font-size: 19px !important;
-        font-weight: bold !important;
+        font-size: 18px !important;
+        font-weight: 700 !important;
         color: #2c1a0c !important;
-        text-shadow: 1px 1px 2px #fdf6e3 !important;
+        text-shadow: 0.6px 0.6px 0.8px #fff !important;
     }}
 
-    /* Hộp selectbox */
-    .stSelectbox div[data-baseweb="select"] {{
-        font-family: 'Special Elite', cursive !important;
-        font-size: 15px !important;
-        color: #2c1a0c !important;
-        background: #fdf6e3 !important;
-        border: 1.5px dashed #5d4037 !important;
-        border-radius: 6px !important;
-    }}
+    /* Hộp selectbox - nội dung + dropdown */
+    .stSelectbox div[data-baseweb="select"],
     .stSelectbox div[data-baseweb="popover"] {{
         font-family: 'Special Elite', cursive !important;
         font-size: 15px !important;
-        background: #fdf6e3 !important;
         color: #2c1a0c !important;
-        border: 1.5px dashed #5d4037 !important;
+        background: #fdf6e3 !important;
+        border: 1.2px dashed #5d4037 !important;
+        border-radius: 6px !important;
     }}
 
-    /* Bảng kết quả */
+    /* Bảng vintage */
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
-        border-radius: 12px;
+        border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        background: #fffef9;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+        background: #fffaf0;
         font-family: 'Special Elite', cursive !important;
     }}
     table.dataframe thead th {{
         background: #5d4037 !important;
-        color: #fdf6e3 !important;
-        font-weight: bold;
+        color: #f8f1df !important;
+        font-weight: 800;
         text-align: center;
         padding: 10px !important;
         font-size: 15px;
@@ -164,36 +165,28 @@ st.markdown(f"""
         padding: 8px !important;
         font-size: 14px;
         color: #3e2723 !important;
-        border: 1.5px solid #3e2723 !important;
+        border: 1px solid #e6d7c4 !important;
     }}
-    table.dataframe tbody tr:nth-child(even) td {{
-        background: #f8f1df !important;
-    }}
-    table.dataframe tbody tr:hover td {{
-        background: #ffeaa7 !important;
-        transition: 0.2s ease-in-out;
-    }}
+    table.dataframe tbody tr:nth-child(even) td {{ background: #f6efe0 !important; }}
+    table.dataframe tbody tr:hover td {{ background: #fceec8 !important; transition: 0.2s ease-in-out; }}
 
-    /* Thông báo tìm thấy */
+    /* Thông báo */
     .highlight-msg {{
         font-size: 18px;
-        font-weight: bold;
+        font-weight: 800;
         color: #3e2723;
-        background: #d7ccc8;
-        padding: 10px 15px;
+        background: #e9decf;
+        padding: 10px 14px;
         border-left: 6px solid #3e2723;
         border-radius: 6px;
-        margin: 15px 0;
-        display: flex;
+        margin: 14px 0;
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
         gap: 8px;
         font-family: 'Special Elite', cursive !important;
     }}
-    .shake {{
-        display: inline-block;
-        animation: shake 1s infinite;
-    }}
+
+    .shake {{ display: inline-block; animation: shake 1s infinite; }}
     @keyframes shake {{
         0% {{ transform: translate(1px, 1px) rotate(0deg); }}
         25% {{ transform: translate(-1px, -1px) rotate(-1deg); }}
@@ -204,11 +197,11 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# ===== Header =====
-st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+# ====== Header ======
+st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
-# ===== Dropdowns và logic =====
+# ====== Logic dropdowns & result display ======
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
 if zone:
     df = load_and_clean(zone)
@@ -240,6 +233,7 @@ if zone:
             if not df_desc.empty:
                 df_result = df_desc.copy().reset_index(drop=True)
 
+                # các cột hiển thị
                 cols_to_show = ["PART NUMBER (PN)"]
                 for alt_col in ["PART INTERCHANGE", "PN INTERCHANGE"]:
                     if alt_col in df_result.columns:
@@ -251,10 +245,7 @@ if zone:
                 df_result = df_result[cols_to_show]
                 df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
-                st.markdown(
-                    f'<div class="highlight-msg"><span class="shake">✅</span> Tìm thấy {len(df_result)} dòng dữ liệu</div>',
-                    unsafe_allow_html=True
-                )
+                st.markdown(f'<div class="highlight-msg"><span class="shake">✅</span> Tìm thấy {len(df_result)} dòng dữ liệu</div>', unsafe_allow_html=True)
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
