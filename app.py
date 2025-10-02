@@ -24,6 +24,7 @@ def set_background(bg_file, cloud_file):
     .stApp {{
         position: relative;
         background: transparent;
+        z-index: 1; /* đảm bảo foreground hiển thị trên nền */
     }}
 
     /* Máy bay nền */
