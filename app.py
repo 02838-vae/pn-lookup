@@ -25,31 +25,15 @@ img_base64 = get_base64_of_bin_file("airplane.jpg")
 # ===== CSS =====
 st.markdown(f"""
     <style>
-    /* Nền trang */
+    /* Nền trang với overlay trắng mờ */
     .stApp {{
-        background-image: url("data:image/jpg;base64,{img_base64}");
+        background: 
+            linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)), 
+            url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        position: relative;
     }}
 
-    /* Lớp phủ làm mờ (overlay) */
-    .stApp::before {{
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255,255,255,0.55); /* chỉnh độ mờ */
-        z-index: 1;
-    }}
-
-    /* Đảm bảo nội dung luôn hiển thị trên lớp mờ */
     .block-container {{
-        position: relative;
-        z-index: 2;
         padding-top: 0rem !important;
     }}
 
@@ -103,7 +87,7 @@ st.markdown(f"""
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        background: rgba(255,255,255,0.95);
+        background: white;
     }}
     table.dataframe thead th {{
         background: #2c3e50 !important;
