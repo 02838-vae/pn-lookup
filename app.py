@@ -22,15 +22,18 @@ def get_base64_of_bin_file(bin_file):
 
 img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-# ===== CSS =====
+# ===== CSS Vintage =====
 st.markdown(f"""
     <style>
-    /* Nền trang với overlay trắng mờ */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Special+Elite&display=swap');
+
+    /* Nền giấy cũ + overlay */
     .stApp {{
         background: 
-            linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)), 
+            linear-gradient(rgba(245, 222, 179, 0.85), rgba(245, 222, 179, 0.85)),
             url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
+        font-family: 'Special Elite', 'Courier New', monospace;
     }}
 
     .block-container {{
@@ -43,89 +46,82 @@ st.markdown(f"""
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
-        font-size: 32px;   /* tăng size */
-        font-weight: 900;
+        font-size: 34px;
+        font-weight: bold;
         text-align: center;
-        animation: colorchange 5s infinite alternate;
+        color: #5b3924;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        font-family: 'Playfair Display', serif;
         margin: 20px auto 10px auto;
-        white-space: nowrap;
-    }}
-    @keyframes colorchange {{
-        0% {{color: #e74c3c;}}
-        25% {{color: #3498db;}}
-        50% {{color: #2ecc71;}}
-        75% {{color: #f1c40f;}}
-        100% {{color: #9b59b6;}}
     }}
 
     /* Tiêu đề chính */
     .main-title {{
-        font-size: 28px;  /* tăng size */
-        font-weight: 900;
+        font-size: 28px;
+        font-weight: bold;
         text-align: center;
-        background: linear-gradient(90deg, #ff6a00, #ff8c00, #ffd700);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #3b2f2f;
+        font-family: 'Special Elite', cursive;
         margin-top: 10px;
-        margin-bottom: 20px;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.4); /* giảm đổ bóng */
-        white-space: nowrap;
+        margin-bottom: 25px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+        letter-spacing: 2px;
     }}
 
     /* Label câu hỏi */
     .stSelectbox label {{
-        font-weight: 900 !important;
+        font-weight: 700 !important;
         font-size: 18px !important;
-        color: #0b3d91 !important;
-        text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
+        color: #4e342e !important;
+        font-family: 'Courier New', monospace;
     }}
 
-    /* Bảng kết quả */
+    /* Bảng vintage */
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
-        border-radius: 12px;
+        border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        background: white;
+        background: #fff8dc;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        font-family: 'Courier New', monospace;
     }}
     table.dataframe thead th {{
-        background: #2c3e50 !important;
-        color: white !important;
+        background: #6d4c41 !important;
+        color: #f5deb3 !important;
         font-weight: bold;
         text-align: center;
         padding: 10px !important;
         font-size: 15px;
-        border: 2px solid #2c3e50 !important;
+        border: 2px solid #5d4037 !important;
     }}
     table.dataframe tbody td {{
         text-align: center !important;
         padding: 8px !important;
         font-size: 14px;
-        color: #2c3e50 !important;
-        border: 1.5px solid #2c3e50 !important;
+        color: #3e2723;
+        border: 1px solid #8d6e63 !important;
     }}
     table.dataframe tbody tr:nth-child(even) td {{
-        background: #f8f9fa !important;
+        background: #fdf5e6 !important;
     }}
     table.dataframe tbody tr:hover td {{
-        background: #ffeaa7 !important;
-        transition: 0.2s ease-in-out;
+        background: #ffe0b2 !important;
+        transition: 0.3s ease-in-out;
     }}
 
+    /* Thông báo tìm thấy dữ liệu */
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
-        color: #154360;
-        background: #d6eaf8;
+        color: #3e2723;
+        background: #f5deb3;
         padding: 10px 15px;
-        border-left: 6px solid #154360;
+        border-left: 6px solid #6d4c41;
         border-radius: 6px;
         margin: 15px 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
+        font-family: 'Playfair Display', serif;
+        text-align: center;
     }}
     .shake {{
         display: inline-block;
@@ -143,7 +139,7 @@ st.markdown(f"""
 
 # ===== Header =====
 st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
-st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">📜 Tra cứu Part number</div>', unsafe_allow_html=True)
 
 # ===== Dropdowns và logic =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
