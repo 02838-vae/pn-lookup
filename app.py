@@ -1,11 +1,11 @@
 import pandas as pd
 import streamlit as st
+import base64
 
 # ===== Đọc file Excel =====
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
-# Chuẩn hóa tên cột
 def load_and_clean(sheet):
     df = pd.read_excel(excel_file, sheet_name=sheet)
     df.columns = df.columns.str.strip().str.upper()
@@ -14,44 +14,51 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
+# ===== Load background airplane.jpg =====
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+img_base64 = get_base64_of_bin_file("airplane.jpg")
+
 # ===== CSS Trang trí =====
-st.markdown("""
+st.markdown(f"""
     <style>
-    /* Background ảnh máy bay */
-    .stApp {
+    .stApp {{
         background: none;
         position: relative;
-    }
-    .stApp::before {
+    }}
+    .stApp::before {{
         content: "";
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: url("airplane.jpg") no-repeat center center fixed;
+        background: url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
-        opacity: 0.25; /* chỉnh độ mờ để chữ dễ đọc */
+        opacity: 0.2; /* chỉnh mờ để chữ dễ đọc */
         z-index: -1;
-    }
+    }}
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
-    .top-title {
+    .top-title {{
         font-size: 26px;
         font-weight: bold;
         text-align: center;
         animation: colorchange 5s infinite alternate;
-    }
-    @keyframes colorchange {
-        0% {color: #e74c3c;}
-        25% {color: #3498db;}
-        50% {color: #2ecc71;}
-        75% {color: #f1c40f;}
-        100% {color: #9b59b6;}
-    }
+    }}
+    @keyframes colorchange {{
+        0% {{color: #e74c3c;}}
+        25% {{color: #3498db;}}
+        50% {{color: #2ecc71;}}
+        75% {{color: #f1c40f;}}
+        100% {{color: #9b59b6;}}
+    }}
 
     /* Tiêu đề chính */
-    .main-title {
+    .main-title {{
         font-size: 38px;
         font-weight: 900;
         text-align: center;
@@ -59,38 +66,38 @@ st.markdown("""
         margin-top: 10px;
         margin-bottom: 20px;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    }
+    }}
 
     /* Bảng kết quả */
-    table {
+    table {{
         width: 100%;
         border-collapse: collapse;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    thead th {
+    }}
+    thead th {{
         background: #2c3e50;
         color: white !important;
         font-weight: bold;
         text-align: center;
         padding: 10px;
         font-size: 15px;
-    }
-    tbody td {
+    }}
+    tbody td {{
         background: white;
         text-align: center;
         padding: 8px;
         font-size: 14px;
         color: #2c3e50;
-    }
-    tbody tr:nth-child(even) td {
+    }}
+    tbody tr:nth-child(even) td {{
         background: #f8f9fa;
-    }
-    tbody tr:hover td {
+    }}
+    tbody tr:hover td {{
         background: #ffeaa7;
         transition: 0.2s ease-in-out;
-    }
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -105,7 +112,7 @@ if zone:
 
     # ===== Dropdown 2: A/C =====
     if "A/C" in df.columns:
-        aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac and ac != "NAN"])
+        aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac and ac.upper() != "NAN"])
         aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts, key="aircraft")
     else:
         aircraft = None
@@ -115,7 +122,7 @@ if zone:
 
         # ===== Dropdown 3: Description =====
         if "DESCRIPTION" in df_ac.columns:
-            desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d and d != "NAN"])
+            desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d and d.upper() != "NAN"])
             description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list, key="desc")
         else:
             description = None
@@ -125,7 +132,7 @@ if zone:
 
             # Nếu có cột ITEM thì hỏi thêm
             if "ITEM" in df_desc.columns:
-                items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i and i != "NAN"])
+                items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i and i.upper() != "NAN"])
                 if items:
                     item = st.selectbox("🔢 Bạn muốn tra cứu Item nào?", items, key="item")
                     df_desc = df_desc[df_desc["ITEM"] == item]
