@@ -73,6 +73,14 @@ def set_background(image_file):
             background-color: #ffffff !important;
             color: #000000 !important;
         }}
+        table.dataframe thead th {{
+            background-color: #003366 !important;  /* xanh đậm hơn */
+            color: #ffffff !important;             /* chữ trắng */
+            font-weight: 900 !important;           /* đậm */
+            font-size: 15px !important;            /* to hơn */
+            text-align: center !important;
+            border-bottom: 3px solid #001122 !important;
+        }}
         table.dataframe th, table.dataframe td {{
             text-align: center !important;
             vertical-align: middle !important;
@@ -80,12 +88,7 @@ def set_background(image_file):
             white-space: nowrap !important;
             color: #000000 !important;
             background-color: #ffffff !important;
-        }}
-        table.dataframe thead th {{
-            background-color: #002244 !important;  /* Xanh đậm hơn */
-            color: #ffffff !important;             /* Chữ trắng nổi bật */
-            font-weight: 900 !important;           /* Đậm hẳn */
-            font-size: 14px !important;            /* To hơn một chút */
+            border: 1px solid #cccccc !important;
         }}
         table.dataframe tbody tr:hover {{
             background-color: #f0f8ff !important;
