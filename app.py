@@ -31,16 +31,30 @@ st.markdown(f"""
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
+        position: relative;
     }}
-    .stApp::after {{
+
+    /* Lớp phủ làm mờ (overlay) */
+    .stApp::before {{
         content: "";
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(255,255,255,0.6); 
-        z-index: -1;
+        background: rgba(255,255,255,0.55); /* chỉnh độ mờ */
+        z-index: 1;
+    }}
+
+    /* Đảm bảo nội dung luôn hiển thị trên lớp mờ */
+    .block-container {{
+        position: relative;
+        z-index: 2;
+        padding-top: 0rem !important;
+    }}
+
+    header[data-testid="stHeader"] {{
+        display: none;
     }}
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
@@ -49,7 +63,6 @@ st.markdown(f"""
         font-weight: bold;
         text-align: center;
         animation: colorchange 5s infinite alternate;
-        display: block;
         margin: 15px auto;
         white-space: nowrap;
     }}
@@ -61,9 +74,9 @@ st.markdown(f"""
         100% {{color: #9b59b6;}}
     }}
 
-    /* Tiêu đề chính Tra cứu Part number */
+    /* Tiêu đề chính */
     .main-title {{
-        font-size: 26px;
+        font-size: 22px;
         font-weight: 900;
         text-align: center;
         background: linear-gradient(90deg, #ff6a00, #ff8c00, #ffd700);
@@ -75,14 +88,22 @@ st.markdown(f"""
         white-space: nowrap;
     }}
 
+    /* Label câu hỏi */
+    .stSelectbox label {{
+        font-weight: 900 !important;
+        font-size: 18px !important;
+        color: #0b3d91 !important;
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
+    }}
+
     /* Bảng kết quả */
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        background: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        background: rgba(255,255,255,0.95);
     }}
     table.dataframe thead th {{
         background: #2c3e50 !important;
@@ -97,7 +118,7 @@ st.markdown(f"""
         text-align: center !important;
         padding: 8px !important;
         font-size: 14px;
-        color: #2c3e50;
+        color: #2c3e50 !important;
         border: 1.5px solid #2c3e50 !important;
     }}
     table.dataframe tbody tr:nth-child(even) td {{
@@ -108,7 +129,6 @@ st.markdown(f"""
         transition: 0.2s ease-in-out;
     }}
 
-    /* Thông báo tìm thấy dữ liệu */
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
@@ -129,23 +149,10 @@ st.markdown(f"""
     }}
     @keyframes shake {{
         0% {{ transform: translate(1px, 1px) rotate(0deg); }}
-        10% {{ transform: translate(-1px, -2px) rotate(-1deg); }}
-        20% {{ transform: translate(-3px, 0px) rotate(1deg); }}
-        30% {{ transform: translate(3px, 2px) rotate(0deg); }}
-        40% {{ transform: translate(1px, -1px) rotate(1deg); }}
-        50% {{ transform: translate(-1px, 2px) rotate(-1deg); }}
-        60% {{ transform: translate(-3px, 1px) rotate(0deg); }}
-        70% {{ transform: translate(3px, 1px) rotate(-1deg); }}
-        80% {{ transform: translate(-1px, -1px) rotate(1deg); }}
-        90% {{ transform: translate(1px, 2px) rotate(0deg); }}
-        100% {{ transform: translate(1px, -2px) rotate(-1deg); }}
-    }}
-
-    /* Label câu hỏi trong selectbox */
-    .stSelectbox label {{
-        font-weight: 900 !important;
-        font-size: 18px !important;
-        color: #000000 !important;  /* Đổi sang đen cho nổi bật */
+        25% {{ transform: translate(-1px, -1px) rotate(-1deg); }}
+        50% {{ transform: translate(-2px, 2px) rotate(1deg); }}
+        75% {{ transform: translate(2px, -2px) rotate(1deg); }}
+        100% {{ transform: translate(1px, 1px) rotate(0deg); }}
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -154,12 +161,11 @@ st.markdown(f"""
 st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
-# ===== Dropdown 1: Zone (sheet name) =====
+# ===== Dropdowns và logic =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
 if zone:
     df = load_and_clean(zone)
 
-    # ===== Dropdown 2: A/C =====
     if "A/C" in df.columns:
         aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac and ac.upper() != "NAN"])
         aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts, key="aircraft")
@@ -169,7 +175,6 @@ if zone:
     if aircraft:
         df_ac = df[df["A/C"] == aircraft]
 
-        # ===== Dropdown 3: Description =====
         if "DESCRIPTION" in df_ac.columns:
             desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d and d.upper() != "NAN"])
             description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list, key="desc")
@@ -179,18 +184,15 @@ if zone:
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
 
-            # Nếu có cột ITEM thì hỏi thêm
             if "ITEM" in df_desc.columns:
                 items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i and i.upper() != "NAN"])
                 if items:
                     item = st.selectbox("🔢 Bạn muốn tra cứu Item nào?", items, key="item")
                     df_desc = df_desc[df_desc["ITEM"] == item]
 
-            # Hiển thị kết quả
             if not df_desc.empty:
                 df_result = df_desc.copy().reset_index(drop=True)
 
-                # Giữ cột mong muốn
                 cols_to_show = ["PART NUMBER (PN)"]
                 for alt_col in ["PART INTERCHANGE", "PN INTERCHANGE"]:
                     if alt_col in df_result.columns:
@@ -200,8 +202,6 @@ if zone:
                     cols_to_show.append("NOTE")
 
                 df_result = df_result[cols_to_show]
-
-                # Thêm cột STT
                 df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
                 st.markdown(
