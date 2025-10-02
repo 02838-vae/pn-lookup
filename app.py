@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Đọc toàn bộ file Excel
-excel_file = "data.xlsx"
+excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
 # CSS tuỳ chỉnh
@@ -120,3 +120,4 @@ if sheet_name:
                 st.markdown(result.to_html(escape=False), unsafe_allow_html=True)
             else:
                 st.error("Không tìm thấy dữ liệu phù hợp.")
+
