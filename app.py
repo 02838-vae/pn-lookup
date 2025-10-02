@@ -56,6 +56,9 @@ st.markdown(
     tbody tr:nth-child(even) {
         background-color: #f9f9f9;
     }
+    tbody tr:hover {
+        background-color: #e8f0fe;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -89,7 +92,7 @@ if sheet:
 
     # ---- STEP 2: Chọn A/C ----
     if "A/C" in df.columns:
-        ac_list = sorted([x for x in df["A/C"].dropna().unique() if str(x).strip() != "NAN"])
+        ac_list = sorted([x for x in df["A/C"].dropna().unique() if str(x).strip().upper() != "NAN"])
         aircraft = st.selectbox("✈️ Loại máy bay?", ac_list)
     else:
         aircraft = None
@@ -99,7 +102,7 @@ if sheet:
 
         # ---- STEP 3: Chọn Description ----
         if "DESCRIPTION" in df_ac.columns:
-            desc_list = sorted([x for x in df_ac["DESCRIPTION"].dropna().unique() if str(x).strip() != "NAN"])
+            desc_list = sorted([x for x in df_ac["DESCRIPTION"].dropna().unique() if str(x).strip().upper() != "NAN"])
             description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list)
         else:
             description = None
@@ -109,7 +112,7 @@ if sheet:
 
             # ---- Nếu có ITEM thì hỏi thêm ----
             if "ITEM" in df_desc.columns:
-                item_list = sorted([x for x in df_desc["ITEM"].dropna().unique() if str(x).strip() != "NAN"])
+                item_list = sorted([x for x in df_desc["ITEM"].dropna().unique() if str(x).strip().upper() != "NAN"])
                 if item_list:
                     item = st.selectbox("📦 Bạn muốn tra cứu Item nào?", item_list)
                     df_desc = df_desc[df_desc["ITEM"] == item]
