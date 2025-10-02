@@ -39,7 +39,7 @@ st.markdown(f"""
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(255,255,255,0.7); 
+        background: rgba(255,255,255,0.85); /* mờ hơn */
         z-index: -1;
     }}
 
@@ -153,7 +153,7 @@ st.markdown(f"""
     .stSelectbox label {{
         font-weight: 900 !important;
         font-size: 18px !important;
-        color: #000000 !important;  /* Nổi bật */
+        color: #0b3d91 !important;  /* xanh đậm nổi bật */
     }}
     </style>
 """, unsafe_allow_html=True)
