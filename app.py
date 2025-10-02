@@ -43,11 +43,11 @@ st.markdown(f"""
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
-        font-size: 24px;
-        font-weight: bold;
+        font-size: 32px;   /* tăng size */
+        font-weight: 900;
         text-align: center;
         animation: colorchange 5s infinite alternate;
-        margin: 15px auto;
+        margin: 20px auto 10px auto;
         white-space: nowrap;
     }}
     @keyframes colorchange {{
@@ -60,15 +60,15 @@ st.markdown(f"""
 
     /* Tiêu đề chính */
     .main-title {{
-        font-size: 22px;
+        font-size: 28px;  /* tăng size */
         font-weight: 900;
         text-align: center;
         background: linear-gradient(90deg, #ff6a00, #ff8c00, #ffd700);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-top: 5px;
+        margin-top: 10px;
         margin-bottom: 20px;
-        text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.4); /* giảm đổ bóng */
         white-space: nowrap;
     }}
 
