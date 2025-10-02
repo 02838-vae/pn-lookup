@@ -22,7 +22,7 @@ def get_base64_of_bin_file(bin_file):
 
 img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-# ===== CSS Vintage =====
+# ===== CSS =====
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -78,12 +78,12 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
     }}
 
-    /* Label câu hỏi */
-    .stSelectbox label {{
-        font-weight: bold !important;
+    /* Đồng bộ font cho tất cả text hiển thị */
+    .stMarkdown, .stSelectbox label, .stText, .stRadio label, .stCheckbox label, .stMultiSelect label {{
+        font-family: 'Special Elite', cursive !important;
         font-size: 18px !important;
         color: #4e342e !important;
-        font-family: 'Special Elite', cursive !important;
+        font-weight: bold !important;
     }}
 
     /* Ô dropdown */
@@ -153,11 +153,22 @@ st.markdown(f"""
         gap: 8px;
         font-family: 'Special Elite', cursive !important;
     }}
+    .shake {{
+        display: inline-block;
+        animation: shake 1s infinite;
+    }}
+    @keyframes shake {{
+        0% {{ transform: translate(1px, 1px) rotate(0deg); }}
+        25% {{ transform: translate(-1px, -1px) rotate(-1deg); }}
+        50% {{ transform: translate(-2px, 2px) rotate(1deg); }}
+        75% {{ transform: translate(2px, -2px) rotate(1deg); }}
+        100% {{ transform: translate(1px, 1px) rotate(0deg); }}
+    }}
     </style>
 """, unsafe_allow_html=True)
 
 # ===== Header =====
-st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
 # ===== Dropdowns và logic =====
@@ -204,9 +215,9 @@ if zone:
                 df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
                 st.markdown(
-                    f'<div class="highlight-msg">✅ Tìm thấy {len(df_result)} dòng dữ liệu</div>',
+                    f'<div class="highlight-msg"><span class="shake">✅</span> Tìm thấy {len(df_result)} dòng dữ liệu</div>',
                     unsafe_allow_html=True
                 )
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
-                st.error("📌 Rất tiếc, không tìm thấy dữ liệu phù hợp.")
+                st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
