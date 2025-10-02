@@ -17,20 +17,11 @@ def load_and_clean(sheet):
 # ===== CSS Trang trí =====
 st.markdown("""
     <style>
-    /* Background ảnh máy bay */
+    /* Background ảnh máy bay với overlay mờ */
     .stApp {
-        background: url("airplane.jpg") no-repeat center center fixed;
+        background: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), 
+                    url("airplane.jpg") no-repeat center center fixed;
         background-size: cover;
-    }
-    .stApp::before {
-        content: "";
-        position: fixed;
-        top:0;
-        left:0;
-        width:100%;
-        height:100%;
-        background: rgba(255,255,255,0.55); /* làm nhạt ảnh nhưng vẫn nhìn rõ */
-        z-index: -1;
     }
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
@@ -67,11 +58,12 @@ st.markdown("""
         overflow: hidden;
     }
     thead th {
-        background: #34495e;
+        background: #2c3e50;
         color: white !important;
         font-weight: bold;
         text-align: center;
         padding: 10px;
+        font-size: 15px;
     }
     tbody td {
         background: white;
@@ -145,11 +137,10 @@ if zone:
 
                 df_result = df_result[cols_to_show]
 
-                # Thêm STT bắt đầu từ 1 (ở header dòng 1)
-                df_result.index = df_result.index + 1
-                df_result.index.name = "STT"
+                # Thêm cột STT (thay vì index.name)
+                df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
                 st.success(f"Tìm thấy {len(df_result)} dòng dữ liệu:")
-                st.write(df_result.to_html(escape=False), unsafe_allow_html=True)
+                st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
