@@ -62,7 +62,7 @@ st.markdown(f"""
         100% {{color: #9b59b6;}}
     }}
 
-    /* Tiêu đề chính Tra cứu PN */
+    /* Tiêu đề chính Tra cứu Part number */
     .main-title {{
         font-size: 36px;
         font-weight: 900;
@@ -70,12 +70,7 @@ st.markdown(f"""
         color: #2c3e50;
         margin-top: 10px;
         margin-bottom: 20px;
-        text-shadow: 1px 1px 3px rgba(255,255,255,0.9);
-        background: rgba(255,255,255,0.9);
-        padding: 12px 20px;
-        border-radius: 12px;
-        border: 2px solid #2c3e50;
-        display: inline-block;
+        text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
     }}
 
     /* Bảng kết quả */
@@ -110,23 +105,29 @@ st.markdown(f"""
         transition: 0.2s ease-in-out;
     }}
 
-    /* Thông báo tìm thấy dữ liệu */
+    /* Thông báo tìm thấy dữ liệu - blink */
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
-        color: #1a5276; /* xanh đậm */
+        color: #154360;
         background: #d6eaf8;
         padding: 10px 15px;
         border-left: 6px solid #154360;
         border-radius: 6px;
         margin: 15px 0;
+        animation: blink 1.2s infinite;
+    }}
+    @keyframes blink {{
+        0% {{ opacity: 1; }}
+        50% {{ opacity: 0.4; }}
+        100% {{ opacity: 1; }}
     }}
     </style>
 """, unsafe_allow_html=True)
 
 # ===== Header =====
 st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
-st.markdown('<div class="main-title">🔎 Tra cứu Part Number (PN)</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
 # ===== Dropdown 1: Zone (sheet name) =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
