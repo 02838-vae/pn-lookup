@@ -62,12 +62,14 @@ def set_background(image_file):
             width: 100% !important;
             font-size: 13px !important;
             table-layout: auto;
+            color: #000000 !important; /* Màu chữ đen rõ nét */
         }}
         table.dataframe th, table.dataframe td {{
             text-align: center !important;
             vertical-align: middle !important;
             padding: 6px 10px;
             white-space: nowrap !important;   /* luôn hiển thị đầy đủ, không ngắt dòng */
+            color: #000000 !important;
         }}
         table.dataframe thead th {{
             background-color: #e6f2ff !important;
@@ -154,13 +156,12 @@ if sheet_name:
                     if not result.empty:
                         st.success(f"Tìm thấy {len(result)} dòng dữ liệu:")
 
+                        # Xác định cột cần hiển thị (bỏ DESCRIPTION)
                         cols = []
                         if "PART NUMBER (PN)" in df.columns:
                             cols.append("PART NUMBER (PN)")
                         if "PART INTERCHANGE" in df.columns:
                             cols.append("PART INTERCHANGE")
-                        if "DESCRIPTION" in df.columns:
-                            cols.append("DESCRIPTION")
                         if "ITEM" in df.columns and item:
                             cols.append("ITEM")
                         if "NOTE" in df.columns:
@@ -175,7 +176,8 @@ if sheet_name:
                             .set_properties(**{
                                 "text-align": "center",
                                 "vertical-align": "middle",
-                                "white-space": "nowrap"
+                                "white-space": "nowrap",
+                                "color": "black"
                             })
                         )
 
