@@ -21,16 +21,23 @@ def set_background(bg_file, cloud_file):
 
     page_bg = f"""
     <style>
-    /* Background base */
-    body {{
-        background: url("data:image/jpg;base64,{bg_encoded}") no-repeat center center fixed;
-        background-size: cover;
-        margin: 0;
-        padding: 0;
+    .stApp {{
+        position: relative;
+        background: transparent;
     }}
 
-    /* Layer: Clouds */
-    body::before {{
+    /* Máy bay nền */
+    .stApp::before {{
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("data:image/jpg;base64,{bg_encoded}") no-repeat center center fixed;
+        background-size: cover;
+        z-index: -3;
+    }}
+
+    /* Lớp mây chạy */
+    .stApp::after {{
         content: "";
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
@@ -41,32 +48,9 @@ def set_background(bg_file, cloud_file):
         z-index: -2;
     }}
 
-    /* Layer: Gradient overlay */
-    body::after {{
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.15));
-        opacity: 0.6;
-        animation: moveGradient 25s ease-in-out infinite;
-        z-index: -1;
-    }}
-
-    /* Nội dung app nằm nổi lên */
-    .block-container {{
-        position: relative;
-        z-index: 1;
-    }}
-
     @keyframes moveClouds {{
         from {{ background-position: 0 0; }}
-        to {{ background-position: 10000px 0; }}
-    }}
-
-    @keyframes moveGradient {{
-        0%   {{ background-position: 0 0; }}
-        50%  {{ background-position: 0 300px; }}
-        100% {{ background-position: 0 0; }}
+        to   {{ background-position: 10000px 0; }}
     }}
 
     /* Chữ chạy đổi màu */
@@ -86,11 +70,11 @@ def set_background(bg_file, cloud_file):
 
     /* Tiêu đề chính */
     .main-title {{
-        font-size: 24px;
+        font-size: 22px;
         font-weight: bold;
         text-align: center;
         color: #ffe600;
-        margin-top: -10px;
+        margin-top: -5px;
         margin-bottom: 20px;
         text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
     }}
@@ -101,6 +85,7 @@ def set_background(bg_file, cloud_file):
         font-weight: bold;
         color: #ff1e56;
         animation: blink 1s infinite;
+        text-align: center;
     }}
     @keyframes blink {{
         0%   {{ opacity: 1; }}
