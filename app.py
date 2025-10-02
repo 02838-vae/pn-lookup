@@ -26,8 +26,9 @@ img_base64 = get_base64_of_bin_file("airplane.jpg")
 st.markdown(f"""
     <style>
     .stApp {{
-        background: none;
+        background: transparent;
         position: relative;
+        z-index: 0;
     }}
     .stApp::before {{
         content: "";
@@ -38,7 +39,7 @@ st.markdown(f"""
         bottom: 0;
         background: url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
-        opacity: 0.2; /* chỉnh mờ để chữ dễ đọc */
+        opacity: 0.15; /* mờ hơn để nội dung nổi bật */
         z-index: -1;
     }}
 
@@ -48,6 +49,10 @@ st.markdown(f"""
         font-weight: bold;
         text-align: center;
         animation: colorchange 5s infinite alternate;
+        background: rgba(255,255,255,0.7);
+        padding: 5px 10px;
+        border-radius: 8px;
+        display: inline-block;
     }}
     @keyframes colorchange {{
         0% {{color: #e74c3c;}}
@@ -63,9 +68,13 @@ st.markdown(f"""
         font-weight: 900;
         text-align: center;
         color: #2c3e50;
-        margin-top: 10px;
+        margin-top: 15px;
         margin-bottom: 20px;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        text-shadow: 1px 1px 3px rgba(255,255,255,0.9);
+        background: rgba(255,255,255,0.8);
+        padding: 10px;
+        border-radius: 10px;
+        display: inline-block;
     }}
 
     /* Bảng kết quả */
@@ -75,6 +84,7 @@ st.markdown(f"""
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        background: white;
     }}
     thead th {{
         background: #2c3e50;
