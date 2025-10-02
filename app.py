@@ -17,12 +17,22 @@ def load_and_clean(sheet):
 # ===== CSS Trang trí =====
 st.markdown("""
     <style>
-    /* Background ảnh máy bay rõ ràng với lớp phủ mờ nhẹ */
+    /* Background ảnh máy bay */
     .stApp {
-        background: 
-            linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)),
-            url("airplane.jpg") no-repeat center center fixed;
+        background: none;
+        position: relative;
+    }
+    .stApp::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("airplane.jpg") no-repeat center center fixed;
         background-size: cover;
+        opacity: 0.25; /* chỉnh độ mờ để chữ dễ đọc */
+        z-index: -1;
     }
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
