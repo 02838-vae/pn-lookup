@@ -39,7 +39,7 @@ st.markdown(f"""
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(255,255,255,0.75); /* nền chung mờ */
+        background: rgba(255,255,255,0.80); /* nền chung mờ */
         z-index: -1;
     }}
 
@@ -228,3 +228,4 @@ if zone:
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
+
