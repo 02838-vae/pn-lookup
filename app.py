@@ -10,15 +10,20 @@ xls = pd.ExcelFile(excel_file)
 st.set_page_config(page_title="PN Lookup", layout="wide")
 
 # ======= Background with Parallax =======
-def set_background(image_file):
-    with open(image_file, "rb") as f:
-        data = f.read()
-    encoded = base64.b64encode(data).decode()
+def set_background(bg_file, cloud_file):
+    with open(bg_file, "rb") as f:
+        bg_data = f.read()
+    bg_encoded = base64.b64encode(bg_data).decode()
+
+    with open(cloud_file, "rb") as f:
+        cloud_data = f.read()
+    cloud_encoded = base64.b64encode(cloud_data).decode()
+
     page_bg = f"""
     <style>
     /* Layer 1: Ảnh máy bay */
     .stApp {{
-        background-image: url("data:image/jpg;base64,{encoded}");
+        background-image: url("data:image/jpg;base64,{bg_encoded}");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -31,7 +36,7 @@ def set_background(image_file):
         content: "";
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: url("https://i.ibb.co/3Wf0v0q/clouds.png") repeat-x;
+        background: url("data:image/jpg;base64,{cloud_encoded}") repeat-x;
         background-size: contain;
         opacity: 0.35;
         animation: moveClouds 60s linear infinite;
@@ -77,7 +82,7 @@ def set_background(image_file):
 
     /* Tiêu đề chính */
     .main-title {{
-        font-size: 32px;
+        font-size: 28px;
         font-weight: bold;
         text-align: center;
         color: #ffe600;
@@ -126,7 +131,7 @@ def set_background(image_file):
     """
     st.markdown(page_bg, unsafe_allow_html=True)
 
-set_background("airplane.jpg")
+set_background("airplane.jpg", "cloud.jpg")
 
 # ======= Animated title =======
 st.markdown("<div class='animated-title'>Tổ bảo dưỡng số 1</div>", unsafe_allow_html=True)
