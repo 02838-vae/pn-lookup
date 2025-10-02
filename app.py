@@ -43,6 +43,14 @@ st.markdown(f"""
         z-index: -1;
     }}
 
+    /* Fix khoảng trắng phía trên */
+    .block-container {{
+        padding-top: 0rem !important;
+    }}
+    header[data-testid="stHeader"] {{
+        display: none;
+    }}
+
     /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
         font-size: 24px;
@@ -63,7 +71,7 @@ st.markdown(f"""
 
     /* Tiêu đề chính Tra cứu Part number */
     .main-title {{
-        font-size: 26px;
+        font-size: 22px;
         font-weight: 900;
         text-align: center;
         background: linear-gradient(90deg, #ff6a00, #ff8c00, #ffd700);
@@ -145,7 +153,7 @@ st.markdown(f"""
     .stSelectbox label {{
         font-weight: 900 !important;
         font-size: 18px !important;
-        color: #000000 !important;  /* Đổi sang đen cho nổi bật */
+        color: #000000 !important;  /* Nổi bật */
     }}
     </style>
 """, unsafe_allow_html=True)
