@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import base64
+import glob
 import os
 
 # ===== Đọc file Excel =====
@@ -15,45 +16,56 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Load tất cả ảnh airplane*.jpg/jpeg/png =====
-def get_base64_of_bin_file(path):
-    with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
+# ===== Load nhiều ảnh background =====
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
-bg_files = [
-    os.path.join(os.getcwd(), f)
-    for f in os.listdir(".")
-    if f.lower().startswith("airplane") and f.lower().endswith((".jpg", ".jpeg", ".png"))
-]
-bg_files.sort()
+# Tìm tất cả ảnh airplane*.jpg/png/jpeg
+bg_files = sorted(
+    glob.glob("airplane*.jpg") +
+    glob.glob("airplane*.jpeg") +
+    glob.glob("airplane*.png")
+)
 
-if not bg_files:
-    st.error("⚠️ Không tìm thấy hình nền airplane trong thư mục!")
-    img_base64_list = []
-else:
-    img_base64_list = [get_base64_of_bin_file(f) for f in bg_files]
+img_base64_list = [get_base64_of_bin_file(f) for f in bg_files]
 
-# ===== CSS Vintage + Slideshow Background =====
+# ===== CSS cho slideshow background =====
 css_images = ""
 for i, img64 in enumerate(img_base64_list):
-    css_images += f"""
-    .bg-{i} {{
-        background-image: url("data:image/jpg;base64,{img64}");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        position: fixed;
-        top:0; left:0; right:0; bottom:0;
-        opacity: 0;
-        animation: fadeinout {len(img_base64_list)*10}s infinite;
-        animation-delay: {i*10}s;
-        z-index: -2;
-    }}
-    """
+    delay = i * 10
+    if i == 0:
+        css_images += f"""
+        .bg-{i} {{
+            background-image: url("data:image/jpg;base64,{img64}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            opacity: 1;
+            z-index: -3;
+        }}
+        """
+    else:
+        css_images += f"""
+        .bg-{i} {{
+            background-image: url("data:image/jpg;base64,{img64}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            opacity: 0;
+            animation: fadeinout {len(img_base64_list)*10}s infinite;
+            animation-delay: {delay}s;
+            z-index: -3;
+        }}
+        """
 
 st.markdown(f"""
     <style>
-    /* Slideshow nền */
     {css_images}
     @keyframes fadeinout {{
         0% {{ opacity: 0; }}
@@ -63,75 +75,129 @@ st.markdown(f"""
         100% {{ opacity: 0; }}
     }}
 
+    /* Overlay mờ để text rõ hơn */
     .bg-overlay {{
         position: fixed;
         top:0; left:0; right:0; bottom:0;
-        background: rgba(255,255,255,0.6);  /* làm mờ background */
-        z-index: -1;
+        background: rgba(255,255,255,0.65);
+        z-index: -2;
     }}
 
-    /* Vintage style */
+    /* Font vintage */
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
-
-    body, .stApp {{
+    html, body, [class*="css"]  {{
         font-family: 'Special Elite', cursive !important;
     }}
 
+    /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
         font-size: 32px;
         font-weight: bold;
         text-align: center;
+        animation: colorchange 5s infinite alternate;
+        display: block;
         margin: 15px auto;
-        color: #3b2f2f;
-        text-shadow: 1px 1px 3px #f1e1a6;
+        white-space: nowrap;
+    }}
+    @keyframes colorchange {{
+        0% {{color: #e74c3c;}}
+        25% {{color: #3498db;}}
+        50% {{color: #2ecc71;}}
+        75% {{color: #f1c40f;}}
+        100% {{color: #9b59b6;}}
     }}
 
+    /* Tiêu đề chính Tra cứu Part number */
     .main-title {{
         font-size: 28px;
         font-weight: 900;
         text-align: center;
-        color: #5e3a1e;
+        color: #2c3e50;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
         margin-top: 5px;
         margin-bottom: 20px;
-        text-shadow: 2px 2px 4px #d9c07e;
-    }}
-
-    /* Label câu hỏi */
-    .stSelectbox label {{
-        font-weight: 900 !important;
-        font-size: 18px !important;
-        color: #2d1b04 !important;
-        text-shadow: 1px 1px 1px #f4e1b3;
+        white-space: nowrap;
     }}
 
     /* Bảng kết quả */
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
-        border: 2px solid #5e3a1e !important;
-        background: #fffdf5;
-        font-size: 15px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        background: white;
     }}
     table.dataframe thead th {{
-        background: #8b5a2b !important;
-        color: #fffce8 !important;
-        padding: 8px;
+        background: #2c3e50 !important;
+        color: white !important;
         font-weight: bold;
+        text-align: center;
+        padding: 10px !important;
+        font-size: 15px;
+        border: 2px solid #2c3e50 !important;
     }}
     table.dataframe tbody td {{
-        border: 1.5px solid #8b5a2b !important;
-        padding: 6px;
-        color: #2d1b04;
+        text-align: center !important;
+        padding: 8px !important;
+        font-size: 14px;
+        color: #2c3e50;
+        border: 1.5px solid #2c3e50 !important;
     }}
     table.dataframe tbody tr:nth-child(even) td {{
-        background: #fdf6e3 !important;
+        background: #f8f9fa !important;
+    }}
+    table.dataframe tbody tr:hover td {{
+        background: #ffeaa7 !important;
+        transition: 0.2s ease-in-out;
+    }}
+
+    /* Thông báo tìm thấy dữ liệu */
+    .highlight-msg {{
+        font-size: 18px;
+        font-weight: bold;
+        color: #154360;
+        background: #d6eaf8;
+        padding: 10px 15px;
+        border-left: 6px solid #154360;
+        border-radius: 6px;
+        margin: 15px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }}
+    .shake {{
+        display: inline-block;
+        animation: shake 1s infinite;
+    }}
+    @keyframes shake {{
+        0% {{ transform: translate(1px, 1px) rotate(0deg); }}
+        10% {{ transform: translate(-1px, -2px) rotate(-1deg); }}
+        20% {{ transform: translate(-3px, 0px) rotate(1deg); }}
+        30% {{ transform: translate(3px, 2px) rotate(0deg); }}
+        40% {{ transform: translate(1px, -1px) rotate(1deg); }}
+        50% {{ transform: translate(-1px, 2px) rotate(-1deg); }}
+        60% {{ transform: translate(-3px, 1px) rotate(0deg); }}
+        70% {{ transform: translate(3px, 1px) rotate(-1deg); }}
+        80% {{ transform: translate(-1px, -1px) rotate(1deg); }}
+        90% {{ transform: translate(1px, 2px) rotate(0deg); }}
+        100% {{ transform: translate(1px, -2px) rotate(-1deg); }}
+    }}
+
+    /* Label câu hỏi */
+    .stSelectbox label {{
+        font-weight: 900 !important;
+        font-size: 18px !important;
+        color: #000000 !important;
     }}
     </style>
 """, unsafe_allow_html=True)
 
-# Render slideshow layers
+# Render background
 for i in range(len(img_base64_list)):
     st.markdown(f'<div class="bg-{i}"></div>', unsafe_allow_html=True)
+
 st.markdown('<div class="bg-overlay"></div>', unsafe_allow_html=True)
 
 # ===== Header =====
@@ -143,7 +209,7 @@ zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, k
 if zone:
     df = load_and_clean(zone)
 
-    # Dropdown 2: A/C
+    # ===== Dropdown 2: A/C =====
     if "A/C" in df.columns:
         aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac and ac.upper() != "NAN"])
         aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts, key="aircraft")
@@ -153,7 +219,7 @@ if zone:
     if aircraft:
         df_ac = df[df["A/C"] == aircraft]
 
-        # Dropdown 3: Description
+        # ===== Dropdown 3: Description =====
         if "DESCRIPTION" in df_ac.columns:
             desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d and d.upper() != "NAN"])
             description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list, key="desc")
@@ -163,7 +229,7 @@ if zone:
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
 
-            # Dropdown 4: Item
+            # Nếu có cột ITEM thì hỏi thêm
             if "ITEM" in df_desc.columns:
                 items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i and i.upper() != "NAN"])
                 if items:
@@ -173,6 +239,8 @@ if zone:
             # Hiển thị kết quả
             if not df_desc.empty:
                 df_result = df_desc.copy().reset_index(drop=True)
+
+                # Giữ cột mong muốn
                 cols_to_show = ["PART NUMBER (PN)"]
                 for alt_col in ["PART INTERCHANGE", "PN INTERCHANGE"]:
                     if alt_col in df_result.columns:
@@ -180,10 +248,16 @@ if zone:
                         break
                 if "NOTE" in df_result.columns:
                     cols_to_show.append("NOTE")
+
                 df_result = df_result[cols_to_show]
+
+                # Thêm cột STT
                 df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
-                st.success(f"✅ Tìm thấy {len(df_result)} dòng dữ liệu")
+                st.markdown(
+                    f'<div class="highlight-msg"><span class="shake">✅</span> Tìm thấy {len(df_result)} dòng dữ liệu</div>',
+                    unsafe_allow_html=True
+                )
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
