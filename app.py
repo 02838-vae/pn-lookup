@@ -14,35 +14,47 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Load background airplane.jpg =====
+# ===== Danh sách background =====
+bg_files = ["airplane.jpg", "airplane1.jpg", "airplane2.jpg"]
+
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         data = f.read()
-    return base64.b64encode(data).decode()
+    return base64.b64encode(f.read()).decode()
 
-img_base64 = get_base64_of_bin_file("airplane.jpg")
+bg_base64 = [get_base64_of_bin_file(f) for f in bg_files]
 
-# ===== CSS Vintage =====
+# ===== CSS =====
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Special+Elite&display=swap');
 
-    /* Nền giấy cũ + overlay */
+    /* Animation đổi background */
+    @keyframes bgChange {{
+        0%   {{ background-image: url("data:image/jpg;base64,{bg_base64[0]}"); }}
+        33%  {{ background-image: url("data:image/jpg;base64,{bg_base64[1]}"); }}
+        66%  {{ background-image: url("data:image/jpg;base64,{bg_base64[2]}"); }}
+        100% {{ background-image: url("data:image/jpg;base64,{bg_base64[0]}"); }}
+    }}
+
     .stApp {{
-        background: 
-            linear-gradient(rgba(245, 222, 179, 0.85), rgba(245, 222, 179, 0.85)),
-            url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
+        animation: bgChange 30s infinite;
         background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
         font-family: 'Special Elite', 'Courier New', monospace;
     }}
 
-    .block-container {{
-        padding-top: 0rem !important;
+    .stApp::after {{
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(255,255,255,0.7);
+        z-index: -1;
     }}
 
-    header[data-testid="stHeader"] {{
-        display: none;
-    }}
+    .block-container {{ padding-top: 0rem !important; }}
+    header[data-testid="stHeader"] {{ display: none; }}
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
@@ -72,8 +84,7 @@ st.markdown(f"""
     .stSelectbox label {{
         font-weight: 700 !important;
         font-size: 18px !important;
-        color: #4e342e !important;
-        font-family: 'Courier New', monospace;
+        color: #2c1e1e !important;
     }}
 
     /* Bảng vintage */
@@ -120,7 +131,6 @@ st.markdown(f"""
         border-left: 6px solid #6d4c41;
         border-radius: 6px;
         margin: 15px 0;
-        font-family: 'Playfair Display', serif;
         text-align: center;
     }}
     .shake {{
