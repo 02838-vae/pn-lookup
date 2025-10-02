@@ -78,8 +78,7 @@ st.markdown(f"""
     /* Bảng kết quả */
     table {{
         width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
+        border-collapse: collapse;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -92,7 +91,7 @@ st.markdown(f"""
         text-align: center;
         padding: 10px;
         font-size: 15px;
-        border: 1px solid #34495e;
+        border-bottom: 2px solid #34495e;
     }}
     tbody td {{
         background: white;
@@ -100,7 +99,7 @@ st.markdown(f"""
         padding: 8px;
         font-size: 14px;
         color: #2c3e50;
-        border: 1px solid #dcdcdc;
+        border: 1px dotted #bbb;   /* kẻ ô chấm mảnh */
     }}
     tbody tr:nth-child(even) td {{
         background: #f8f9fa;
