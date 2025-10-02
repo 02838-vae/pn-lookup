@@ -36,7 +36,6 @@ st.markdown(f"""
         background-size: cover;
     }}
 
-    /* Overlay giấy cũ */
     .stApp::after {{
         content: "";
         position: fixed;
@@ -47,13 +46,8 @@ st.markdown(f"""
         z-index: -1;
     }}
 
-    .block-container {{
-        padding-top: 0rem !important;
-    }}
-
-    header[data-testid="stHeader"] {{
-        display: none;
-    }}
+    .block-container {{ padding-top: 0rem !important; }}
+    header[data-testid="stHeader"] {{ display: none; }}
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
@@ -78,8 +72,9 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
     }}
 
-    /* Đồng bộ font cho tất cả text hiển thị */
-    .stMarkdown, .stSelectbox label, .stText, .stRadio label, .stCheckbox label, .stMultiSelect label {{
+    /* Đồng bộ font cho toàn bộ label + text câu hỏi */
+    .stSelectbox label, .stRadio label, .stCheckbox label, .stMultiSelect label,
+    div[data-baseweb="select"] span, .stMarkdown p {{
         font-family: 'Special Elite', cursive !important;
         font-size: 18px !important;
         color: #4e342e !important;
@@ -96,7 +91,6 @@ st.markdown(f"""
         border-radius: 6px !important;
     }}
 
-    /* Các lựa chọn trong dropdown */
     .stSelectbox div[data-baseweb="popover"] {{
         font-family: 'Special Elite', cursive !important;
         font-size: 15px !important;
@@ -105,7 +99,7 @@ st.markdown(f"""
         border: 1.5px dashed #5d4037 !important;
     }}
 
-    /* Bảng kết quả */
+    /* Bảng */
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
@@ -129,15 +123,12 @@ st.markdown(f"""
         color: #3e2723 !important;
         border: 1.5px dashed #5d4037 !important;
     }}
-    table.dataframe tbody tr:nth-child(even) td {{
-        background: #f8f4ec !important;
-    }}
+    table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec !important; }}
     table.dataframe tbody tr:hover td {{
         background: #f1e0c6 !important;
         transition: 0.3s ease-in-out;
     }}
 
-    /* Thông báo tìm thấy dữ liệu */
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
