@@ -17,50 +17,46 @@ def load_and_clean(sheet):
 # ===== CSS Trang trí =====
 st.markdown("""
     <style>
-    /* Toàn bộ app */
+    /* Background với ảnh */
     .stApp {
-        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-        font-family: 'Segoe UI', sans-serif;
+        background: url('airplane.jpg') no-repeat center center fixed;
+        background-size: cover;
+    }
+    .stApp::before {
+        content: "";
+        position: fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background: rgba(255,255,255,0.65); /* làm nhạt ảnh */
+        z-index: -1;
     }
 
-    @keyframes gradientBG {
-        0%{background-position:0% 50%}
-        50%{background-position:100% 50%}
-        100%{background-position:0% 50%}
+    /* Dòng chữ Tổ bảo dưỡng số 1 */
+    .top-title {
+        font-size: 26px;
+        font-weight: bold;
+        text-align: center;
+        animation: colorchange 5s infinite alternate;
+    }
+    @keyframes colorchange {
+        0% {color: #e74c3c;}
+        25% {color: #3498db;}
+        50% {color: #2ecc71;}
+        75% {color: #f1c40f;}
+        100% {color: #9b59b6;}
     }
 
-    /* Neon Header */
-    .neon-title {
-        font-size: 42px;
+    /* Tiêu đề chính */
+    .main-title {
+        font-size: 38px;
         font-weight: 900;
         text-align: center;
-        color: #fff;
-        text-shadow:
-            0 0 5px #fff,
-            0 0 10px #ff00de,
-            0 0 20px #ff00de,
-            0 0 40px #ff00de;
-        animation: glow 3s ease-in-out infinite alternate;
-    }
-    @keyframes glow {
-        from {
-            text-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de, 0 0 30px #ff00de;
-        }
-        to {
-            text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 60px #00ffff;
-        }
-    }
-
-    /* Glassmorphism box */
-    .glass-box {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(12px);
-        border-radius: 20px;
-        padding: 20px;
+        color: #2c3e50;
+        margin-top: 10px;
         margin-bottom: 20px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
     }
 
     /* Bảng kết quả */
@@ -71,7 +67,7 @@ st.markdown("""
         overflow: hidden;
     }
     thead th {
-        background: #222;
+        background: #34495e;
         color: white !important;
         font-weight: bold;
         text-align: center;
@@ -82,17 +78,17 @@ st.markdown("""
         text-align: center;
         padding: 8px;
         font-size: 14px;
+        color: #2c3e50;
     }
     tbody tr:nth-child(even) td {
         background: #f2f2f2;
     }
     tbody tr:hover td {
         background: #ffeaa7;
-        transform: scale(1.01);
         transition: 0.2s ease-in-out;
     }
 
-    /* Dropdown + button đẹp */
+    /* Dropdown + button */
     .stSelectbox, .stButton>button {
         border-radius: 12px !important;
         font-weight: 600 !important;
@@ -101,8 +97,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ===== Header =====
-st.markdown('<div class="neon-title">✨ Tra cứu Part Number (PN) ✨</div>', unsafe_allow_html=True)
-st.write("")  # khoảng cách
+st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🔎 Tra cứu Part Number (PN)</div>', unsafe_allow_html=True)
 
 # ===== Dropdown 1: Zone (sheet name) =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
@@ -153,9 +149,7 @@ if zone:
                 df_result.index = df_result.index + 1
                 df_result.index.name = "STT"
 
-                st.markdown('<div class="glass-box">', unsafe_allow_html=True)
                 st.success(f"Tìm thấy {len(df_result)} dòng dữ liệu:")
                 st.write(df_result.to_html(escape=False), unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
