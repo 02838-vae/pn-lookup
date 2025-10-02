@@ -22,7 +22,11 @@ def get_base64_of_bin_file(bin_file):
         return base64.b64encode(f.read()).decode()
 
 # ===== Quét thư mục, lấy tất cả file airplane*.jpg/jpeg/png =====
-bg_files = [f for f in os.listdir(".") if f.lower().startswith("airplane") and f.lower().endswith((".jpg", ".jpeg", ".png"))]
+bg_files = [
+    os.path.join(os.getcwd(), f)
+    for f in os.listdir(".")
+    if f.lower().startswith("airplane") and f.lower().endswith((".jpg", ".jpeg", ".png"))
+]
 bg_files.sort()
 
 if not bg_files:
@@ -217,3 +221,4 @@ if zone:
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
+
