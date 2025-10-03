@@ -6,7 +6,6 @@ import streamlit as st
 # ====== File ======
 excel_file = "A787.xlsx"
 bg_image_file = "airplane.jpg"   # nền chính
-texture_file = "paper.jpg"       # overlay texture giấy
 
 # ====== Load & clean Excel ======
 def load_and_clean(sheet):
@@ -25,27 +24,13 @@ def get_base64(path):
     return None
 
 img_base64 = get_base64(bg_image_file)
-texture_base64 = get_base64(texture_file)
 
 # ====== CSS ======
 if img_base64:
     bg_css = f"url('data:image/jpg;base64,{img_base64}') no-repeat center center fixed"
 else:
-    bg_css = "linear-gradient(#e8d8b9, #d6c49d)"  # fallback vintage
-
-texture_layer = ""
-if texture_base64:
-    texture_layer = f"""
-    .stApp::after {{
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: url('data:image/jpg;base64,{texture_base64}') repeat;
-        opacity: 0.35;
-        pointer-events: none;
-        z-index: 0;
-    }}
-    """
+    # fallback gradient vàng vintage
+    bg_css = "linear-gradient(180deg, #f3e5ab, #e6d690, #d6c38c)"
 
 st.markdown(f"""
 <style>
@@ -55,7 +40,7 @@ st.markdown(f"""
     background: {bg_css};
     background-size: cover;
     font-family: 'Special+Elite', cursive !important;
-    filter: sepia(0.35) contrast(1.1) brightness(1.05);
+    filter: sepia(0.25) contrast(1.05) brightness(1.05);
     position: relative;
 }}
 
@@ -138,7 +123,6 @@ table.dataframe tbody tr:hover td {{
     border-radius: 5px;
     margin: 12px 0;
 }}
-{texture_layer}
 </style>
 """, unsafe_allow_html=True)
 
