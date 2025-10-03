@@ -22,12 +22,11 @@ def get_base64_of_bin_file(bin_file):
 
 img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-# ===== CSS Vintage =====
+# ===== CSS Vintage + icon máy bay chạy ngang =====
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-    /* Toàn trang */
     .stApp {{
         font-family: 'Special Elite', cursive !important;
         background: 
@@ -36,7 +35,6 @@ st.markdown(f"""
         background-size: cover;
     }}
 
-    /* Hiệu ứng giấy cũ overlay */
     .stApp::after {{
         content: "";
         position: fixed;
@@ -50,12 +48,8 @@ st.markdown(f"""
     .block-container {{
         padding-top: 0rem !important;
     }}
+    header[data-testid="stHeader"] {{ display: none; }}
 
-    header[data-testid="stHeader"] {{
-        display: none;
-    }}
-
-    /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
         font-size: 34px;
         font-weight: bold;
@@ -63,10 +57,8 @@ st.markdown(f"""
         margin: 20px auto 10px auto;
         color: #3e2723;
         text-shadow: 1px 1px 0px #fff;
-        font-family: 'Special Elite', cursive !important;
     }}
 
-    /* Tiêu đề chính */
     .main-title {{
         font-size: 26px;
         font-weight: 900;
@@ -75,10 +67,8 @@ st.markdown(f"""
         margin-top: 5px;
         margin-bottom: 20px;
         text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-        font-family: 'Special Elite', cursive !important;
     }}
 
-    /* Label câu hỏi */
     .stSelectbox label {{
         font-weight: bold !important;
         font-size: 18px !important;
@@ -86,7 +76,6 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
     }}
 
-    /* Ô dropdown */
     .stSelectbox div[data-baseweb="select"] {{
         font-family: 'Special Elite', cursive !important;
         font-size: 15px !important;
@@ -95,8 +84,6 @@ st.markdown(f"""
         border: 1.5px dashed #5d4037 !important;
         border-radius: 6px !important;
     }}
-
-    /* Các lựa chọn trong dropdown */
     .stSelectbox div[data-baseweb="popover"] {{
         font-family: 'Special Elite', cursive !important;
         font-size: 15px !important;
@@ -105,7 +92,6 @@ st.markdown(f"""
         border: 1.5px dashed #5d4037 !important;
     }}
 
-    /* Bảng kết quả */
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
@@ -129,15 +115,12 @@ st.markdown(f"""
         color: #3e2723 !important;
         border: 1.5px dashed #5d4037 !important;
     }}
-    table.dataframe tbody tr:nth-child(even) td {{
-        background: #f8f4ec !important;
-    }}
+    table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec !important; }}
     table.dataframe tbody tr:hover td {{
         background: #f1e0c6 !important;
         transition: 0.3s ease-in-out;
     }}
 
-    /* Thông báo tìm thấy dữ liệu */
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
@@ -151,7 +134,6 @@ st.markdown(f"""
         align-items: center;
         justify-content: center;
         gap: 8px;
-        font-family: 'Special Elite', cursive !important;
     }}
     .shake {{
         display: inline-block;
@@ -164,7 +146,26 @@ st.markdown(f"""
         75% {{ transform: translate(2px, -2px) rotate(1deg); }}
         100% {{ transform: translate(1px, 1px) rotate(0deg); }}
     }}
+
+    /* Icon máy bay chạy ngang đáy */
+    .plane {{
+        position: fixed;
+        bottom: 20px;
+        left: -100px;
+        font-size: 32px;
+        animation: fly 15s linear infinite;
+        z-index: 1000;
+    }}
+    @keyframes fly {{
+        0%   {{ left: -100px; transform: scaleX(1); }}
+        49%  {{ transform: scaleX(1); }}
+        50%  {{ left: 100%; transform: scaleX(-1); }}
+        99%  {{ transform: scaleX(-1); }}
+        100% {{ left: -100px; transform: scaleX(1); }}
+    }}
     </style>
+
+    <div class="plane">✈️</div>
 """, unsafe_allow_html=True)
 
 # ===== Header =====
