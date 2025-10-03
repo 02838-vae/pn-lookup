@@ -5,7 +5,8 @@ import streamlit as st
 
 # ====== File ======
 excel_file = "A787.xlsx"
-bg_image_file = "airplane.jpg"   # đổi tên nếu cần
+bg_image_file = "airplane.jpg"   # nền chính
+texture_file = "paper.jpg"       # overlay texture giấy
 
 # ====== Load & clean Excel ======
 def load_and_clean(sheet):
@@ -16,7 +17,7 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ====== Encode ảnh nền ======
+# ====== Encode ảnh ======
 def get_base64(path):
     if os.path.exists(path):
         with open(path, "rb") as f:
@@ -24,12 +25,27 @@ def get_base64(path):
     return None
 
 img_base64 = get_base64(bg_image_file)
+texture_base64 = get_base64(texture_file)
 
 # ====== CSS ======
 if img_base64:
     bg_css = f"url('data:image/jpg;base64,{img_base64}') no-repeat center center fixed"
 else:
     bg_css = "linear-gradient(#e8d8b9, #d6c49d)"  # fallback vintage
+
+texture_layer = ""
+if texture_base64:
+    texture_layer = f"""
+    .stApp::after {{
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url('data:image/jpg;base64,{texture_base64}') repeat;
+        opacity: 0.35;
+        pointer-events: none;
+        z-index: 0;
+    }}
+    """
 
 st.markdown(f"""
 <style>
@@ -39,7 +55,8 @@ st.markdown(f"""
     background: {bg_css};
     background-size: cover;
     font-family: 'Special+Elite', cursive !important;
-    filter: sepia(0.4) contrast(1.1) brightness(1.05); /* vintage effect trực tiếp trên nền */
+    filter: sepia(0.35) contrast(1.1) brightness(1.05);
+    position: relative;
 }}
 
 .block-container {{
@@ -67,7 +84,7 @@ header[data-testid="stHeader"] {{display: none;}}
 
 /* Label câu hỏi */
 label, div[role="group"] label {{
-    font-family: 'Special Elite', cursive !important;
+    font-family: 'Special+Elite', cursive !important;
     font-size: 18px !important;
     font-weight: 700 !important;
     color: #2c1a0c !important;
@@ -77,7 +94,7 @@ label, div[role="group"] label {{
 /* Dropdown + menu */
 .stSelectbox div[data-baseweb="select"],
 .stSelectbox div[data-baseweb="popover"] {{
-    font-family: 'Special Elite', cursive !important;
+    font-family: 'Special+Elite', cursive !important;
     font-size: 15px !important;
     color: #2c1a0c !important;
     background: #fdf6e3 !important;
@@ -90,7 +107,7 @@ table.dataframe {{
     border-collapse: collapse;
     width: 100%;
     background: #fffaf0;
-    font-family: 'Special Elite', cursive !important;
+    font-family: 'Special+Elite', cursive !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }}
 table.dataframe thead th {{
@@ -121,6 +138,7 @@ table.dataframe tbody tr:hover td {{
     border-radius: 5px;
     margin: 12px 0;
 }}
+{texture_layer}
 </style>
 """, unsafe_allow_html=True)
 
