@@ -35,7 +35,6 @@ except:
 # ===== CSS =====
 st.markdown(f"""
     <style>
-    /* Background vintage với overlay vàng nhạt */
     .stApp {{
         background: 
             linear-gradient(rgba(255, 239, 186, 0.65), rgba(255, 239, 186, 0.65)),
@@ -45,7 +44,6 @@ st.markdown(f"""
     .block-container {{ padding-top: 0rem !important; }}
     header[data-testid="stHeader"] {{ display: none; }}
 
-    /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
         font-size: 32px;
         font-weight: 900;
@@ -63,7 +61,6 @@ st.markdown(f"""
         100% {{color: #9b59b6;}}
     }}
 
-    /* Tiêu đề chính */
     .main-title {{
         font-size: 28px;
         font-weight: 900;
@@ -76,7 +73,6 @@ st.markdown(f"""
         white-space: nowrap;
     }}
 
-    /* Label câu hỏi */
     .stSelectbox label {{
         font-weight: 900 !important;
         font-size: 18px !important;
@@ -87,7 +83,6 @@ st.markdown(f"""
         font-family: "Courier New", monospace !important;
     }}
 
-    /* Bảng kết quả */
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
@@ -151,12 +146,12 @@ st.markdown(f"""
     /* Máy bay gif chạy ngang dưới cùng */
     .plane-gif {{
         position: fixed;
-        bottom: 20px;
-        left: -150px;
-        width: 120px;
-        height: auto;
+        bottom: 15px;
+        left: -100px;
+        height: 60px; /* resize nhỏ lại */
+        width: auto;
         z-index: 99999;
-        animation: fly 15s linear infinite;
+        animation: fly 20s linear infinite;
     }}
     @keyframes fly {{
         0% {{ left: -150px; }}
