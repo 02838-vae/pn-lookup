@@ -1,7 +1,6 @@
 import pandas as pd
 import streamlit as st
 import base64
-import os
 
 # ===== Đọc file Excel =====
 excel_file = "A787.xlsx"
@@ -15,7 +14,7 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Load background =====
+# ===== Load background airplane.jpg =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         data = f.read()
@@ -23,35 +22,28 @@ def get_base64_of_bin_file(bin_file):
 
 img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-# ===== Load gif (máy bay nhỏ bay ngang) =====
+# ===== Load airplane.gif =====
 def get_gif_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-gif_path = "airplane.gif"
-gif_base64 = ""
-if os.path.exists(gif_path):
-    gif_base64 = get_gif_base64(gif_path)
+try:
+    gif_base64 = get_gif_base64("airplane.gif")
+except:
+    gif_base64 = None
 
 # ===== CSS =====
 st.markdown(f"""
     <style>
-    /* Nền vintage */
+    /* Background vintage với overlay vàng nhạt */
     .stApp {{
         background: 
-            linear-gradient(rgba(245, 222, 179, 0.6), rgba(245, 222, 179, 0.6)), 
+            linear-gradient(rgba(255, 239, 186, 0.65), rgba(255, 239, 186, 0.65)),
             url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
-        font-family: 'Georgia', serif;
     }}
-
-    .block-container {{
-        padding-top: 0rem !important;
-    }}
-
-    header[data-testid="stHeader"] {{
-        display: none;
-    }}
+    .block-container {{ padding-top: 0rem !important; }}
+    header[data-testid="stHeader"] {{ display: none; }}
 
     /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
@@ -60,14 +52,15 @@ st.markdown(f"""
         text-align: center;
         animation: colorchange 5s infinite alternate;
         margin: 20px auto 10px auto;
+        font-family: "Courier New", monospace;
         white-space: nowrap;
     }}
     @keyframes colorchange {{
-        0% {{color: #8B0000;}}
-        25% {{color: #5D3A00;}}
-        50% {{color: #2E4B3F;}}
-        75% {{color: #8B5E3C;}}
-        100% {{color: #3B3B3B;}}
+        0% {{color: #e74c3c;}}
+        25% {{color: #3498db;}}
+        50% {{color: #2ecc71;}}
+        75% {{color: #f1c40f;}}
+        100% {{color: #9b59b6;}}
     }}
 
     /* Tiêu đề chính */
@@ -75,10 +68,11 @@ st.markdown(f"""
         font-size: 28px;
         font-weight: 900;
         text-align: center;
-        color: #5B4636;
+        color: #4b3832;
         margin-top: 10px;
         margin-bottom: 20px;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+        font-family: "Courier New", monospace;
         white-space: nowrap;
     }}
 
@@ -86,14 +80,11 @@ st.markdown(f"""
     .stSelectbox label {{
         font-weight: 900 !important;
         font-size: 18px !important;
-        color: #3E2723 !important;
-        font-family: 'Georgia', serif !important;
+        color: #2c1810 !important;
+        font-family: "Courier New", monospace !important;
     }}
-
-    /* Dropdown menu */
-    .stSelectbox div[data-baseweb="select"] > div {{
-        font-family: 'Georgia', serif !important;
-        color: #2c3e50 !important;
+    div[data-baseweb="select"] * {{
+        font-family: "Courier New", monospace !important;
     }}
 
     /* Bảng kết quả */
@@ -103,27 +94,27 @@ st.markdown(f"""
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        background: #fff8dc;
-        font-family: 'Georgia', serif;
+        background: white;
+        font-family: "Courier New", monospace;
     }}
     table.dataframe thead th {{
-        background: #5D3A00 !important;
-        color: white !important;
+        background: #4b3832 !important;
+        color: #f8f1e7 !important;
         font-weight: bold;
         text-align: center;
         padding: 10px !important;
         font-size: 15px;
-        border: 2px solid #5D3A00 !important;
+        border: 2px solid #4b3832 !important;
     }}
     table.dataframe tbody td {{
         text-align: center !important;
         padding: 8px !important;
         font-size: 14px;
-        color: #2c3e50 !important;
-        border: 1.5px solid #5D3A00 !important;
+        color: #2c1810 !important;
+        border: 1.5px solid #4b3832 !important;
     }}
     table.dataframe tbody tr:nth-child(even) td {{
-        background: #fdf5e6 !important;
+        background: #fdf6e3 !important;
     }}
     table.dataframe tbody tr:hover td {{
         background: #ffeaa7 !important;
@@ -133,30 +124,42 @@ st.markdown(f"""
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
-        color: #3E2723;
-        background: #f1e0c6;
+        color: #154360;
+        background: #d6eaf8;
         padding: 10px 15px;
-        border-left: 6px solid #5D3A00;
+        border-left: 6px solid #154360;
         border-radius: 6px;
         margin: 15px 0;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        font-family: 'Georgia', serif;
+        font-family: "Courier New", monospace;
+    }}
+    .shake {{
+        display: inline-block;
+        animation: shake 1s infinite;
+    }}
+    @keyframes shake {{
+        0% {{ transform: translate(1px, 1px) rotate(0deg); }}
+        25% {{ transform: translate(-1px, -1px) rotate(-1deg); }}
+        50% {{ transform: translate(-2px, 2px) rotate(1deg); }}
+        75% {{ transform: translate(2px, -2px) rotate(1deg); }}
+        100% {{ transform: translate(1px, 1px) rotate(0deg); }}
     }}
 
     /* Máy bay gif chạy ngang dưới cùng */
     .plane-gif {{
         position: fixed;
-        bottom: 10px;
-        left: -200px;
-        height: 60px;
-        animation: fly 20s linear infinite;
-        z-index: 9999;
+        bottom: 20px;
+        left: -150px;
+        width: 120px;
+        height: auto;
+        z-index: 99999;
+        animation: fly 15s linear infinite;
     }}
     @keyframes fly {{
-        0% {{ left: -200px; }}
+        0% {{ left: -150px; }}
         100% {{ left: 100%; }}
     }}
     </style>
@@ -165,12 +168,6 @@ st.markdown(f"""
 # ===== Header =====
 st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
-
-# ===== Máy bay gif nếu có =====
-if gif_base64:
-    st.markdown(f"""
-        <img src="data:image/gif;base64,{gif_base64}" class="plane-gif"/>
-    """, unsafe_allow_html=True)
 
 # ===== Dropdowns và logic =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
@@ -222,3 +219,9 @@ if zone:
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
+
+# ===== Show airplane gif nếu có =====
+if gif_base64:
+    st.markdown(f"""
+        <img src="data:image/gif;base64,{gif_base64}" class="plane-gif"/>
+    """, unsafe_allow_html=True)
