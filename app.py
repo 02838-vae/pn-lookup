@@ -1,11 +1,9 @@
 import os
-import base64
 import pandas as pd
 import streamlit as st
 
-# ====== File ======
+# ====== File Excel ======
 excel_file = "A787.xlsx"
-bg_image_file = "airplane.jpg"   # nền chính
 
 # ====== Load & clean Excel ======
 def load_and_clean(sheet):
@@ -16,104 +14,93 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ====== Encode ảnh ======
-def get_base64(path):
-    if os.path.exists(path):
-        with open(path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
-    return None
-
-img_base64 = get_base64(bg_image_file)
-
-# ====== CSS ======
-if img_base64:
-    bg_css = f"url('data:image/jpg;base64,{img_base64}') no-repeat center center fixed"
-else:
-    # fallback gradient vàng vintage
-    bg_css = "linear-gradient(180deg, #f3e5ab, #e6d690, #d6c38c)"
-
-st.markdown(f"""
+# ====== CSS Vintage với overlay vàng ======
+st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-.stApp {{
-    background: {bg_css};
+.stApp {
+    background: linear-gradient(rgba(255,235,175,0.4), rgba(255,235,175,0.4)), 
+                url('airplane.jpg');
     background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     font-family: 'Special+Elite', cursive !important;
     filter: sepia(0.25) contrast(1.05) brightness(1.05);
     position: relative;
-}}
+}
 
-.block-container {{
+.block-container {
     position: relative;
     z-index: 1;
-}}
+    padding-top: 0rem !important;
+}
 
-header[data-testid="stHeader"] {{display: none;}}
+header[data-testid="stHeader"] {display: none;}
 
 /* Tiêu đề */
-.top-title {{
+.top-title {
     font-size: 34px;
     font-weight: 900;
     text-align: center;
     margin: 15px 0 5px 0;
     color: #3e2723;
     text-shadow: 1px 1px #fff;
-}}
-.main-title {{
+}
+.main-title {
     font-size: 24px;
     text-align: center;
     margin-bottom: 20px;
     color: #5d4037;
-}}
+}
 
 /* Label câu hỏi */
-label, div[role="group"] label {{
-    font-family: 'Special+Elite', cursive !important;
+label, div[role="group"] label {
+    font-family: 'Special Elite', cursive !important;
     font-size: 18px !important;
     font-weight: 700 !important;
     color: #2c1a0c !important;
     text-shadow: 0.5px 0.5px 0.8px #fff;
-}}
+}
 
-/* Dropdown + menu */
+/* Dropdown */
 .stSelectbox div[data-baseweb="select"],
-.stSelectbox div[data-baseweb="popover"] {{
-    font-family: 'Special+Elite', cursive !important;
+.stSelectbox div[data-baseweb="popover"] {
+    font-family: 'Special Elite', cursive !important;
     font-size: 15px !important;
     color: #2c1a0c !important;
     background: #fdf6e3 !important;
     border: 1px solid #5d4037 !important;
     border-radius: 6px !important;
-}}
+}
 
 /* Bảng vintage */
-table.dataframe {{
+table.dataframe {
     border-collapse: collapse;
     width: 100%;
     background: #fffaf0;
-    font-family: 'Special+Elite', cursive !important;
+    font-family: 'Special Elite', cursive !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}}
-table.dataframe thead th {{
+}
+table.dataframe thead th {
     background: #5d4037 !important;
     color: #f8f1df !important;
     padding: 8px;
-}}
-table.dataframe tbody td {{
+}
+table.dataframe tbody td {
     padding: 6px;
     border: 1px solid #d9cbb5;
     color: #3e2723;
-}}
-table.dataframe tbody tr:nth-child(even) td {{
+}
+table.dataframe tbody tr:nth-child(even) td {
     background: #f6efe0 !important;
-}}
-table.dataframe tbody tr:hover td {{
+}
+table.dataframe tbody tr:hover td {
     background: #fceec8 !important;
-}}
+}
 
 /* Thông báo */
-.highlight-msg {{
+.highlight-msg {
     font-size: 18px;
     font-weight: bold;
     color: #3e2723;
@@ -122,7 +109,7 @@ table.dataframe tbody tr:hover td {{
     border-left: 6px solid #3e2723;
     border-radius: 5px;
     margin: 12px 0;
-}}
+}
 </style>
 """, unsafe_allow_html=True)
 
