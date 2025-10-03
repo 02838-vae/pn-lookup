@@ -14,7 +14,7 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Load background airplane.jpg =====
+# ===== Load background vintage airplane.jpg =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         data = f.read()
@@ -22,118 +22,121 @@ def get_base64_of_bin_file(bin_file):
 
 img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-# ===== CSS Vintage + icon máy bay chạy ngang =====
+# ===== Load gif động airplane.gif =====
+def get_gif_base64(path):
+    with open(path, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+gif_base64 = get_gif_base64("airplane.gif")
+
+# ===== CSS =====
 st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
-
+    /* Nền trang vintage */
     .stApp {{
-        font-family: 'Special Elite', cursive !important;
         background: 
-            linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
+            linear-gradient(rgba(245, 222, 179, 0.6), rgba(245, 222, 179, 0.6)), 
             url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
-    }}
-
-    .stApp::after {{
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: url("https://www.transparenttextures.com/patterns/aged-paper.png");
-        opacity: 0.35;
-        pointer-events: none;
-        z-index: -1;
     }}
 
     .block-container {{
         padding-top: 0rem !important;
     }}
-    header[data-testid="stHeader"] {{ display: none; }}
 
-    .top-title {{
-        font-size: 34px;
-        font-weight: bold;
-        text-align: center;
-        margin: 20px auto 10px auto;
-        color: #3e2723;
-        text-shadow: 1px 1px 0px #fff;
+    header[data-testid="stHeader"] {{
+        display: none;
     }}
 
-    .main-title {{
-        font-size: 26px;
+    /* Dòng chữ Tổ bảo dưỡng số 1 */
+    .top-title {{
+        font-size: 32px;
         font-weight: 900;
         text-align: center;
-        color: #5d4037;
-        margin-top: 5px;
+        animation: colorchange 5s infinite alternate;
+        margin: 20px auto 10px auto;
+        white-space: nowrap;
+        font-family: Arial, sans-serif;
+    }}
+    @keyframes colorchange {{
+        0% {{color: #e74c3c;}}
+        25% {{color: #3498db;}}
+        50% {{color: #2ecc71;}}
+        75% {{color: #f1c40f;}}
+        100% {{color: #9b59b6;}}
+    }}
+
+    /* Tiêu đề chính */
+    .main-title {{
+        font-size: 28px;
+        font-weight: 900;
+        text-align: center;
+        background: linear-gradient(90deg, #ff6a00, #ff8c00, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-top: 10px;
         margin-bottom: 20px;
-        text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+        white-space: nowrap;
+        font-family: Arial, sans-serif;
     }}
 
-    .stSelectbox label {{
-        font-weight: bold !important;
-        font-size: 18px !important;
-        color: #4e342e !important;
-        font-family: 'Special Elite', cursive !important;
+    /* Font cho label câu hỏi + dropdown */
+    .stSelectbox label, .stSelectbox div[data-baseweb="select"] * {{
+        font-family: Arial, sans-serif !important;
+        font-size: 16px !important;
+        color: #2c3e50 !important;
     }}
 
-    .stSelectbox div[data-baseweb="select"] {{
-        font-family: 'Special Elite', cursive !important;
-        font-size: 15px !important;
-        color: #3e2723 !important;
-        background: #fdfbf5 !important;
-        border: 1.5px dashed #5d4037 !important;
-        border-radius: 6px !important;
-    }}
-    .stSelectbox div[data-baseweb="popover"] {{
-        font-family: 'Special Elite', cursive !important;
-        font-size: 15px !important;
-        background: #fdfbf5 !important;
-        color: #3e2723 !important;
-        border: 1.5px dashed #5d4037 !important;
-    }}
-
+    /* Bảng kết quả */
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
-        border: 2px solid #5d4037;
-        font-family: 'Special Elite', cursive !important;
-        background: #fdfbf5;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        background: white;
+        font-family: Arial, sans-serif;
     }}
     table.dataframe thead th {{
-        background: #795548 !important;
+        background: #2c3e50 !important;
         color: white !important;
         font-weight: bold;
         text-align: center;
         padding: 10px !important;
         font-size: 15px;
-        border: 2px solid #5d4037 !important;
+        border: 2px solid #2c3e50 !important;
     }}
     table.dataframe tbody td {{
         text-align: center !important;
         padding: 8px !important;
         font-size: 14px;
-        color: #3e2723 !important;
-        border: 1.5px dashed #5d4037 !important;
+        color: #2c3e50 !important;
+        border: 1.5px solid #2c3e50 !important;
     }}
-    table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec !important; }}
+    table.dataframe tbody tr:nth-child(even) td {{
+        background: #f8f9fa !important;
+    }}
     table.dataframe tbody tr:hover td {{
-        background: #f1e0c6 !important;
-        transition: 0.3s ease-in-out;
+        background: #ffeaa7 !important;
+        transition: 0.2s ease-in-out;
     }}
 
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
-        color: #3e2723;
-        background: #efebe9;
+        color: #154360;
+        background: #d6eaf8;
         padding: 10px 15px;
-        border-left: 6px solid #6d4c41;
+        border-left: 6px solid #154360;
         border-radius: 6px;
         margin: 15px 0;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
+        font-family: Arial, sans-serif;
     }}
     .shake {{
         display: inline-block;
@@ -147,29 +150,29 @@ st.markdown(f"""
         100% {{ transform: translate(1px, 1px) rotate(0deg); }}
     }}
 
-    /* Icon máy bay chạy ngang đáy */
-    .plane {{
+    /* Máy bay GIF động */
+    .plane-gif {{
         position: fixed;
         bottom: 20px;
-        left: -100px;
-        font-size: 32px;
-        animation: fly 15s linear infinite;
+        left: -150px;
+        width: 80px;
+        animation: flygif 15s linear infinite;
         z-index: 1000;
     }}
-    @keyframes fly {{
-        0%   {{ left: -100px; transform: scaleX(1); }}
+    @keyframes flygif {{
+        0%   {{ left: -150px; transform: scaleX(1); }}
         49%  {{ transform: scaleX(1); }}
         50%  {{ left: 100%; transform: scaleX(-1); }}
         99%  {{ transform: scaleX(-1); }}
-        100% {{ left: -100px; transform: scaleX(1); }}
+        100% {{ left: -150px; transform: scaleX(1); }}
     }}
     </style>
 
-    <div class="plane">✈️</div>
+    <img src="data:image/gif;base64,{gif_base64}" class="plane-gif"/>
 """, unsafe_allow_html=True)
 
 # ===== Header =====
-st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
 # ===== Dropdowns và logic =====
