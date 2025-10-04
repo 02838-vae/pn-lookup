@@ -15,13 +15,16 @@ def load_and_clean(sheet):
     return df
 
 
-# ===== Load background airplane.jpg =====
+# ===== Hàm chuyển file ảnh thành base64 =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
+
+# ===== Load ảnh nền và ảnh GIF động =====
 img_base64 = get_base64_of_bin_file("airplane.jpg")
+gif_base64 = get_base64_of_bin_file("airplane.gif")
 
 
 # ===== CSS Vintage + Hiệu ứng máy bay =====
@@ -182,10 +185,10 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-# ===== Hiệu ứng máy bay =====
-st.markdown("""
+# ===== Hiệu ứng máy bay động (GIF Base64) =====
+st.markdown(f"""
 <div class="airplane-container">
-    <img class="airplane" src="airplane.gif">
+    <img class="airplane" src="data:image/gif;base64,{gif_base64}">
 </div>
 """, unsafe_allow_html=True)
 
