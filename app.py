@@ -24,7 +24,7 @@ def get_base64_of_bin_file(bin_file):
 
 # ===== Load ảnh nền và ảnh GIF động =====
 img_base64 = get_base64_of_bin_file("airplane.jpg")
-gif_base64 = get_base64_of_bin_file("Airplane.gif")
+gif_base64 = get_base64_of_bin_file("airplane.gif")
 
 
 # ===== CSS Vintage + Hiệu ứng máy bay =====
@@ -174,6 +174,9 @@ st.markdown(f"""
         left: -200px;
         width: 160px;
         animation: flyAcross 12s linear infinite;
+        mix-blend-mode: multiply;
+        opacity: 0.9;
+        filter: brightness(0.95) contrast(1.05);
     }}
 
     @keyframes flyAcross {{
@@ -248,4 +251,3 @@ if zone:
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("📌 Rất tiếc, không tìm thấy dữ liệu phù hợp.")
-
