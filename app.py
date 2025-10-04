@@ -21,8 +21,8 @@ def get_base64_of_bin_file(bin_file):
     return base64.b64encode(data).decode()
 
 img_base64 = get_base64_of_bin_file("airplane.jpg")
- <img src="airplane.gif">
-
+html = f'<img src="data:image/jpeg;base64,{img_base64}">'
+print(html)
 # ===== CSS Vintage =====
 st.markdown(f"""
     <style>
@@ -211,4 +211,5 @@ if zone:
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("📌 Rất tiếc, không tìm thấy dữ liệu phù hợp.")
+
 
