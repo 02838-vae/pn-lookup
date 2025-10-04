@@ -34,7 +34,7 @@ st.markdown(f"""
 
     /* Toàn trang */
     .stApp {{
-        font-family: 'Special Elite', cursive !important;
+        font-family: 'Special+Elite', cursive !important;
         background: 
             linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
             url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
@@ -159,38 +159,33 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
     }}
 
-    /* --- Hiệu ứng máy bay bay ngang qua tiêu đề --- */
+    /* --- Máy bay đứng yên --- */
     .airplane-container {{
         position: relative;
         width: 100%;
         height: 120px;
-        overflow: hidden;
+        overflow: visible;
         margin-bottom: -30px;
     }}
 
     .airplane {{
         position: absolute;
         top: 20px;
-        left: -200px;
+        left: 50%;
+        transform: translateX(-50%);
         width: 160px;
-        animation: flyAcross 12s linear infinite;
-        opacity: 0.88;
-        filter: brightness(0.9) contrast(1.25) saturate(1.05) drop-shadow(0 0 4px rgba(0,0,0,0.15));
+        opacity: 0.9;
+        filter: brightness(0.9) contrast(1.25) saturate(1.05)
+                drop-shadow(0 0 6px rgba(0,0,0,0.2));
         background: none !important;
         mix-blend-mode: normal;
         z-index: 10;
-    }}
-
-    @keyframes flyAcross {{
-        0% {{ left: -200px; transform: rotate(5deg); }}
-        50% {{ top: 15px; transform: rotate(0deg); }}
-        100% {{ left: 100%; transform: rotate(-3deg); }}
     }}
     </style>
 """, unsafe_allow_html=True)
 
 
-# ===== Hiệu ứng máy bay động (GIF Base64) =====
+# ===== Hiển thị máy bay GIF đứng yên =====
 st.markdown(f"""
 <div class="airplane-container">
     <img class="airplane" src="data:image/gif;base64,{gif_base64}">
