@@ -14,6 +14,7 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
+
 # ===== Load background airplane.jpg =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
@@ -21,19 +22,19 @@ def get_base64_of_bin_file(bin_file):
     return base64.b64encode(data).decode()
 
 img_base64 = get_base64_of_bin_file("airplane.jpg")
-html = f'<img src="data:image/jpeg;base64,{img_base64}">'
-print(html)
-# ===== CSS Vintage =====
+
+
+# ===== CSS Vintage + Hiệu ứng máy bay =====
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
     /* Toàn trang */
     .stApp {{
-        font-family: 'Special Elite', cursive !important;
+        font-family: 'Special+Elite', cursive !important;
         background: 
             linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
-            url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
+            url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
     }}
 
@@ -154,12 +155,45 @@ st.markdown(f"""
         gap: 8px;
         font-family: 'Special Elite', cursive !important;
     }}
+
+    /* --- Hiệu ứng máy bay bay ngang qua tiêu đề --- */
+    .airplane-container {{
+        position: relative;
+        width: 100%;
+        height: 120px;
+        overflow: hidden;
+        margin-bottom: -30px;
+    }}
+
+    .airplane {{
+        position: absolute;
+        top: 20px;
+        left: -200px;
+        width: 160px;
+        animation: flyAcross 12s linear infinite;
+    }}
+
+    @keyframes flyAcross {{
+        0% {{ left: -200px; transform: rotate(5deg); }}
+        50% {{ top: 15px; transform: rotate(0deg); }}
+        100% {{ left: 100%; transform: rotate(-3deg); }}
+    }}
     </style>
 """, unsafe_allow_html=True)
+
+
+# ===== Hiệu ứng máy bay =====
+st.markdown("""
+<div class="airplane-container">
+    <img class="airplane" src="airplane.gif">
+</div>
+""", unsafe_allow_html=True)
+
 
 # ===== Header =====
 st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
+
 
 # ===== Dropdowns và logic =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
@@ -211,5 +245,3 @@ if zone:
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("📌 Rất tiếc, không tìm thấy dữ liệu phù hợp.")
-
-
