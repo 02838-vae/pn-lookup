@@ -24,7 +24,7 @@ def get_base64_of_bin_file(bin_file):
 
 # ===== Load ảnh nền và ảnh GIF động =====
 img_base64 = get_base64_of_bin_file("airplane.jpg")
-gif_base64 = get_base64_of_bin_file("airplane.gif")
+gif_base64 = get_base64_of_bin_file("Airplane.gif")
 
 
 # ===== CSS Vintage + Hiệu ứng máy bay =====
@@ -251,3 +251,4 @@ if zone:
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
                 st.error("📌 Rất tiếc, không tìm thấy dữ liệu phù hợp.")
+
