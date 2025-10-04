@@ -14,166 +14,150 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Load background =====
+# ===== Load background airplane.jpg =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
 img_base64 = get_base64_of_bin_file("airplane.jpg")
-gif_base64 = get_base64_of_bin_file("airplane.gif")
 
-# ===== CSS vintage + airplane gif =====
-st.markdown("""
+# ===== CSS Vintage =====
+st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-    .stApp {
-        background: 
-            linear-gradient(rgba(245, 222, 179, 0.5), rgba(245, 222, 179, 0.5)),
-            url("data:image/jpg;base64,""" + img_base64 + """) no-repeat center center fixed;
-        background-size: cover;
+    /* Toàn trang */
+    .stApp {{
         font-family: 'Special Elite', cursive !important;
-    }
+        background: 
+            linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
+            url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
+        background-size: cover;
+    }}
 
-    .block-container {
+    /* Overlay giấy cũ */
+    .stApp::after {{
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("https://www.transparenttextures.com/patterns/aged-paper.png");
+        opacity: 0.35;
+        pointer-events: none;
+        z-index: -1;
+    }}
+
+    .block-container {{
         padding-top: 0rem !important;
-    }
+    }}
 
-    header[data-testid="stHeader"] {
+    header[data-testid="stHeader"] {{
         display: none;
-    }
+    }}
 
-    /* Tổ bảo dưỡng số 1 */
-    .top-title {
-        font-size: 32px;
-        font-weight: 900;
+    /* Dòng chữ Tổ bảo dưỡng số 1 */
+    .top-title {{
+        font-size: 34px;
+        font-weight: bold;
         text-align: center;
-        animation: colorchange 5s infinite alternate;
         margin: 20px auto 10px auto;
-        white-space: nowrap;
-    }
-    @keyframes colorchange {
-        0% {color: #6b4226;}
-        25% {color: #8b5e3c;}
-        50% {color: #c97f4a;}
-        75% {color: #a0522d;}
-        100% {color: #5c4033;}
-    }
+        color: #3e2723;
+        text-shadow: 1px 1px 0px #fff;
+        font-family: 'Special Elite', cursive !important;
+    }}
 
     /* Tiêu đề chính */
-    .main-title {
-        font-size: 28px;
+    .main-title {{
+        font-size: 26px;
         font-weight: 900;
         text-align: center;
-        background: linear-gradient(90deg, #b5651d, #e0ac69, #deb887);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-top: 10px;
+        color: #5d4037;
+        margin-top: 5px;
         margin-bottom: 20px;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        white-space: nowrap;
-    }
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        font-family: 'Special Elite', cursive !important;
+    }}
 
     /* Label câu hỏi */
-    .stSelectbox label {
-        font-weight: 900 !important;
+    .stSelectbox label {{
+        font-weight: bold !important;
         font-size: 18px !important;
-        color: #3e2723 !important;
+        color: #4e342e !important;
         font-family: 'Special Elite', cursive !important;
-        text-shadow: 1px 1px 1px rgba(255,255,255,0.7);
-    }
+    }}
 
-    /* Dropdown box */
-    .stSelectbox div[data-baseweb="select"] {
+    /* Ô dropdown */
+    .stSelectbox div[data-baseweb="select"] {{
         font-family: 'Special Elite', cursive !important;
         font-size: 15px !important;
-    }
+        color: #3e2723 !important;
+        background: #fdfbf5 !important;
+        border: 1.5px dashed #5d4037 !important;
+        border-radius: 6px !important;
+    }}
+
+    /* Các lựa chọn trong dropdown */
+    .stSelectbox div[data-baseweb="popover"] {{
+        font-family: 'Special Elite', cursive !important;
+        font-size: 15px !important;
+        background: #fdfbf5 !important;
+        color: #3e2723 !important;
+        border: 1.5px dashed #5d4037 !important;
+    }}
 
     /* Bảng kết quả */
-    table.dataframe {
+    table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        background: #fffaf0;
+        border: 2px solid #5d4037;
         font-family: 'Special Elite', cursive !important;
-    }
-    table.dataframe thead th {
-        background: #5c4033 !important;
-        color: #fdf5e6 !important;
+        background: #fdfbf5;
+    }}
+    table.dataframe thead th {{
+        background: #795548 !important;
+        color: #fff8e1 !important;
         font-weight: bold;
         text-align: center;
         padding: 10px !important;
         font-size: 15px;
-        border: 2px solid #3e2723 !important;
-    }
-    table.dataframe tbody td {
+        border: 2px solid #5d4037 !important;
+    }}
+    table.dataframe tbody td {{
         text-align: center !important;
         padding: 8px !important;
         font-size: 14px;
         color: #3e2723 !important;
-        border: 1.5px solid #5c4033 !important;
-    }
-    table.dataframe tbody tr:nth-child(even) td {
-        background: #f8f1e7 !important;
-    }
-    table.dataframe tbody tr:hover td {
-        background: #ffeaa7 !important;
-        transition: 0.2s ease-in-out;
-    }
+        border: 1.5px dashed #5d4037 !important;
+    }}
+    table.dataframe tbody tr:nth-child(even) td {{
+        background: #f8f4ec !important;
+    }}
+    table.dataframe tbody tr:hover td {{
+        background: #f1e0c6 !important;
+        transition: 0.3s ease-in-out;
+    }}
 
-    /* Highlight message */
-    .highlight-msg {
+    /* Thông báo tìm thấy dữ liệu */
+    .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
         color: #3e2723;
-        background: #f4e1c1;
+        background: #efebe9;
         padding: 10px 15px;
-        border-left: 6px solid #5c4033;
+        border-left: 6px solid #6d4c41;
         border-radius: 6px;
         margin: 15px 0;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-    }
-    .shake {
-        display: inline-block;
-        animation: shake 1s infinite;
-    }
-    @keyframes shake {
-        0% { transform: translate(1px, 1px) rotate(0deg); }
-        25% { transform: translate(-1px, -1px) rotate(-1deg); }
-        50% { transform: translate(-2px, 2px) rotate(1deg); }
-        75% { transform: translate(2px, -2px) rotate(1deg); }
-        100% { transform: translate(1px, 1px) rotate(0deg); }
-    }
-
-    /* Airplane gif chạy ngang dưới cùng */
-    .flying-plane {
-        position: fixed;
-        bottom: 10px;
-        left: -150px;
-        width: 120px;
-        height: auto;
-        z-index: 9999;
-        animation: flyLR 20s linear infinite;
-    }
-    @keyframes flyLR {
-        0%   { left: -150px; transform: scaleX(1); }
-        49%  { left: 100vw; transform: scaleX(1); }
-        50%  { left: 100vw; transform: scaleX(-1); }
-        100% { left: -150px; transform: scaleX(-1); }
-    }
+        font-family: 'Special Elite', cursive !important;
+    }}
     </style>
-
-    <img src="data:image/gif;base64,""" + gif_base64 + """ class="flying-plane">
 """, unsafe_allow_html=True)
 
 # ===== Header =====
-st.markdown('<div class="top-title">Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
 # ===== Dropdowns và logic =====
@@ -220,9 +204,9 @@ if zone:
                 df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
                 st.markdown(
-                    f'<div class="highlight-msg"><span class="shake">✅</span> Tìm thấy {len(df_result)} dòng dữ liệu</div>',
+                    f'<div class="highlight-msg">✅ Tìm thấy {len(df_result)} dòng dữ liệu</div>',
                     unsafe_allow_html=True
                 )
                 st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
-                st.error("Rất tiếc, không tìm thấy dữ liệu phù hợp.")
+                st.error("📌 Rất tiếc, không tìm thấy dữ liệu phù hợp.")
