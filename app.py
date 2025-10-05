@@ -14,17 +14,15 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Hàm chuyển file ảnh thành base64 =====
+# ===== Load background airplane.jpg =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
-# ===== Load ảnh nền và ảnh GIF động =====
 img_base64 = get_base64_of_bin_file("airplane.jpg")
-gif_base64 = get_base64_of_bin_file("Airplane.gif")
 
-# ===== CSS Vintage + Máy bay đứng yên =====
+# ===== CSS Vintage =====
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -34,7 +32,7 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
         background: 
             linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
-            url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
+            url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
     }}
 
@@ -57,33 +55,12 @@ st.markdown(f"""
         display: none;
     }}
 
-    /* --- Máy bay đứng yên phía trên tiêu đề --- */
-    .airplane-container {{
-        position: fixed;
-        top: 10px;
-        left: 0;
-        width: 100%;
-        height: 100px;
-        text-align: center;
-        z-index: 20;
-        pointer-events: none;
-    }}
-
-    .airplane {{
-        width: 100px;
-        opacity: 0.95;
-        filter: brightness(0.95) contrast(1.2) saturate(1.1)
-                drop-shadow(0 0 4px rgba(0,0,0,0.25));
-        background: none !important;
-        mix-blend-mode: normal;
-    }}
-
     /* Dòng chữ Tổ bảo dưỡng số 1 */
     .top-title {{
         font-size: 34px;
         font-weight: bold;
         text-align: center;
-        margin: 140px auto 10px auto; /* đẩy xuống dưới máy bay */
+        margin: 20px auto 10px auto;
         color: #3e2723;
         text-shadow: 1px 1px 0px #fff;
         font-family: 'Special Elite', cursive !important;
@@ -177,13 +154,6 @@ st.markdown(f"""
         font-family: 'Special Elite', cursive !important;
     }}
     </style>
-""", unsafe_allow_html=True)
-
-# ===== Hiển thị máy bay GIF =====
-st.markdown(f"""
-<div class="airplane-container">
-    <img class="airplane" src="data:image/gif;base64,{gif_base64}">
-</div>
 """, unsafe_allow_html=True)
 
 # ===== Header =====
