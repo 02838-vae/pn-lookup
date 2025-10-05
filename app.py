@@ -22,7 +22,7 @@ def get_base64_of_bin_file(bin_file):
 # ===== Load ảnh nền =====
 img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-# ===== CSS tổng thể + emoji máy bay phát sáng =====
+# ===== CSS tổng thể =====
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -109,41 +109,12 @@ table.dataframe tbody tr:hover td {{ background: #f1e0c6 !important; transition:
     justify-content: center;
     gap: 8px;
 }}
-
-/* ===== Emoji máy bay phát sáng nhấp nháy ===== */
-.flying-plane {{
-    position: fixed;
-    bottom: 40px;
-    left: -120px;
-    font-size: 50px;
-    animation: flyAcrossBottom 10s linear infinite, glowPulse 2s ease-in-out infinite alternate;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 15px rgba(0,200,255,0.7));
-    z-index: 9999;
-    opacity: 0.9;
-}}
-
-@keyframes flyAcrossBottom {{
-    0% {{ left: -120px; transform: translateY(0px) rotate(0deg); }}
-    25% {{ transform: translateY(-3px) rotate(2deg); }}
-    50% {{ transform: translateY(2px) rotate(-2deg); }}
-    100% {{ left: 100%; transform: translateY(0px) rotate(0deg); }}
-}}
-
-@keyframes glowPulse {{
-    0% {{ filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 15px rgba(0,200,255,0.7)); }}
-    50% {{ filter: drop-shadow(0 0 15px rgba(255,255,255,1)) drop-shadow(0 0 20px rgba(0,200,255,1)); }}
-    100% {{ filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 15px rgba(0,200,255,0.7)); }}
-}}
 </style>
-
-<div class="flying-plane">✈️</div>
 """, unsafe_allow_html=True)
-
 
 # ===== Header =====
 st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
-
 
 # ===== Nhạc nền =====
 try:
@@ -159,7 +130,6 @@ try:
         st.audio(audio_bytes, format="audio/mp3", start_time=0)
 except FileNotFoundError:
     st.warning("⚠️ Không tìm thấy file background.mp3 — vui lòng thêm file vào cùng thư mục với app.py")
-
 
 # ===== Dropdowns & logic =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
