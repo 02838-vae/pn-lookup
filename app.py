@@ -14,13 +14,24 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Load background airplane.jpg =====
+
+# ===== Hàm chuyển file thành base64 =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
+
+# ===== Load ảnh nền =====
 img_base64 = get_base64_of_bin_file("airplane.jpg")
+
+# ===== Load nhạc nền =====
+def get_audio_base64(audio_file):
+    with open(audio_file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+audio_base64 = get_audio_base64("background.mp3")
 
 # ===== CSS Vintage =====
 st.markdown(f"""
@@ -30,9 +41,9 @@ st.markdown(f"""
     /* Toàn trang */
     .stApp {{
         font-family: 'Special Elite', cursive !important;
-        background: 
-            linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
-            url("data:image/jpg;base64,{img_base64}") no-repeat center center fixed;
+        background:
+            linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)),
+            url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
     }}
 
@@ -64,6 +75,11 @@ st.markdown(f"""
         color: #3e2723;
         text-shadow: 1px 1px 0px #fff;
         font-family: 'Special Elite', cursive !important;
+        background: rgba(245, 242, 230, 0.9);
+        display: inline-block;
+        padding: 8px 18px;
+        border-radius: 8px;
+        box-shadow: 0 0 8px rgba(93, 64, 55, 0.3);
     }}
 
     /* Tiêu đề chính */
@@ -156,9 +172,19 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
+
+# ===== Nhạc nền autoplay =====
+st.markdown(f"""
+    <audio autoplay loop hidden>
+        <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+    </audio>
+""", unsafe_allow_html=True)
+
+
 # ===== Header =====
 st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
+
 
 # ===== Dropdowns và logic =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
