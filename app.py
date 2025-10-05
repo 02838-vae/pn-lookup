@@ -15,7 +15,7 @@ def load_and_clean(sheet):
     return df
 
 
-# ===== Hàm chuyển file thành base64 =====
+# ===== Hàm chuyển file ảnh thành base64 =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         data = f.read()
@@ -31,9 +31,13 @@ def get_audio_base64(audio_file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-audio_base64 = get_audio_base64("background.mp3")
+try:
+    audio_base64 = get_audio_base64("background.mp3")
+except FileNotFoundError:
+    audio_base64 = None
 
-# ===== CSS Vintage =====
+
+# ===== CSS giao diện =====
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -41,8 +45,8 @@ st.markdown(f"""
     /* Toàn trang */
     .stApp {{
         font-family: 'Special Elite', cursive !important;
-        background:
-            linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)),
+        background: 
+            linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
             url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
     }}
@@ -71,15 +75,14 @@ st.markdown(f"""
         font-size: 34px;
         font-weight: bold;
         text-align: center;
-        margin: 20px auto 10px auto;
+        margin: 30px auto 10px auto;
         color: #3e2723;
         text-shadow: 1px 1px 0px #fff;
         font-family: 'Special Elite', cursive !important;
-        background: rgba(245, 242, 230, 0.9);
-        display: inline-block;
-        padding: 8px 18px;
-        border-radius: 8px;
-        box-shadow: 0 0 8px rgba(93, 64, 55, 0.3);
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }}
 
     /* Tiêu đề chính */
@@ -92,6 +95,10 @@ st.markdown(f"""
         margin-bottom: 20px;
         text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
         font-family: 'Special Elite', cursive !important;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }}
 
     /* Label câu hỏi */
@@ -173,17 +180,34 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-# ===== Nhạc nền autoplay =====
-st.markdown(f"""
-    <audio autoplay loop hidden>
-        <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
-    </audio>
-""", unsafe_allow_html=True)
-
-
 # ===== Header =====
 st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
+
+
+# ===== Phát nhạc nền =====
+if audio_base64:
+    st.markdown(f"""
+        <audio id="bg-music" autoplay loop>
+            <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+        </audio>
+
+        <script>
+        // Một số trình duyệt chặn autoplay, nên ta thử phát sau 1s
+        window.addEventListener('DOMContentLoaded', function() {{
+            var audio = document.getElementById("bg-music");
+            setTimeout(() => {{
+                var playPromise = audio.play();
+                if (playPromise !== undefined) {{
+                    playPromise.catch(_ => {{
+                        console.log("Autoplay bị chặn, thử lại khi người dùng click");
+                        document.body.addEventListener('click', () => audio.play(), {{ once: true }});
+                    }});
+                }}
+            }}, 1000);
+        }});
+        </script>
+    """, unsafe_allow_html=True)
 
 
 # ===== Dropdowns và logic =====
