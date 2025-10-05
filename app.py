@@ -64,11 +64,6 @@ st.markdown(f"""
         margin: 30px auto 10px auto;
         color: #3e2723;
         text-shadow: 1px 1px 0px #fff;
-        font-family: 'Special Elite', cursive !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
     }}
 
     .main-title {{
@@ -79,11 +74,36 @@ st.markdown(f"""
         margin-top: 5px;
         margin-bottom: 20px;
         text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-        font-family: 'Special Elite', cursive !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    }}
+
+    /* Bảng căn giữa toàn bộ text */
+    table.dataframe {{
         width: 100%;
+        border-collapse: collapse;
+        border: 2px solid #5d4037;
+        background: #fdfbf5;
+        font-family: 'Special Elite', cursive !important;
+        text-align: center;
+    }}
+    table.dataframe th, table.dataframe td {{
+        border: 1.5px dashed #5d4037 !important;
+        padding: 8px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        color: #3e2723;
+    }}
+    table.dataframe thead th {{
+        background: #795548;
+        color: #fff8e1;
+        font-weight: bold;
+        font-size: 15px;
+    }}
+    table.dataframe tbody tr:nth-child(even) td {{
+        background: #f8f4ec;
+    }}
+    table.dataframe tbody tr:hover td {{
+        background: #f1e0c6;
+        transition: 0.3s ease-in-out;
     }}
 
     .highlight-msg {{
@@ -99,7 +119,6 @@ st.markdown(f"""
         align-items: center;
         justify-content: center;
         gap: 8px;
-        font-family: 'Special Elite', cursive !important;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -110,38 +129,31 @@ st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsa
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
 
-# ===== Nhạc nền =====
+# ===== Nhạc nền (click để bật) =====
 if audio_base64:
     st.markdown(f"""
-        <audio id="bg-music" loop>
-            <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
-        </audio>
-
-        <script>
-        const audio = document.getElementById("bg-music");
-
-        // Phát sau khi người dùng click vào trang lần đầu
-        document.addEventListener('click', () => {{
-            if (audio.paused) {{
-                audio.play().catch(err => console.log("Autoplay bị chặn:", err));
-            }}
-        }}, {{ once: true }});
-
-        // Tự động thử phát sau 1 giây
-        window.addEventListener('DOMContentLoaded', () => {{
-            setTimeout(() => {{
-                audio.play().catch(_ => console.log("Chờ click để phát nhạc"));
-            }}, 1000);
-        }});
-        </script>
-
         <div style="text-align:center; margin-top:10px;">
-            <button onclick="document.getElementById('bg-music').play();" 
+            <button id="play-music" 
                     style="padding:8px 15px; font-family:'Special Elite'; font-size:16px;
                            background:#d7ccc8; color:#3e2723; border:none; border-radius:6px; cursor:pointer;">
                 🎵 Bật nhạc nền
             </button>
         </div>
+
+        <script>
+        const btn = document.getElementById('play-music');
+        let audioElement = null;
+
+        btn.addEventListener('click', () => {{
+            if (!audioElement) {{
+                audioElement = document.createElement('audio');
+                audioElement.src = "data:audio/mp3;base64,{audio_base64}";
+                audioElement.loop = true;
+                document.body.appendChild(audioElement);
+            }}
+            audioElement.play().catch(e => console.log("Không thể phát nhạc:", e));
+        }});
+        </script>
     """, unsafe_allow_html=True)
 
 
