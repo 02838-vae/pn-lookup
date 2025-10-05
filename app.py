@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 import base64
 
-# ===== Đọc file Excel =====
+# ===== Hàm load Excel =====
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
@@ -14,135 +14,127 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-
-# ===== Hàm chuyển file ảnh thành base64 =====
+# ===== Hàm load file nhị phân thành Base64 =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
+        return base64.b64encode(f.read()).decode()
 
-
-# ===== Load ảnh nền =====
+# ===== Load ảnh nền và máy bay =====
 img_base64 = get_base64_of_bin_file("airplane.jpg")
-
+plane_gif_base64 = get_base64_of_bin_file("flying_plane.gif")
 
 # ===== CSS tổng thể =====
 st.markdown(f"""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-    .stApp {{
-        font-family: 'Special Elite', cursive !important;
-        background: 
-            linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
-            url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
-        background-size: cover;
-    }}
+.stApp {{
+    font-family: 'Special Elite', cursive !important;
+    background: 
+        linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
+        url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
+    background-size: cover;
+}}
+.stApp::after {{
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("https://www.transparenttextures.com/patterns/aged-paper.png");
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: -1;
+}}
 
-    .stApp::after {{
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: url("https://www.transparenttextures.com/patterns/aged-paper.png");
-        opacity: 0.35;
-        pointer-events: none;
-        z-index: -1;
-    }}
+.block-container {{ padding-top: 0rem !important; }}
+header[data-testid="stHeader"] {{ display: none; }}
 
-    .block-container {{
-        padding-top: 0rem !important;
-    }}
+.top-title {{
+    font-size: 34px;
+    font-weight: bold;
+    text-align: center;
+    margin: 20px auto 10px auto;
+    color: #3e2723;
+    text-shadow: 1px 1px 0px #fff;
+}}
+.main-title {{
+    font-size: 26px;
+    font-weight: 900;
+    text-align: center;
+    color: #5d4037;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+}}
 
-    header[data-testid="stHeader"] {{
-        display: none;
-    }}
+.stSelectbox label {{ font-weight: bold !important; font-size: 18px !important; color: #4e342e !important; }}
+.stSelectbox div[data-baseweb="select"] {{ font-size: 15px !important; color: #3e2723 !important; background: #fdfbf5 !important; border: 1.5px dashed #5d4037 !important; border-radius: 6px !important; }}
+.stSelectbox div[data-baseweb="popover"] {{ font-size: 15px !important; background: #fdfbf5 !important; color: #3e2723 !important; border: 1.5px dashed #5d4037 !important; }}
 
-    .top-title {{
-        font-size: 34px;
-        font-weight: bold;
-        text-align: center;
-        margin: 20px auto 10px auto;
-        color: #3e2723;
-        text-shadow: 1px 1px 0px #fff;
-    }}
+table.dataframe {{
+    width: 100%;
+    border-collapse: collapse !important;
+    border: 2px solid #5d4037;
+    background: #fdfbf5;
+    text-align: center;
+}}
+table.dataframe thead th {{
+    background: #795548 !important;
+    color: #fff8e1 !important;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px !important;
+    font-size: 15px;
+    border: 2px solid #5d4037 !important;
+}}
+table.dataframe tbody td {{
+    text-align: center !important;
+    padding: 8px !important;
+    font-size: 14px;
+    color: #3e2723 !important;
+    border: 1.5px dashed #5d4037 !important;
+}}
+table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec !important; }}
+table.dataframe tbody tr:hover td {{ background: #f1e0c6 !important; transition: 0.3s ease-in-out; }}
 
-    .main-title {{
-        font-size: 26px;
-        font-weight: 900;
-        text-align: center;
-        color: #5d4037;
-        margin-top: 5px;
-        margin-bottom: 20px;
-        text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-    }}
+.highlight-msg {{
+    font-size: 18px;
+    font-weight: bold;
+    color: #3e2723;
+    background: #efebe9;
+    padding: 10px 15px;
+    border-left: 6px solid #6d4c41;
+    border-radius: 6px;
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}}
 
-    .stSelectbox label {{
-        font-weight: bold !important;
-        font-size: 18px !important;
-        color: #4e342e !important;
-    }}
+/* ===== Máy bay phát sáng phía dưới ===== */
+.flying-plane {{
+    position: fixed;
+    bottom: 40px;
+    left: -120px;
+    width: 80px;
+    animation: flyAcrossBottom 10s linear infinite;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.9))
+            drop-shadow(0 0 15px rgba(0,200,255,0.7));
+    z-index: 9999;
+    opacity: 0.9;
+}}
 
-    .stSelectbox div[data-baseweb="select"] {{
-        font-size: 15px !important;
-        color: #3e2723 !important;
-        background: #fdfbf5 !important;
-        border: 1.5px dashed #5d4037 !important;
-        border-radius: 6px !important;
-    }}
+@keyframes flyAcrossBottom {{
+    0% {{ left: -120px; transform: translateY(0px) rotate(0deg); }}
+    25% {{ transform: translateY(-3px) rotate(2deg); }}
+    50% {{ transform: translateY(2px) rotate(-2deg); }}
+    100% {{ left: 100%; transform: translateY(0px) rotate(0deg); }}
+}}
+</style>
 
-    .stSelectbox div[data-baseweb="popover"] {{
-        font-size: 15px !important;
-        background: #fdfbf5 !important;
-        color: #3e2723 !important;
-        border: 1.5px dashed #5d4037 !important;
-    }}
-
-    table.dataframe {{
-        width: 100%;
-        border-collapse: collapse !important;
-        border: 2px solid #5d4037;
-        background: #fdfbf5;
-        text-align: center;
-    }}
-    table.dataframe thead th {{
-        background: #795548 !important;
-        color: #fff8e1 !important;
-        font-weight: bold;
-        text-align: center;
-        padding: 10px !important;
-        font-size: 15px;
-        border: 2px solid #5d4037 !important;
-    }}
-    table.dataframe tbody td {{
-        text-align: center !important;
-        padding: 8px !important;
-        font-size: 14px;
-        color: #3e2723 !important;
-        border: 1.5px dashed #5d4037 !important;
-    }}
-    table.dataframe tbody tr:nth-child(even) td {{
-        background: #f8f4ec !important;
-    }}
-    table.dataframe tbody tr:hover td {{
-        background: #f1e0c6 !important;
-        transition: 0.3s ease-in-out;
-    }}
-
-    .highlight-msg {{
-        font-size: 18px;
-        font-weight: bold;
-        color: #3e2723;
-        background: #efebe9;
-        padding: 10px 15px;
-        border-left: 6px solid #6d4c41;
-        border-radius: 6px;
-        margin: 15px 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }}
-    </style>
+<div class="flying-plane">
+    <img src="data:image/gif;base64,{plane_gif_base64}" width="80">
+</div>
 """, unsafe_allow_html=True)
 
 
@@ -155,22 +147,19 @@ st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_a
 try:
     with open("background.mp3", "rb") as f:
         audio_bytes = f.read()
-        st.markdown(
-            """
+        st.markdown("""
             <div style='text-align:center; margin-top:5px;'>
                 <p style='font-family:Special Elite; color:#3e2723; font-size:17px;'>
                     🎵 Nhạc nền (hãy nhấn Play để thưởng thức)
                 </p>
             </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        """, unsafe_allow_html=True)
         st.audio(audio_bytes, format="audio/mp3", start_time=0)
 except FileNotFoundError:
-    st.warning("⚠️ Không tìm thấy file background.mp3 — vui lòng thêm file này vào cùng thư mục với app.py")
+    st.warning("⚠️ Không tìm thấy file background.mp3 — vui lòng thêm file vào cùng thư mục với app.py")
 
 
-# ===== Dropdowns và logic =====
+# ===== Dropdowns & logic =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
 if zone:
     df = load_and_clean(zone)
