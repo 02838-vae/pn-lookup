@@ -22,7 +22,7 @@ def load_and_clean(sheet):
 
 
 # ======================================================
-# 🎬 VIDEO INTRO FULLSCREEN + HIỆU ỨNG CHỮ KHÓI + CANH GIỮA
+# 🎬 VIDEO INTRO FULLSCREEN + CHỮ KHÓI TAN + ÁNH SÁNG BẠC
 # ======================================================
 if "intro_done" not in st.session_state:
     st.session_state.intro_done = False
@@ -63,50 +63,60 @@ if not st.session_state.intro_done:
             animation-delay: 8s;
         }}
 
-        /* --- DÒNG CHỮ Ở GIỮA MÀN HÌNH --- */
+        /* --- DÒNG CHỮ PHÍA DƯỚI MÁY BAY --- */
         #intro-text {{
             position: fixed;
-            top: 50%;
+            bottom: 15%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             width: 100%;
             text-align: center;
             font-family: 'Cinzel', serif;
-            font-size: 46px;
+            font-size: 48px;
             font-weight: bold;
             letter-spacing: 3px;
-            color: #fff;
+            color: #ffffff;
             text-shadow: 0px 0px 15px rgba(255,255,255,0.7);
             opacity: 0;
             z-index: 10000;
-            animation: fadeSmoke 7s ease-in-out forwards;
+            background: linear-gradient(90deg, #ffffff, #a3b8ff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: fadeSmoke 7s ease-in-out forwards, shine 3s linear infinite;
             animation-delay: 1s;
         }}
 
-        /* Hiệu ứng xuất hiện và tan như khói */
+        /* Hiệu ứng ánh sáng bạc lướt qua */
+        @keyframes shine {{
+            0% {{ background-position: 200% center; }}
+            100% {{ background-position: -200% center; }}
+        }}
+
+        /* Hiệu ứng khói tan dần */
         @keyframes fadeSmoke {{
             0% {{
                 opacity: 0;
                 filter: blur(20px);
-                transform: translate(-50%, -40%);
+                transform: translateX(-50%) translateY(40px);
             }}
             25% {{
                 opacity: 1;
                 filter: blur(0px);
-                transform: translate(-50%, -50%);
+                transform: translateX(-50%) translateY(0);
             }}
             75% {{
                 opacity: 1;
-                filter: blur(1px);
+                filter: blur(2px);
             }}
             100% {{
                 opacity: 0;
                 filter: blur(25px);
-                transform: translate(-50%, -60%);
+                transform: translateX(-50%) translateY(-40px);
             }}
         }}
 
-        /* Video mờ dần */
+        /* Video mờ dần khi hết */
         @keyframes fadeOut {{
             0% {{opacity: 1;}}
             85% {{opacity: 1;}}
@@ -121,7 +131,7 @@ if not st.session_state.intro_done:
         <div id="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
         """, unsafe_allow_html=True)
 
-        # Thời gian khớp với hiệu ứng
+        # Thời gian khớp với hiệu ứng video
         time.sleep(9)
         st.session_state.intro_done = True
         st.rerun()
@@ -130,7 +140,7 @@ if not st.session_state.intro_done:
         st.error(f"Lỗi phát video: {e}")
 
 # ======================================================
-# 🌿 TRANG CHÍNH — PHONG CÁCH VINTAGE GỐC
+# 🌿 TRANG CHÍNH — PHONG CÁCH VINTAGE GỐC HOÀN TOÀN
 # ======================================================
 else:
     img_base64 = get_base64_of_bin_file("airplane.jpg")
@@ -141,7 +151,7 @@ else:
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
     .stApp {{
-        font-family: 'Special+Elite', cursive !important;
+        font-family: 'Special Elite', cursive !important;
         background:
             linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)),
             url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
@@ -156,6 +166,7 @@ else:
         pointer-events: none;
         z-index: -1;
     }}
+
     header[data-testid="stHeader"] {{ display: none; }}
     .block-container {{ padding-top: 0rem !important; }}
 
@@ -179,7 +190,7 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # --- Header cổ điển ---
+    # --- Header vintage ---
     st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
