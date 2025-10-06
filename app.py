@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import base64
+import time
 
 # ===================== HÀM HỖ TRỢ =====================
 def get_base64_of_bin_file(bin_file):
@@ -15,8 +16,8 @@ except FileNotFoundError:
     video_base64 = None
     st.warning("⚠️ Không tìm thấy file airplane.mp4 — sẽ bỏ qua phần video mở đầu.")
 
-# ===================== NẾU CÓ VIDEO =====================
-if video_base64 and "show_main" not in st.session_state:
+# ===================== NẾU CÓ VIDEO VÀ CHƯA VÀO APP CHÍNH =====================
+if video_base64 and "video_done" not in st.session_state:
     st.markdown(
         f"""
         <style>
@@ -71,41 +72,18 @@ if video_base64 and "show_main" not in st.session_state:
             <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
         </video>
         <div class="fade-text"><span>KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</span></div>
-
-        <script>
-        const video = document.getElementById("introVideo");
-
-        // Khi video kết thúc => gửi tín hiệu
-        video.addEventListener("ended", () => {{
-            window.parent.postMessage("videoEnded", "*");
-        }});
-
-        // Dự phòng: nếu không nhận được tín hiệu => tự động sau 8s
-        setTimeout(() => {{
-            window.parent.postMessage("videoEnded", "*");
-        }}, 8000);
-        </script>
         """,
         unsafe_allow_html=True,
     )
 
-    # Script Streamlit nhận tín hiệu và hiển thị trang chính
-    st.markdown(
-        """
-        <script>
-        window.addEventListener("message", (event) => {
-            if (event.data === "videoEnded") {
-                window.location.href = "?show_main=true";
-            }
-        });
-        </script>
-        """,
-        unsafe_allow_html=True,
-    )
+    # Đếm thời gian đúng bằng độ dài video
+    time.sleep(8)
 
-    st.stop()
+    # Khi hết video => hiển thị trang chính
+    st.session_state.video_done = True
+    st.rerun()
 
-# ===================== GIAO DIỆN CHÍNH (VINTAGE) =====================
+# ===================== TRANG CHÍNH (VINTAGE) =====================
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
