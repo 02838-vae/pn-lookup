@@ -3,13 +3,12 @@ import pandas as pd
 import base64
 import time
 
-# ===== HÀM ĐỌC FILE VÀ CHUYỂN BASE64 =====
+# ===== HÀM CHUYỂN FILE SANG BASE64 =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-
-# ===== HÀM LOAD & LÀM SẠCH DỮ LIỆU EXCEL =====
+# ===== LOAD DỮ LIỆU EXCEL =====
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
@@ -22,68 +21,72 @@ def load_and_clean(sheet):
     return df
 
 
-# ============================================================
-# 🛫 PHẦN VIDEO INTRO — FULLSCREEN & CHUYỂN CẢNH MƯỢT MÀ
-# ============================================================
+# ======================================================
+# 🎞️ VIDEO INTRO FULLSCREEN (có fade chuyển trang)
+# ======================================================
 if "intro_done" not in st.session_state:
     st.session_state.intro_done = False
 
 if not st.session_state.intro_done:
+    video_path = "airplane.mp4"
+
     try:
-        video_path = "airplane.mp4"
         video_base64 = get_base64_of_bin_file(video_path)
 
-        # Ẩn toàn bộ app để video chiếm trọn màn hình
         st.markdown("""
         <style>
-        .stApp, header[data-testid="stHeader"], div[data-testid="stToolbar"] {
-            display: none !important;
-        }
         html, body {
             margin: 0;
             padding: 0;
-            background: black;
             overflow: hidden;
+            background: black;
         }
-        </style>
-        """, unsafe_allow_html=True)
-
-        # Video full màn hình
-        video_html = f"""
-        <div style="
+        #intro-video-container {
             position: fixed;
             top: 0; left: 0;
             width: 100vw;
             height: 100vh;
             z-index: 9999;
-            background: black;
+            background-color: black;
             display: flex;
             justify-content: center;
             align-items: center;
-        ">
-            <video autoplay muted playsinline style="width:100%; height:100%; object-fit:cover;">
-                <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
-                Trình duyệt của bạn không hỗ trợ video.
+            animation: fadeOut 1.2s ease-out forwards;
+            animation-delay: 7s; /* sau 7s fade-out */
+        }
+        @keyframes fadeOut {
+            from {opacity: 1;}
+            to {opacity: 0; visibility: hidden;}
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        </style>
+
+        <div id="intro-video-container">
+            <video autoplay muted playsinline>
+                <source src="data:video/mp4;base64,%s" type="video/mp4">
             </video>
         </div>
-        """
-        st.markdown(video_html, unsafe_allow_html=True)
+        """ % video_base64, unsafe_allow_html=True)
 
-        # Chờ video chạy xong (chỉnh thời gian phù hợp)
-        time.sleep(7)
+        # Chờ video + hiệu ứng fade-out xong rồi rerun
+        time.sleep(8)
         st.session_state.intro_done = True
         st.rerun()
 
     except Exception as e:
-        st.error(f"Lỗi khi phát video: {e}")
+        st.error(f"Lỗi phát video: {e}")
 
-# ============================================================
-# 📜 GIAO DIỆN CHÍNH — VINTAGE + HIỆU ỨNG FADE-IN
-# ============================================================
+# ======================================================
+# 🌿 GIAO DIỆN CHÍNH — PHONG CÁCH VINTAGE
+# ======================================================
 else:
     img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-    # CSS tổng thể
+    # CSS phong cách vintage
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -95,12 +98,11 @@ else:
             url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
         opacity: 0;
-        animation: fadeIn 1.2s ease forwards;
+        animation: fadeIn 1.2s ease-in forwards;
     }}
-
     @keyframes fadeIn {{
-        from {{ opacity: 0; }}
-        to {{ opacity: 1; }}
+        from {{opacity: 0;}}
+        to {{opacity: 1;}}
     }}
 
     header[data-testid="stHeader"], div[data-testid="stToolbar"] {{
@@ -108,86 +110,68 @@ else:
     }}
 
     .block-container {{
-        padding-top: 0rem !important;
+        padding-top: 1rem !important;
     }}
 
     .top-title {{
         font-size: 34px;
         font-weight: bold;
         text-align: center;
-        margin: 20px auto 10px auto;
         color: #3e2723;
+        margin-top: 15px;
         text-shadow: 1px 1px 0px #fff;
     }}
-
     .main-title {{
         font-size: 26px;
-        font-weight: 900;
         text-align: center;
         color: #5d4037;
-        margin-top: 5px;
         margin-bottom: 20px;
         text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
     }}
 
-    .stSelectbox label {{ 
-        font-weight: bold !important; 
-        font-size: 18px !important; 
-        color: #4e342e !important; 
+    .stSelectbox label {{
+        font-weight: bold;
+        font-size: 18px;
+        color: #4e342e;
     }}
     .stSelectbox div[data-baseweb="select"] {{
-        font-size: 15px !important; 
-        color: #3e2723 !important; 
-        background: #fdfbf5 !important; 
-        border: 1.5px dashed #5d4037 !important; 
-        border-radius: 6px !important; 
-    }}
-    .stSelectbox div[data-baseweb="popover"] {{
-        font-size: 15px !important; 
-        background: #fdfbf5 !important; 
-        color: #3e2723 !important; 
-        border: 1.5px dashed #5d4037 !important; 
+        background: #fdfbf5 !important;
+        border: 1.5px dashed #5d4037 !important;
+        border-radius: 6px !important;
     }}
 
     table.dataframe {{
         width: 100%;
-        border-collapse: collapse !important;
+        border-collapse: collapse;
         border: 2px solid #5d4037;
         background: #fdfbf5;
         text-align: center;
     }}
     table.dataframe thead th {{
-        background: #795548 !important;
-        color: #fff8e1 !important;
+        background: #795548;
+        color: #fff8e1;
         font-weight: bold;
-        text-align: center;
-        padding: 10px !important;
-        font-size: 15px;
-        border: 2px solid #5d4037 !important;
+        padding: 10px;
+        border: 2px solid #5d4037;
     }}
     table.dataframe tbody td {{
-        text-align: center !important;
-        padding: 8px !important;
-        font-size: 14px;
-        color: #3e2723 !important;
-        border: 1.5px dashed #5d4037 !important;
+        padding: 8px;
+        color: #3e2723;
+        border: 1.5px dashed #5d4037;
     }}
-    table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec !important; }}
-    table.dataframe tbody tr:hover td {{ background: #f1e0c6 !important; transition: 0.3s ease-in-out; }}
+    table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec; }}
+    table.dataframe tbody tr:hover td {{ background: #f1e0c6; transition: 0.3s; }}
 
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
         color: #3e2723;
         background: #efebe9;
-        padding: 10px 15px;
+        padding: 10px;
         border-left: 6px solid #6d4c41;
         border-radius: 6px;
         margin: 15px 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
+        text-align: center;
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -200,45 +184,36 @@ else:
     try:
         with open("background.mp3", "rb") as f:
             audio_bytes = f.read()
-            st.markdown("""
-                <div style='text-align:center; margin-top:5px;'>
-                    <p style='font-family:Special Elite; color:#3e2723; font-size:17px;'>
-                        🎵 Nhạc nền (hãy nhấn Play để thưởng thức)
-                    </p>
-                </div>
-            """, unsafe_allow_html=True)
-            st.audio(audio_bytes, format="audio/mp3", start_time=0)
+            st.markdown("<p style='text-align:center;'>🎵 Nhạc nền — nhấn Play để nghe</p>", unsafe_allow_html=True)
+            st.audio(audio_bytes, format="audio/mp3")
     except FileNotFoundError:
-        st.warning("⚠️ Không tìm thấy file background.mp3 — vui lòng thêm file vào cùng thư mục với app.py")
+        st.warning("⚠️ Thiếu file background.mp3")
 
-    # ===== DROPDOWN LOGIC =====
-    zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
+    # ===== DROPDOWN TRA CỨU =====
+    zone = st.selectbox("📂 Chọn zone muốn tra cứu", xls.sheet_names, key="zone")
+
     if zone:
         df = load_and_clean(zone)
-
         if "A/C" in df.columns:
-            aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac and ac.upper() != "NAN"])
-            aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts, key="aircraft")
+            aircrafts = sorted(df["A/C"].dropna().unique())
+            aircraft = st.selectbox("✈️ Loại máy bay", aircrafts)
         else:
             aircraft = None
 
         if aircraft:
             df_ac = df[df["A/C"] == aircraft]
-
             if "DESCRIPTION" in df_ac.columns:
-                desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d and d.upper() != "NAN"])
-                description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list, key="desc")
+                descs = sorted(df_ac["DESCRIPTION"].dropna().unique())
+                description = st.selectbox("📑 Phần cần tra cứu", descs)
             else:
                 description = None
 
             if description:
                 df_desc = df_ac[df_ac["DESCRIPTION"] == description]
-
                 if "ITEM" in df_desc.columns:
-                    items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i and i.upper() != "NAN"])
-                    if items:
-                        item = st.selectbox("🔢 Bạn muốn tra cứu Item nào?", items, key="item")
-                        df_desc = df_desc[df_desc["ITEM"] == item]
+                    items = sorted(df_desc["ITEM"].dropna().unique())
+                    item = st.selectbox("🔢 Item", items)
+                    df_desc = df_desc[df_desc["ITEM"] == item]
 
                 if not df_desc.empty:
                     df_result = df_desc.copy().reset_index(drop=True)
@@ -260,4 +235,4 @@ else:
                     )
                     st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
                 else:
-                    st.error("📌 Rất tiếc, không tìm thấy dữ liệu phù hợp.")
+                    st.error("❌ Không tìm thấy dữ liệu phù hợp.")
