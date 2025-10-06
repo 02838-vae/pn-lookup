@@ -24,7 +24,6 @@ def get_base64_of_bin_file(bin_file):
 # ======================================================
 # ================ PHẦN VIDEO INTRO ====================
 # ======================================================
-
 if "intro_done" not in st.session_state:
     st.session_state.intro_done = False
 
@@ -33,7 +32,6 @@ if not st.session_state.intro_done:
         video_path = "airplane.mp4"
         video_base64 = get_base64_of_bin_file(video_path)
 
-        # Hiển thị video full màn hình
         video_html = f"""
         <div style="
             position: fixed; top: 0; left: 0;
@@ -48,23 +46,24 @@ if not st.session_state.intro_done:
         video_container = st.empty()
         video_container.markdown(video_html, unsafe_allow_html=True)
 
-        # ⏱️ Thời gian video chạy (thay đổi cho đúng độ dài file mp4 của bạn)
-        time.sleep(6)  # ví dụ: video dài 6 giây
+        # chỉnh theo độ dài video intro (giây)
+        time.sleep(6)
 
-        # Ẩn video và đánh dấu là đã xong
         video_container.empty()
         st.session_state.intro_done = True
 
     except FileNotFoundError:
         st.warning("⚠️ Không tìm thấy file airplane.mp4 — vui lòng thêm vào cùng thư mục với app.py")
 
+
 # ======================================================
 # ============== PHẦN GIAO DIỆN CHÍNH ==================
 # ======================================================
-
 if st.session_state.intro_done:
+    # ===== Load ảnh nền =====
     img_base64 = get_base64_of_bin_file("airplane.jpg")
 
+    # ===== CSS phong cách vintage =====
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -72,22 +71,109 @@ if st.session_state.intro_done:
     .stApp {{
         font-family: 'Special Elite', cursive !important;
         background:
-            linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)),
+            linear-gradient(rgba(245, 242, 230, 0.88), rgba(245, 242, 230, 0.88)),
             url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
-        opacity: 0;
-        animation: fadeIn 1s forwards;
+        animation: fadeIn 1.2s ease forwards;
     }}
+
     @keyframes fadeIn {{
         from {{ opacity: 0; }}
         to {{ opacity: 1; }}
     }}
+
+    .stApp::after {{
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("https://www.transparenttextures.com/patterns/aged-paper.png");
+        opacity: 0.35;
+        pointer-events: none;
+        z-index: -1;
+    }}
+
+    .block-container {{ padding-top: 0rem !important; }}
     header[data-testid="stHeader"] {{ display: none; }}
+
+    .top-title {{
+        font-size: 34px;
+        font-weight: bold;
+        text-align: center;
+        margin: 20px auto 10px auto;
+        color: #3e2723;
+        text-shadow: 1px 1px 0px #fff;
+    }}
+
+    .main-title {{
+        font-size: 26px;
+        font-weight: 900;
+        text-align: center;
+        color: #5d4037;
+        margin-top: 5px;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    }}
+
+    .stSelectbox label {{
+        font-weight: bold !important;
+        font-size: 18px !important;
+        color: #4e342e !important;
+    }}
+
+    .stSelectbox div[data-baseweb="select"] {{
+        font-size: 15px !important;
+        color: #3e2723 !important;
+        background: #fdfbf5 !important;
+        border: 1.5px dashed #5d4037 !important;
+        border-radius: 6px !important;
+    }}
+
+    table.dataframe {{
+        width: 100%;
+        border-collapse: collapse !important;
+        border: 2px solid #5d4037;
+        background: #fdfbf5;
+        text-align: center;
+    }}
+    table.dataframe thead th {{
+        background: #795548 !important;
+        color: #fff8e1 !important;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px !important;
+        font-size: 15px;
+        border: 2px solid #5d4037 !important;
+    }}
+    table.dataframe tbody td {{
+        text-align: center !important;
+        padding: 8px !important;
+        font-size: 14px;
+        color: #3e2723 !important;
+        border: 1.5px dashed #5d4037 !important;
+    }}
+    table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec !important; }}
+    table.dataframe tbody tr:hover td {{ background: #f1e0c6 !important; transition: 0.3s ease-in-out; }}
+
+    .highlight-msg {{
+        font-size: 18px;
+        font-weight: bold;
+        color: #3e2723;
+        background: #efebe9;
+        padding: 10px 15px;
+        border-left: 6px solid #6d4c41;
+        border-radius: 6px;
+        margin: 15px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="top-title" style="font-size:34px; text-align:center;">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-title" style="font-size:26px; text-align:center;">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
+    # ===== Header =====
+    st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
     # ===== Dropdowns & logic =====
     zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
@@ -132,7 +218,10 @@ if st.session_state.intro_done:
                     df_result = df_result[cols_to_show]
                     df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
-                    st.success(f"✅ Tìm thấy {len(df_result)} dòng dữ liệu")
-                    st.write(df_result)
+                    st.markdown(
+                        f'<div class="highlight-msg">✅ Tìm thấy {len(df_result)} dòng dữ liệu</div>',
+                        unsafe_allow_html=True
+                    )
+                    st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
                 else:
                     st.error("📌 Rất tiếc, không tìm thấy dữ liệu phù hợp.")
