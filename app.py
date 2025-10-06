@@ -32,7 +32,7 @@ if video_base64 and "show_main" not in st.session_state:
             left: 0;
             width: 100vw;
             height: 100vh;
-            object-fit: contain; /* đảm bảo full hình máy bay */
+            object-fit: contain;
             z-index: 1;
             background-color: black;
         }}
@@ -74,15 +74,22 @@ if video_base64 and "show_main" not in st.session_state:
 
         <script>
         const video = document.getElementById("introVideo");
+
+        // Khi video kết thúc => gửi tín hiệu
         video.addEventListener("ended", () => {{
             window.parent.postMessage("videoEnded", "*");
         }});
+
+        // Dự phòng: nếu không nhận được tín hiệu => tự động sau 8s
+        setTimeout(() => {{
+            window.parent.postMessage("videoEnded", "*");
+        }}, 8000);
         </script>
         """,
         unsafe_allow_html=True,
     )
 
-    # Script nhận tín hiệu từ video -> chuyển sang giao diện chính
+    # Script Streamlit nhận tín hiệu và hiển thị trang chính
     st.markdown(
         """
         <script>
