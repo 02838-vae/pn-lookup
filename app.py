@@ -22,7 +22,7 @@ def load_and_clean(sheet):
 
 
 # ======================================================
-# 🎬 VIDEO INTRO FULLSCREEN + CHUYỂN CẢNH MƯỢT
+# 🎬 VIDEO INTRO FULLSCREEN + HIỆU ỨNG CHỮ "KHÁM PHÁ..."
 # ======================================================
 if "intro_done" not in st.session_state:
     st.session_state.intro_done = False
@@ -52,7 +52,7 @@ if not st.session_state.intro_done:
             background: black !important;
         }}
 
-        /* --- VÙNG VIDEO FULLSCREEN --- */
+        /* --- VIDEO FULLSCREEN --- */
         #intro-video-container {{
             position: fixed;
             top: 0; left: 0;
@@ -73,28 +73,45 @@ if not st.session_state.intro_done:
             object-fit: cover;
         }}
 
-        /* --- LỚP MỜ DẦN KHI KẾT THÚC VIDEO --- */
+        /* --- CHỮ DƯỚI MÁY BAY --- */
+        .intro-text {{
+            position: absolute;
+            bottom: 12%;
+            width: 100%;
+            text-align: center;
+            color: #ffffff;
+            font-family: 'Cinzel', serif;
+            font-size: 38px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.7);
+            opacity: 0;
+            animation: fadeUp 6s ease-in-out forwards;
+            animation-delay: 1s;
+        }}
+        @keyframes fadeUp {{
+            0% {{
+                opacity: 0;
+                transform: translateY(50px);
+            }}
+            25% {{
+                opacity: 1;
+                transform: translateY(0);
+            }}
+            75% {{
+                opacity: 1;
+                transform: translateY(0);
+            }}
+            100% {{
+                opacity: 0;
+                transform: translateY(-20px);
+            }}
+        }}
+
+        /* --- FADEOUT VIDEO --- */
         @keyframes fadeOut {{
             0% {{opacity: 1;}}
             90% {{opacity: 1;}}
             100% {{opacity: 0; visibility: hidden;}}
-        }}
-
-        /* --- CHỮ INTRO CINE STYLE --- */
-        .intro-text {{
-            position: absolute;
-            color: white;
-            font-family: 'Cinzel', serif;
-            font-size: 42px;
-            letter-spacing: 3px;
-            text-shadow: 0px 0px 25px rgba(255,255,255,0.8);
-            animation: fadeText 5s ease-in-out forwards;
-        }}
-        @keyframes fadeText {{
-            0% {{opacity: 0; transform: scale(0.9);}}
-            30% {{opacity: 1; transform: scale(1);}}
-            70% {{opacity: 1; transform: scale(1);}}
-            100% {{opacity: 0; transform: scale(1.1);}}
         }}
         </style>
 
@@ -102,10 +119,11 @@ if not st.session_state.intro_done:
             <video autoplay muted playsinline>
                 <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
             </video>
-            <div class="intro-text">TỔ BẢO DƯỠNG SỐ 1 ✈️</div>
+            <div class="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
         </div>
         """, unsafe_allow_html=True)
 
+        # Thời gian video (tùy chỉnh theo thực tế)
         time.sleep(8)
         st.session_state.intro_done = True
         st.rerun()
