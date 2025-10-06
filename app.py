@@ -1,164 +1,152 @@
-import streamlit as st
 import pandas as pd
+import streamlit as st
 import base64
 import time
-
-# ===== Hàm load Excel =====
-excel_file = "A787.xlsx"
-xls = pd.ExcelFile(excel_file)
-
-def load_and_clean(sheet):
-    df = pd.read_excel(excel_file, sheet_name=sheet)
-    df.columns = df.columns.str.strip().str.upper()
-    for col in df.columns:
-        if df[col].dtype == "object":
-            df[col] = df[col].fillna("").astype(str).str.strip()
-    return df
 
 # ===== Hàm load file nhị phân thành Base64 =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-
-# ======================================================
-# 🎬 VIDEO INTRO FULLSCREEN + CHỮ ÁNH SÁNG BẠC + KHÓI TAN
-# ======================================================
+# ===== Intro Video =====
 if "intro_done" not in st.session_state:
     st.session_state.intro_done = False
 
 if not st.session_state.intro_done:
     try:
-        video_base64 = get_base64_of_bin_file("airplane.mp4")
+        video_path = "airplane.mp4"
+        video_base64 = get_base64_of_bin_file(video_path)
 
-        st.markdown(f"""
+        intro_html = f"""
         <style>
-        /* Ẩn giao diện Streamlit */
-        [data-testid="stAppViewContainer"], [data-testid="stHeader"],
-        [data-testid="stToolbar"], [data-testid="stSidebar"], .block-container {{
-            padding: 0 !important;
-            margin: 0 !important;
-        }}
-        header[data-testid="stHeader"], footer, div[data-testid="stDecoration"] {{
-            display: none !important;
-        }}
         html, body {{
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-            height: 100vh !important;
-            width: 100vw !important;
-            background: black !important;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+            height: 100%;
+            width: 100%;
         }}
-
-        /* --- VIDEO FULLSCREEN --- */
-        #intro-video {{
+        #video-container {{
             position: fixed;
             top: 0; left: 0;
             width: 100vw;
             height: 100vh;
-            object-fit: cover;
+            background-color: black;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }}
+        #intro-video {{
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            background-color: black;
             z-index: 9999;
             animation: fadeOut 2s ease-in-out forwards;
             animation-delay: 8s;
         }}
-
-        /* --- DÒNG CHỮ PHÍA DƯỚI MÁY BAY --- */
+        @media (max-width: 768px) {{
+            #intro-video {{
+                width: 100vw;
+                height: auto;
+                max-height: 100vh;
+                object-fit: contain;
+            }}
+        }}
         #intro-text {{
-            position: fixed;
-            bottom: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
+            position: absolute;
+            bottom: 10%;
+            font-family: 'Special Elite', cursive;
+            font-size: 2.2rem;
+            color: #f0f0f0;
             text-align: center;
-            font-family: 'Cinzel', serif;
-            font-size: 48px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            color: #ffffff;
-            text-shadow: 0px 0px 15px rgba(255,255,255,0.7);
+            text-shadow: 0 0 15px #fff, 0 0 30px #87CEFA, 0 0 60px #fff;
             opacity: 0;
-            z-index: 10000;
-            background: linear-gradient(90deg, #ffffff, #a3b8ff, #ffffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: fadeSmoke 7s ease-in-out forwards, shine 3s linear infinite;
-            animation-delay: 1s;
+            animation: fadeInOut 7s ease-in-out forwards, shimmer 3s linear infinite;
         }}
-
-        /* --- Hiệu ứng ánh sáng bạc --- */
-        @keyframes shine {{
-            0% {{ background-position: 200% center; }}
-            100% {{ background-position: -200% center; }}
+        @keyframes fadeInOut {{
+            0% {{ opacity: 0; transform: translateY(20px); }}
+            25% {{ opacity: 1; transform: translateY(0); }}
+            75% {{ opacity: 1; transform: translateY(0); }}
+            100% {{ opacity: 0; transform: translateY(-20px); filter: blur(6px); }}
         }}
-
-        /* --- Hiệu ứng khói tan --- */
-        @keyframes fadeSmoke {{
-            0% {{
-                opacity: 0;
-                filter: blur(20px);
-                transform: translateX(-50%) translateY(40px);
-            }}
-            25% {{
-                opacity: 1;
-                filter: blur(0px);
-                transform: translateX(-50%) translateY(0);
-            }}
-            75% {{
-                opacity: 1;
-                filter: blur(2px);
-            }}
-            100% {{
-                opacity: 0;
-                filter: blur(25px);
-                transform: translateX(-50%) translateY(-40px);
-            }}
+        @keyframes shimmer {{
+            0% {{ text-shadow: 0 0 10px #fff, 0 0 20px #87CEFA; color: #e0f7fa; }}
+            50% {{ text-shadow: 0 0 20px #fff, 0 0 40px #B0E0E6; color: #f0f8ff; }}
+            100% {{ text-shadow: 0 0 10px #fff, 0 0 20px #87CEFA; color: #e0f7fa; }}
         }}
-
-        /* --- Video mờ dần --- */
         @keyframes fadeOut {{
-            0% {{opacity: 1;}}
-            85% {{opacity: 1;}}
-            100% {{opacity: 0; visibility: hidden;}}
+            from {{ opacity: 1; }}
+            to {{ opacity: 0; visibility: hidden; }}
         }}
         </style>
 
-        <video id="intro-video" autoplay muted playsinline>
-            <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
-        </video>
+        <div id="video-container">
+            <video id="intro-video" autoplay muted playsinline onended="showApp()">
+                <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
+                Trình duyệt của bạn không hỗ trợ video.
+            </video>
+            <div id="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
+        </div>
 
-        <div id="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
-        """, unsafe_allow_html=True)
-
-        time.sleep(9)
-        st.session_state.intro_done = True
-        st.rerun()
+        <script>
+        function showApp() {{
+            const video = document.getElementById('video-container');
+            video.style.animation = 'fadeOut 2s ease-in-out forwards';
+            setTimeout(() => {{
+                video.remove();
+                const app = window.parent.document.querySelector('.stApp');
+                if (app) {{
+                    app.style.visibility = 'visible';
+                    app.style.opacity = '0';
+                    app.style.transition = 'opacity 2s ease';
+                    setTimeout(() => {{ app.style.opacity = '1'; }}, 100);
+                }}
+            }}, 2000);
+        }}
+        setTimeout(showApp, 9000);  // fallback nếu video không gọi onended
+        </script>
+        """
+        st.markdown(intro_html, unsafe_allow_html=True)
 
     except Exception as e:
-        st.error(f"Lỗi phát video: {e}")
+        st.error(f"Lỗi khi tải video: {e}")
 
-# ======================================================
-# 🌿 TRANG CHÍNH — PHONG CÁCH VINTAGE GỐC CỦA BẠN
-# ======================================================
+    time.sleep(9)
+    st.session_state.intro_done = True
+
 else:
+    # ===== Phần chính vintage =====
+    excel_file = "A787.xlsx"
+    xls = pd.ExcelFile(excel_file)
+
+    def load_and_clean(sheet):
+        df = pd.read_excel(excel_file, sheet_name=sheet)
+        df.columns = df.columns.str.strip().str.upper()
+        for col in df.columns:
+            if df[col].dtype == "object":
+                df[col] = df[col].fillna("").astype(str).str.strip()
+        return df
+
     img_base64 = get_base64_of_bin_file("airplane.jpg")
 
+    # ===== CSS vintage =====
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
-
     .stApp {{
         font-family: 'Special Elite', cursive !important;
-        background: 
-            linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
+        background:
+            linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)),
             url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
-        animation: fadeInPage 2.5s ease-in-out;
-    }}
-    @keyframes fadeInPage {{
-        0% {{ opacity: 0; filter: blur(10px); }}
-        100% {{ opacity: 1; filter: blur(0px); }}
     }}
     .stApp::after {{
         content: "";
@@ -169,10 +157,8 @@ else:
         pointer-events: none;
         z-index: -1;
     }}
-
-    .block-container {{ padding-top: 0rem !important; }}
     header[data-testid="stHeader"] {{ display: none; }}
-
+    .block-container {{ padding-top: 0rem !important; }}
     .top-title {{
         font-size: 34px;
         font-weight: bold;
@@ -190,11 +176,18 @@ else:
         margin-bottom: 20px;
         text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
     }}
-
-    .stSelectbox label {{ font-weight: bold !important; font-size: 18px !important; color: #4e342e !important; }}
-    .stSelectbox div[data-baseweb="select"] {{ font-size: 15px !important; color: #3e2723 !important; background: #fdfbf5 !important; border: 1.5px dashed #5d4037 !important; border-radius: 6px !important; }}
-    .stSelectbox div[data-baseweb="popover"] {{ font-size: 15px !important; background: #fdfbf5 !important; color: #3e2723 !important; border: 1.5px dashed #5d4037 !important; }}
-
+    .stSelectbox label {{
+        font-weight: bold !important;
+        font-size: 18px !important;
+        color: #4e342e !important;
+    }}
+    .stSelectbox div[data-baseweb="select"] {{
+        font-size: 15px !important;
+        color: #3e2723 !important;
+        background: #fdfbf5 !important;
+        border: 1.5px dashed #5d4037 !important;
+        border-radius: 6px !important;
+    }}
     table.dataframe {{
         width: 100%;
         border-collapse: collapse !important;
@@ -220,7 +213,6 @@ else:
     }}
     table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec !important; }}
     table.dataframe tbody tr:hover td {{ background: #f1e0c6 !important; transition: 0.3s ease-in-out; }}
-
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
@@ -295,7 +287,6 @@ else:
                             break
                     if "NOTE" in df_result.columns:
                         cols_to_show.append("NOTE")
-
                     df_result = df_result[cols_to_show]
                     df_result.insert(0, "STT", range(1, len(df_result) + 1))
 
