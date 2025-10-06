@@ -22,7 +22,7 @@ def load_and_clean(sheet):
 
 
 # ======================================================
-# 🎞️ VIDEO INTRO FULLSCREEN (có fade chuyển trang)
+# 🎞️ VIDEO INTRO FULLSCREEN (ẨN TOÀN BỘ HEADER / PADDING)
 # ======================================================
 if "intro_done" not in st.session_state:
     st.session_state.intro_done = False
@@ -33,27 +33,37 @@ if not st.session_state.intro_done:
     try:
         video_base64 = get_base64_of_bin_file(video_path)
 
-        # Sử dụng f-string thay vì %s
         st.markdown(f"""
         <style>
+        /* Xóa trắng Streamlit mặc định */
+        [data-testid="stAppViewContainer"], [data-testid="stHeader"],
+        [data-testid="stToolbar"], [data-testid="stSidebar"], .block-container {{
+            padding: 0 !important;
+            margin: 0 !important;
+        }}
+        header[data-testid="stHeader"], footer, div[data-testid="stDecoration"] {{
+            display: none !important;
+        }}
+
         html, body {{
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: black;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            height: 100vh !important;
+            background: black !important;
         }}
         #intro-video-container {{
             position: fixed;
             top: 0; left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 9999;
+            z-index: 99999;
             background-color: black;
             display: flex;
             justify-content: center;
             align-items: center;
             animation: fadeOut 1.2s ease-out forwards;
-            animation-delay: 7s; /* sau 7s fade-out */
+            animation-delay: 7s;
         }}
         @keyframes fadeOut {{
             from {{opacity: 1;}}
@@ -73,7 +83,6 @@ if not st.session_state.intro_done:
         </div>
         """, unsafe_allow_html=True)
 
-        # Chờ video + hiệu ứng fade-out xong rồi rerun
         time.sleep(8)
         st.session_state.intro_done = True
         st.rerun()
@@ -81,16 +90,21 @@ if not st.session_state.intro_done:
     except Exception as e:
         st.error(f"Lỗi phát video: {e}")
 
+
 # ======================================================
 # 🌿 GIAO DIỆN CHÍNH — PHONG CÁCH VINTAGE
 # ======================================================
 else:
     img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-    # CSS phong cách vintage
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+
+    /* Ẩn header mặc định Streamlit */
+    header[data-testid="stHeader"], div[data-testid="stToolbar"], footer {{
+        display: none !important;
+    }}
 
     .stApp {{
         font-family: 'Special Elite', cursive !important;
@@ -104,10 +118,6 @@ else:
     @keyframes fadeIn {{
         from {{opacity: 0;}}
         to {{opacity: 1;}}
-    }}
-
-    header[data-testid="stHeader"], div[data-testid="stToolbar"] {{
-        display: none !important;
     }}
 
     .block-container {{
