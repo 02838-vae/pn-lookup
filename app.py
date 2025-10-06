@@ -33,15 +33,16 @@ if not st.session_state.intro_done:
     try:
         video_base64 = get_base64_of_bin_file(video_path)
 
-        st.markdown("""
+        # Sử dụng f-string thay vì %s
+        st.markdown(f"""
         <style>
-        html, body {
+        html, body {{
             margin: 0;
             padding: 0;
             overflow: hidden;
             background: black;
-        }
-        #intro-video-container {
+        }}
+        #intro-video-container {{
             position: fixed;
             top: 0; left: 0;
             width: 100vw;
@@ -53,24 +54,24 @@ if not st.session_state.intro_done:
             align-items: center;
             animation: fadeOut 1.2s ease-out forwards;
             animation-delay: 7s; /* sau 7s fade-out */
-        }
-        @keyframes fadeOut {
-            from {opacity: 1;}
-            to {opacity: 0; visibility: hidden;}
-        }
-        video {
-            width: 100%;
-            height: 100%;
+        }}
+        @keyframes fadeOut {{
+            from {{opacity: 1;}}
+            to {{opacity: 0; visibility: hidden;}}
+        }}
+        video {{
+            width: 100%%;
+            height: 100%%;
             object-fit: cover;
-        }
+        }}
         </style>
 
         <div id="intro-video-container">
             <video autoplay muted playsinline>
-                <source src="data:video/mp4;base64,%s" type="video/mp4">
+                <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
             </video>
         </div>
-        """ % video_base64, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
         # Chờ video + hiệu ứng fade-out xong rồi rerun
         time.sleep(8)
@@ -141,7 +142,7 @@ else:
     }}
 
     table.dataframe {{
-        width: 100%;
+        width: 100%%;
         border-collapse: collapse;
         border: 2px solid #5d4037;
         background: #fdfbf5;
