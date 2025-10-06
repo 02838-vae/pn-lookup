@@ -1,27 +1,26 @@
 import streamlit as st
 import pandas as pd
 import base64
-import time
 
-# ===================== VIDEO INTRO =====================
-video_file = "airplane.mp4"
-
+# ===================== HÀM HỖ TRỢ =====================
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
+# ===================== VIDEO INTRO =====================
+video_file = "airplane.mp4"
 try:
     video_base64 = get_base64_of_bin_file(video_file)
 except FileNotFoundError:
     video_base64 = None
     st.warning("⚠️ Không tìm thấy file airplane.mp4 — sẽ bỏ qua phần video mở đầu.")
 
-# ===================== HIỂN THỊ VIDEO INTRO =====================
-if video_base64:
+# ===================== NẾU CÓ VIDEO =====================
+if video_base64 and "show_main" not in st.session_state:
     st.markdown(
         f"""
         <style>
-        body {{
+        html, body {{
             margin: 0;
             padding: 0;
             overflow: hidden;
@@ -33,12 +32,13 @@ if video_base64:
             left: 0;
             width: 100vw;
             height: 100vh;
-            object-fit: cover;
+            object-fit: contain; /* đảm bảo full hình máy bay */
             z-index: 1;
+            background-color: black;
         }}
         .fade-text {{
             position: fixed;
-            bottom: 15%;
+            bottom: 12%;
             width: 100%;
             text-align: center;
             font-family: 'Special Elite', cursive;
@@ -70,23 +70,35 @@ if video_base64:
         <video autoplay muted playsinline id="introVideo">
             <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
         </video>
-        <div class="fade-text">
-            <span>KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</span>
-        </div>
+        <div class="fade-text"><span>KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</span></div>
 
         <script>
         const video = document.getElementById("introVideo");
         video.addEventListener("ended", () => {{
-            window.location.href = "?page=main";
+            window.parent.postMessage("videoEnded", "*");
         }});
         </script>
         """,
         unsafe_allow_html=True,
     )
 
-    st.stop()  # Ngừng Streamlit ở đây cho đến khi video phát xong
+    # Script nhận tín hiệu từ video -> chuyển sang giao diện chính
+    st.markdown(
+        """
+        <script>
+        window.addEventListener("message", (event) => {
+            if (event.data === "videoEnded") {
+                window.location.href = "?show_main=true";
+            }
+        });
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
 
-# ===================== GIAO DIỆN CHÍNH VINTAGE =====================
+    st.stop()
+
+# ===================== GIAO DIỆN CHÍNH (VINTAGE) =====================
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
