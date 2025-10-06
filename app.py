@@ -32,35 +32,79 @@ if not st.session_state.intro_done:
         video_path = "airplane.mp4"
         video_base64 = get_base64_of_bin_file(video_path)
 
+        # Video full màn hình + hiệu ứng fade-out khi kết thúc
         video_html = f"""
-        <div style="
+        <style>
+        html, body {{
+            margin: 0; padding: 0; overflow: hidden;
+            background-color: black;
+        }}
+        .stApp {{
+            visibility: hidden; /* Ẩn toàn bộ nội dung app */
+        }}
+        #intro-video {{
             position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: black; z-index: 9999;
-            display: flex; align-items: center; justify-content: center;">
-            <video autoplay muted playsinline style="width:100%; height:100%; object-fit:cover;">
+            width: 100vw; height: 100vh;
+            z-index: 99999;
+            background-color: black;
+            display: flex; align-items: center; justify-content: center;
+            animation: fadeIn 1.2s ease;
+        }}
+        video {{
+            width: 100vw; height: 100vh;
+            object-fit: cover;
+        }}
+        @keyframes fadeIn {{
+            from {{ opacity: 0; }}
+            to {{ opacity: 1; }}
+        }}
+        @keyframes fadeOut {{
+            from {{ opacity: 1; }}
+            to {{ opacity: 0; }}
+        }}
+        </style>
+
+        <div id="intro-video">
+            <video autoplay muted playsinline id="intro" onended="fadeOutVideo()">
                 <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
             </video>
         </div>
+
+        <script>
+        function fadeOutVideo() {{
+            const v = document.getElementById('intro-video');
+            v.style.animation = 'fadeOut 1.5s ease forwards';
+            setTimeout(() => {{
+                v.remove();
+                const app = window.parent.document.querySelector('.stApp');
+                if (app) {{
+                    app.style.visibility = 'visible';
+                    app.style.animation = 'fadeInApp 1.5s ease forwards';
+                }}
+            }}, 1500);
+        }}
+        </script>
+
+        <style>
+        @keyframes fadeInApp {{
+            from {{ opacity: 0; transform: scale(1.02); }}
+            to {{ opacity: 1; transform: scale(1); }}
+        }}
+        </style>
         """
-        video_container = st.empty()
-        video_container.markdown(video_html, unsafe_allow_html=True)
-
-        # chỉnh theo độ dài video intro (giây)
-        time.sleep(6)
-
-        video_container.empty()
-        st.session_state.intro_done = True
-
+        st.markdown(video_html, unsafe_allow_html=True)
     except FileNotFoundError:
         st.warning("⚠️ Không tìm thấy file airplane.mp4 — vui lòng thêm vào cùng thư mục với app.py")
+
+    # Sau thời gian video (phòng khi JS không hoạt động)
+    time.sleep(6)
+    st.session_state.intro_done = True
 
 
 # ======================================================
 # ============== PHẦN GIAO DIỆN CHÍNH ==================
 # ======================================================
 if st.session_state.intro_done:
-    # ===== Load ảnh nền =====
     img_base64 = get_base64_of_bin_file("airplane.jpg")
 
     # ===== CSS phong cách vintage =====
@@ -74,12 +118,8 @@ if st.session_state.intro_done:
             linear-gradient(rgba(245, 242, 230, 0.88), rgba(245, 242, 230, 0.88)),
             url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
-        animation: fadeIn 1.2s ease forwards;
-    }}
-
-    @keyframes fadeIn {{
-        from {{ opacity: 0; }}
-        to {{ opacity: 1; }}
+        opacity: 0;
+        animation: fadeInApp 1.2s ease forwards;
     }}
 
     .stApp::after {{
@@ -92,8 +132,8 @@ if st.session_state.intro_done:
         z-index: -1;
     }}
 
-    .block-container {{ padding-top: 0rem !important; }}
     header[data-testid="stHeader"] {{ display: none; }}
+    .block-container {{ padding-top: 0rem !important; }}
 
     .top-title {{
         font-size: 34px;
