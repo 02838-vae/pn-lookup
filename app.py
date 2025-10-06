@@ -3,12 +3,12 @@ import pandas as pd
 import base64
 import time
 
-# ===== HÀM CHUYỂN FILE SANG BASE64 =====
+# ====== HÀM CHUYỂN FILE SANG BASE64 ======
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# ===== LOAD DỮ LIỆU EXCEL =====
+# ====== LOAD DỮ LIỆU EXCEL ======
 excel_file = "A787.xlsx"
 xls = pd.ExcelFile(excel_file)
 
@@ -22,7 +22,7 @@ def load_and_clean(sheet):
 
 
 # ======================================================
-# 🎞️ VIDEO INTRO FULLSCREEN (ẨN TOÀN BỘ HEADER / PADDING)
+# 🎬 VIDEO INTRO FULLSCREEN + CHUYỂN CẢNH MƯỢT
 # ======================================================
 if "intro_done" not in st.session_state:
     st.session_state.intro_done = False
@@ -35,7 +35,7 @@ if not st.session_state.intro_done:
 
         st.markdown(f"""
         <style>
-        /* Xóa trắng Streamlit mặc định */
+        /* Ẩn header, sidebar, padding Streamlit */
         [data-testid="stAppViewContainer"], [data-testid="stHeader"],
         [data-testid="stToolbar"], [data-testid="stSidebar"], .block-container {{
             padding: 0 !important;
@@ -44,7 +44,6 @@ if not st.session_state.intro_done:
         header[data-testid="stHeader"], footer, div[data-testid="stDecoration"] {{
             display: none !important;
         }}
-
         html, body {{
             margin: 0 !important;
             padding: 0 !important;
@@ -52,27 +51,50 @@ if not st.session_state.intro_done:
             height: 100vh !important;
             background: black !important;
         }}
+
+        /* --- VÙNG VIDEO FULLSCREEN --- */
         #intro-video-container {{
             position: fixed;
             top: 0; left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 99999;
             background-color: black;
+            z-index: 99999;
             display: flex;
             justify-content: center;
             align-items: center;
-            animation: fadeOut 1.2s ease-out forwards;
-            animation-delay: 7s;
-        }}
-        @keyframes fadeOut {{
-            from {{opacity: 1;}}
-            to {{opacity: 0; visibility: hidden;}}
+            overflow: hidden;
+            animation: fadeOut 1.6s ease-in-out forwards;
+            animation-delay: 7s; /* thời gian video */
         }}
         video {{
-            width: 100%%;
-            height: 100%%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
+        }}
+
+        /* --- LỚP MỜ DẦN KHI KẾT THÚC VIDEO --- */
+        @keyframes fadeOut {{
+            0% {{opacity: 1;}}
+            90% {{opacity: 1;}}
+            100% {{opacity: 0; visibility: hidden;}}
+        }}
+
+        /* --- CHỮ INTRO CINE STYLE --- */
+        .intro-text {{
+            position: absolute;
+            color: white;
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            letter-spacing: 3px;
+            text-shadow: 0px 0px 25px rgba(255,255,255,0.8);
+            animation: fadeText 5s ease-in-out forwards;
+        }}
+        @keyframes fadeText {{
+            0% {{opacity: 0; transform: scale(0.9);}}
+            30% {{opacity: 1; transform: scale(1);}}
+            70% {{opacity: 1; transform: scale(1);}}
+            100% {{opacity: 0; transform: scale(1.1);}}
         }}
         </style>
 
@@ -80,6 +102,7 @@ if not st.session_state.intro_done:
             <video autoplay muted playsinline>
                 <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
             </video>
+            <div class="intro-text">TỔ BẢO DƯỠNG SỐ 1 ✈️</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -100,37 +123,35 @@ else:
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap');
 
-    /* Ẩn header mặc định Streamlit */
     header[data-testid="stHeader"], div[data-testid="stToolbar"], footer {{
         display: none !important;
     }}
 
     .stApp {{
-        font-family: 'Special Elite', cursive !important;
+        font-family: 'Special+Elite', cursive !important;
         background:
             linear-gradient(rgba(245, 242, 230, 0.9), rgba(245, 242, 230, 0.9)),
             url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
         background-size: cover;
-        opacity: 0;
-        animation: fadeIn 1.2s ease-in forwards;
+        animation: fadeInMain 1.5s ease-in-out;
     }}
-    @keyframes fadeIn {{
-        from {{opacity: 0;}}
-        to {{opacity: 1;}}
+    @keyframes fadeInMain {{
+        from {{opacity: 0; filter: blur(6px);}}
+        to {{opacity: 1; filter: blur(0);}}
     }}
 
     .block-container {{
         padding-top: 1rem !important;
     }}
-
     .top-title {{
-        font-size: 34px;
+        font-size: 36px;
         font-weight: bold;
         text-align: center;
         color: #3e2723;
+        text-shadow: 2px 2px 4px #fff;
         margin-top: 15px;
-        text-shadow: 1px 1px 0px #fff;
     }}
     .main-title {{
         font-size: 26px;
@@ -139,7 +160,6 @@ else:
         margin-bottom: 20px;
         text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
     }}
-
     .stSelectbox label {{
         font-weight: bold;
         font-size: 18px;
@@ -150,9 +170,8 @@ else:
         border: 1.5px dashed #5d4037 !important;
         border-radius: 6px !important;
     }}
-
     table.dataframe {{
-        width: 100%%;
+        width: 100%;
         border-collapse: collapse;
         border: 2px solid #5d4037;
         background: #fdfbf5;
@@ -172,7 +191,6 @@ else:
     }}
     table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec; }}
     table.dataframe tbody tr:hover td {{ background: #f1e0c6; transition: 0.3s; }}
-
     .highlight-msg {{
         font-size: 18px;
         font-weight: bold;
