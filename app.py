@@ -22,7 +22,7 @@ def load_and_clean(sheet):
 
 
 # ======================================================
-# 🎬 VIDEO INTRO FULLSCREEN + HIỆU ỨNG CHỮ
+# 🎬 VIDEO INTRO FULLSCREEN + HIỆU ỨNG CHỮ NHƯ KHÓI TAN
 # ======================================================
 if "intro_done" not in st.session_state:
     st.session_state.intro_done = False
@@ -62,50 +62,45 @@ if not st.session_state.intro_done:
             animation-delay: 8s;
         }}
 
-        /* --- CHỮ DƯỚI MÁY BAY --- */
+        /* --- DÒNG CHỮ TRUNG TÂM DƯỚI MÁY BAY --- */
         #intro-text {{
             position: fixed;
-            bottom: 10%;
+            bottom: 12%;
             width: 100%;
             text-align: center;
             font-family: 'Cinzel', serif;
-            font-size: 40px;
+            font-size: 42px;
             font-weight: bold;
             letter-spacing: 3px;
-            z-index: 10000;
-        }}
-
-        /* Từng từ được hiển thị riêng */
-        #intro-text span {{
-            display: inline-block;
+            color: #fff;
+            text-shadow: 0px 0px 15px rgba(255,255,255,0.6);
             opacity: 0;
-            background: linear-gradient(90deg, #ff4b1f, #ff9068, #ffd200, #00c3ff, #ff4b1f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 400%;
-            animation: colorShift 3s linear infinite, wordAppear 1s ease forwards;
+            z-index: 10000;
+            animation: fadeSmoke 7s ease-in-out forwards;
+            animation-delay: 1s;
         }}
 
-        /* Thời gian xuất hiện từng từ */
-        #intro-text span:nth-child(1) {{ animation-delay: 0.3s, 0.3s; }}
-        #intro-text span:nth-child(2) {{ animation-delay: 0.9s, 0.9s; }}
-        #intro-text span:nth-child(3) {{ animation-delay: 1.5s, 1.5s; }}
-        #intro-text span:nth-child(4) {{ animation-delay: 2.1s, 2.1s; }}
-        #intro-text span:nth-child(5) {{ animation-delay: 2.7s, 2.7s; }}
-
-        /* Gradient màu thay đổi liên tục */
-        @keyframes colorShift {{
-            0% {{ background-position: 0% 50%; }}
-            50% {{ background-position: 100% 50%; }}
-            100% {{ background-position: 0% 50%; }}
-        }}
-
-        /* Từng từ bay lên và mờ dần biến mất */
-        @keyframes wordAppear {{
-            0% {{ opacity: 0; transform: translateY(30px); }}
-            20% {{ opacity: 1; transform: translateY(0); }}
-            80% {{ opacity: 1; transform: translateY(0); }}
-            100% {{ opacity: 0; transform: translateY(-30px); }}
+        /* Hiệu ứng hiện dần rồi tan như khói */
+        @keyframes fadeSmoke {{
+            0% {{
+                opacity: 0;
+                filter: blur(10px);
+                transform: translateY(40px);
+            }}
+            30% {{
+                opacity: 1;
+                filter: blur(0px);
+                transform: translateY(0);
+            }}
+            70% {{
+                opacity: 1;
+                filter: blur(1px);
+            }}
+            100% {{
+                opacity: 0;
+                filter: blur(20px);
+                transform: translateY(-30px);
+            }}
         }}
 
         /* Video fade out */
@@ -120,16 +115,10 @@ if not st.session_state.intro_done:
             <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
         </video>
 
-        <div id="intro-text">
-            <span>KHÁM</span>&nbsp;
-            <span>PHÁ</span>&nbsp;
-            <span>THẾ</span>&nbsp;
-            <span>GIỚI</span>&nbsp;
-            <span>CÙNG&nbsp;CHÚNG&nbsp;TÔI</span>
-        </div>
+        <div id="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
         """, unsafe_allow_html=True)
 
-        # thời gian bằng thời lượng video + animation
+        # Chờ cho video + animation chạy xong
         time.sleep(9)
         st.session_state.intro_done = True
         st.rerun()
@@ -138,7 +127,7 @@ if not st.session_state.intro_done:
         st.error(f"Lỗi phát video: {e}")
 
 # ======================================================
-# 🌿 GIAO DIỆN CHÍNH (GIỮ NGUYÊN VINTAGE)
+# 🌿 GIAO DIỆN CHÍNH (GIỮ NGUYÊN PHONG CÁCH VINTAGE)
 # ======================================================
 else:
     img_base64 = get_base64_of_bin_file("airplane.jpg")
@@ -146,6 +135,7 @@ else:
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+
     .stApp {{
         font-family: 'Special Elite', cursive !important;
         background:
@@ -167,5 +157,11 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
+    # ======= NỘI DUNG CHÍNH =======
     st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
     st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
+
+    zone = st.selectbox("📂 Chọn zone:", xls.sheet_names)
+    if zone:
+        df = load_and_clean(zone)
+        st.dataframe(df.head(5))
