@@ -1,6 +1,7 @@
-import pandas as pd
 import streamlit as st
+import time
 import base64
+import pandas as pd
 
 # ===== Hàm load Excel =====
 excel_file = "A787.xlsx"
@@ -14,23 +15,53 @@ def load_and_clean(sheet):
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ===== Hàm load file nhị phân thành Base64 =====
+# ===== Hàm đọc file nhị phân thành Base64 =====
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# ===== Load ảnh nền =====
+# ======== PHẦN VIDEO INTRO ========
+video_path = "airplane.mp4"
+try:
+    video_base64 = get_base64_of_bin_file(video_path)
+    video_html = f"""
+    <div id="intro-video" style="
+        position: fixed; 
+        top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 9999; background: black; display: flex; 
+        align-items: center; justify-content: center;">
+        <video autoplay muted playsinline id="intro" style="width:100%; height:100%; object-fit:cover;">
+            <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
+        </video>
+    </div>
+
+    <script>
+        const intro = document.getElementById('intro');
+        intro.onended = () => {{
+            const videoDiv = document.getElementById('intro-video');
+            videoDiv.style.transition = 'opacity 1s ease';
+            videoDiv.style.opacity = '0';
+            setTimeout(() => videoDiv.remove(), 1000);
+        }};
+    </script>
+    """
+    st.markdown(video_html, unsafe_allow_html=True)
+except FileNotFoundError:
+    st.warning("⚠️ Không tìm thấy file airplane.mp4 — vui lòng thêm vào cùng thư mục với app.py")
+
+# ====== PHẦN GIAO DIỆN CHÍNH ======
+# Load ảnh nền
 img_base64 = get_base64_of_bin_file("airplane.jpg")
 
-# ===== CSS tổng thể =====
+# CSS tổng thể
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
 .stApp {{
     font-family: 'Special Elite', cursive !important;
-    background: 
-        linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)), 
+    background:
+        linear-gradient(rgba(245, 242, 230, 0.85), rgba(245, 242, 230, 0.85)),
         url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
     background-size: cover;
 }}
@@ -43,10 +74,8 @@ st.markdown(f"""
     pointer-events: none;
     z-index: -1;
 }}
-
 .block-container {{ padding-top: 0rem !important; }}
 header[data-testid="stHeader"] {{ display: none; }}
-
 .top-title {{
     font-size: 34px;
     font-weight: bold;
@@ -64,78 +93,17 @@ header[data-testid="stHeader"] {{ display: none; }}
     margin-bottom: 20px;
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }}
-
-.stSelectbox label {{ font-weight: bold !important; font-size: 18px !important; color: #4e342e !important; }}
-.stSelectbox div[data-baseweb="select"] {{ font-size: 15px !important; color: #3e2723 !important; background: #fdfbf5 !important; border: 1.5px dashed #5d4037 !important; border-radius: 6px !important; }}
-.stSelectbox div[data-baseweb="popover"] {{ font-size: 15px !important; background: #fdfbf5 !important; color: #3e2723 !important; border: 1.5px dashed #5d4037 !important; }}
-
-table.dataframe {{
-    width: 100%;
-    border-collapse: collapse !important;
-    border: 2px solid #5d4037;
-    background: #fdfbf5;
-    text-align: center;
-}}
-table.dataframe thead th {{
-    background: #795548 !important;
-    color: #fff8e1 !important;
-    font-weight: bold;
-    text-align: center;
-    padding: 10px !important;
-    font-size: 15px;
-    border: 2px solid #5d4037 !important;
-}}
-table.dataframe tbody td {{
-    text-align: center !important;
-    padding: 8px !important;
-    font-size: 14px;
-    color: #3e2723 !important;
-    border: 1.5px dashed #5d4037 !important;
-}}
-table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec !important; }}
-table.dataframe tbody tr:hover td {{ background: #f1e0c6 !important; transition: 0.3s ease-in-out; }}
-
-.highlight-msg {{
-    font-size: 18px;
-    font-weight: bold;
-    color: #3e2723;
-    background: #efebe9;
-    padding: 10px 15px;
-    border-left: 6px solid #6d4c41;
-    border-radius: 6px;
-    margin: 15px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}}
 </style>
 """, unsafe_allow_html=True)
 
-# ===== Header =====
+# Header
 st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
-# ===== Nhạc nền =====
-try:
-    with open("background.mp3", "rb") as f:
-        audio_bytes = f.read()
-        st.markdown("""
-            <div style='text-align:center; margin-top:5px;'>
-                <p style='font-family:Special Elite; color:#3e2723; font-size:17px;'>
-                    🎵 Nhạc nền (hãy nhấn Play để thưởng thức)
-                </p>
-            </div>
-        """, unsafe_allow_html=True)
-        st.audio(audio_bytes, format="audio/mp3", start_time=0)
-except FileNotFoundError:
-    st.warning("⚠️ Không tìm thấy file background.mp3 — vui lòng thêm file vào cùng thư mục với app.py")
-
-# ===== Dropdowns & logic =====
+# ====== Phần dropdown và logic tra cứu (giữ nguyên code cũ) ======
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names, key="zone")
 if zone:
     df = load_and_clean(zone)
-
     if "A/C" in df.columns:
         aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac and ac.upper() != "NAN"])
         aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts, key="aircraft")
@@ -173,11 +141,7 @@ if zone:
 
                 df_result = df_result[cols_to_show]
                 df_result.insert(0, "STT", range(1, len(df_result) + 1))
-
-                st.markdown(
-                    f'<div class="highlight-msg">✅ Tìm thấy {len(df_result)} dòng dữ liệu</div>',
-                    unsafe_allow_html=True
-                )
-                st.write(df_result.to_html(escape=False, index=False), unsafe_allow_html=True)
+                st.success(f"✅ Tìm thấy {len(df_result)} dòng dữ liệu")
+                st.write(df_result)
             else:
                 st.error("📌 Rất tiếc, không tìm thấy dữ liệu phù hợp.")
