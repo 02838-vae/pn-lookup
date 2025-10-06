@@ -4,7 +4,7 @@ import base64
 import time
 
 # ===================== VIDEO INTRO =====================
-video_file = "intro.mp4"
+video_file = "airplane.mp4"
 with open(video_file, "rb") as f:
     video_bytes = f.read()
 video_base64 = base64.b64encode(video_bytes).decode()
@@ -270,3 +270,4 @@ if zone:
                         st.write(df_res.to_html(escape=False, index=False), unsafe_allow_html=True)
                     else:
                         st.error("📌 Rất tiếc, không tìm thấy dữ liệu phù hợp.")
+
