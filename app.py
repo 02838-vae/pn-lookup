@@ -26,20 +26,31 @@ if not st.session_state.show_main:
 
         st.markdown(f"""
         <style>
-        html, body, [data-testid="stAppViewContainer"] {{
-            margin: 0; padding: 0;
-            background: black;
+        html, body {{
+            margin: 0;
+            padding: 0;
             overflow: hidden;
+            height: 100%;
+            width: 100%;
+            background: black;
+        }}
+        [data-testid="stAppViewContainer"],
+        [data-testid="stToolbar"],
+        [data-testid="stDecoration"],
+        header[data-testid="stHeader"] {{
+            display: none !important;
         }}
         video {{
             position: fixed;
-            top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
+            z-index: 1;
         }}
         .intro-text {{
-            position: absolute;
+            position: fixed;
             bottom: 12vh;
             width: 100%;
             text-align: center;
@@ -55,23 +66,22 @@ if not st.session_state.show_main:
             animation:
                 appear 3s ease-in forwards,
                 floatFade 3s ease-in 5s forwards;
+            z-index: 2;
         }}
         @keyframes appear {{
-            0% {{ opacity: 0; filter: blur(8px); transform: translateY(40px); }}
-            100% {{ opacity: 1; filter: blur(0); transform: translateY(0); }}
+            0% {{ opacity: 0; transform: translateY(40px); }}
+            100% {{ opacity: 1; transform: translateY(0); }}
         }}
         @keyframes floatFade {{
-            0% {{ opacity: 1; filter: blur(0); transform: translateY(0); }}
-            100% {{ opacity: 0; filter: blur(12px); transform: translateY(-30px) scale(1.05); }}
+            0% {{ opacity: 1; transform: translateY(0); }}
+            100% {{ opacity: 0; transform: translateY(-30px) scale(1.05); }}
         }}
         </style>
 
-        <div style="position:fixed; inset:0; background:black; display:flex; justify-content:center; align-items:center; z-index:9999;">
-            <video autoplay muted playsinline>
-                <source src="data:video/mp4;base64,{video_data}" type="video/mp4">
-            </video>
-            <div class="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
-        </div>
+        <video autoplay muted playsinline>
+            <source src="data:video/mp4;base64,{video_data}" type="video/mp4">
+        </video>
+        <div class="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
         """, unsafe_allow_html=True)
 
         if not st.session_state.video_played:
@@ -107,6 +117,11 @@ img_base64 = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else "
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+
+html, body, .stApp {{
+    height: 100%;
+    overflow: hidden auto;
+}}
 
 .stApp {{
     font-family: 'Special Elite', cursive !important;
@@ -224,14 +239,18 @@ body, .stApp {{ cursor: none !important; }}
 </style>
 
 <script>
-document.addEventListener('mousemove', e => {{
-  const trail = document.createElement('div');
-  trail.className = 'trail';
-  trail.style.left = e.clientX + 'px';
-  trail.style.top = e.clientY + 'px';
-  document.body.appendChild(trail);
-  setTimeout(() => trail.remove(), 600);
-}});
+// Duy trì con trỏ sáng liên tục, kể cả khi rerun
+if (!window.cursorTrailAttached) {{
+  document.addEventListener('mousemove', e => {{
+    const trail = document.createElement('div');
+    trail.className = 'trail';
+    trail.style.left = e.clientX + 'px';
+    trail.style.top = e.clientY + 'px';
+    document.body.appendChild(trail);
+    setTimeout(() => trail.remove(), 600);
+  }});
+  window.cursorTrailAttached = true;
+}}
 </script>
 """, unsafe_allow_html=True)
 
