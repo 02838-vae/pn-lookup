@@ -125,28 +125,31 @@ st.markdown(f"""
 header[data-testid="stHeader"] {{ display: none; }}
 .block-container {{ padding-top: 0 !important; }}
 
-.top-title {{
-    font-size: 38px;
+.main-title {{
+    font-size: 42px;
     font-weight: bold;
     text-align: center;
-    margin-top: 25px;
     color: #3e2723;
+    margin-top: 25px;
     text-shadow: 2px 2px 0 #fff, 0 0 25px #f0d49b, 0 0 50px #bca27a;
+}}
+
+.sub-title {{
+    font-size: 30px;
+    text-align: center;
+    color: #6d4c41;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
     animation: glowTitle 3s ease-in-out infinite alternate;
 }}
+
 @keyframes glowTitle {{
     from {{ text-shadow: 0 0 10px #bfa67a, 0 0 20px #d2b48c, 0 0 30px #e6d5a8; color: #4e342e; }}
     to {{ text-shadow: 0 0 20px #f8e1b4, 0 0 40px #e0b97d, 0 0 60px #f7e7ce; color: #5d4037; }}
 }}
 
-.main-title {{
-    font-size: 26px;
-    text-align: center;
-    color: #6d4c41;
-    margin-bottom: 20px;
-    letter-spacing: 1px;
-}}
-
+/* ===== FORM ===== */
 .stSelectbox label {{
     font-weight: bold !important;
     font-size: 18px !important;
@@ -202,9 +205,9 @@ table.dataframe tbody tr:hover td {{
 </style>
 """, unsafe_allow_html=True)
 
-# ===== HEADER =====
-st.markdown('<div class="top-title">🔎 TRA CỨU PART NUMBER</div>', unsafe_allow_html=True)
-st.markdown('<div class="main-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+# ===== TIÊU ĐỀ =====
+st.markdown('<div class="main-title">📜 TỔ BẢO DƯỠNG SỐ 1</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">🔎 TRA CỨU PART NUMBER</div>', unsafe_allow_html=True)
 
 # ===== NHẠC NỀN =====
 try:
