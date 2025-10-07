@@ -19,51 +19,24 @@ if "video_played" not in st.session_state:
 
 video_file = "airplane.mp4"
 
-# ===== MÀN HÌNH VIDEO INTRO (FULL SCREEN) =====
+# ===== MÀN HÌNH VIDEO INTRO =====
 if not st.session_state.show_main:
     if os.path.exists(video_file):
         video_data = get_base64(video_file)
 
         st.markdown(f"""
         <style>
-        html, body, [data-testid="stAppViewContainer"], [data-testid="stVerticalBlock"] {{
-            margin: 0 !important;
-            padding: 0 !important;
-            background: black !important;
-            overflow: hidden !important;
-            height: 100vh !important;
-        }}
-        [data-testid="stHeader"] {{
-            display: none !important;
-        }}
-        .video-container {{
-            position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
+        html, body, [data-testid="stAppViewContainer"] {{
+            margin: 0; padding: 0;
             background: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9998;
             overflow: hidden;
         }}
-        .video-bg {{
-            width: 100%;
-            height: 100%;
+        video {{
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
             object-fit: cover;
-            object-position: center center;
-            z-index: 9997;
-            transition: object-fit 0.3s ease, object-position 0.3s ease;
-        }}
-        /* ⚙️ Điều chỉnh cho điện thoại */
-        @media (max-width: 768px) {{
-            .video-bg {{
-                object-fit: contain !important;
-                object-position: center center !important;
-                transform: scale(1.05);
-                background-color: black;
-            }}
         }}
         .intro-text {{
             position: absolute;
@@ -71,7 +44,7 @@ if not st.session_state.show_main:
             width: 100%;
             text-align: center;
             font-family: 'Special Elite', cursive;
-            font-size: 44px;
+            font-size: 40px;
             font-weight: bold;
             color: #ffffff;
             text-shadow:
@@ -82,7 +55,6 @@ if not st.session_state.show_main:
             animation:
                 appear 3s ease-in forwards,
                 floatFade 3s ease-in 5s forwards;
-            z-index: 9999;
         }}
         @keyframes appear {{
             0% {{ opacity: 0; filter: blur(8px); transform: translateY(40px); }}
@@ -94,8 +66,8 @@ if not st.session_state.show_main:
         }}
         </style>
 
-        <div class="video-container">
-            <video class="video-bg" autoplay muted playsinline>
+        <div style="position:fixed; inset:0; background:black; display:flex; justify-content:center; align-items:center; z-index:9999;">
+            <video autoplay muted playsinline>
                 <source src="data:video/mp4;base64,{video_data}" type="video/mp4">
             </video>
             <div class="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
@@ -131,7 +103,7 @@ def load_and_clean(sheet):
 
 img_base64 = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else ""
 
-# ===== CSS PHONG CÁCH VINTAGE (NỀN RÕ + FONT TO) =====
+# ===== CSS TỔNG THỂ =====
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -152,7 +124,6 @@ st.markdown(f"""
     pointer-events: none;
     z-index: -1;
 }}
-
 header[data-testid="stHeader"] {{ display: none; }}
 .block-container {{ padding-top: 0 !important; }}
 
@@ -170,7 +141,7 @@ header[data-testid="stHeader"] {{ display: none; }}
     text-align: center;
     color: #6d4c41;
     margin-top: 5px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     letter-spacing: 1px;
     animation: glowTitle 3s ease-in-out infinite alternate;
 }}
@@ -191,59 +162,77 @@ header[data-testid="stHeader"] {{ display: none; }}
     background: #fdfbf5 !important;
     border: 2px dashed #5d4037 !important;
     border-radius: 8px !important;
-    min-height: 50px !important;
-    transition: transform 0.2s ease;
-}}
-.stSelectbox div[data-baseweb="select"]:hover {{
-    transform: scale(1.02);
-    box-shadow: 0 0 12px rgba(100, 80, 60, 0.3);
-}}
-.stSelectbox span {{
-    font-size: 18px !important;
+    padding: 6px !important;
 }}
 
-/* ===== BẢNG KẾT QUẢ ===== */
+/* ===== BẢNG ===== */
 table.dataframe {{
     width: 100%;
     border-collapse: collapse;
-    background: rgba(255,255,255,0.88);
-    backdrop-filter: blur(2px);
+    background: #fdfbf5;
     font-size: 18px;
 }}
 table.dataframe thead th {{
     background: #6d4c41;
     color: #fff8e1;
-    padding: 14px;
+    padding: 12px;
     border: 2px solid #3e2723;
-    font-size: 19px;
+    font-size: 18px;
     text-align: center;
 }}
 table.dataframe tbody td {{
-    border: 1.8px solid #5d4037;
+    border: 1.5px solid #5d4037;
     padding: 12px;
-    font-size: 18px;
+    font-size: 17px;
     color: #3e2723;
     text-align: center;
 }}
-table.dataframe tbody tr:nth-child(even) td {{
-    background: rgba(248, 244, 236, 0.85);
-}}
+table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec; }}
 table.dataframe tbody tr:hover td {{
-    background: rgba(241, 224, 198, 0.9);
+    background: #f1e0c6;
     transition: 0.3s;
 }}
 .highlight-msg {{
     font-size: 20px;
     font-weight: bold;
     color: #3e2723;
-    background: rgba(239, 235, 233, 0.9);
-    padding: 12px 18px;
+    background: #efebe9;
+    padding: 10px 15px;
     border-left: 6px solid #6d4c41;
-    border-radius: 8px;
-    margin: 18px 0;
+    border-radius: 6px;
+    margin: 15px 0;
     text-align: center;
 }}
+
+/* =====✨ HIỆU ỨNG CON TRỎ PHÁT SÁNG✨===== */
+body, .stApp {{ cursor: none !important; }}
+.trail {{
+  position: fixed;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,200,0.9) 0%, rgba(255,200,80,0.4) 70%, transparent 100%);
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: screen;
+  animation: fadeOut 0.6s ease-out forwards;
+}}
+@keyframes fadeOut {{
+  from {{ opacity: 1; transform: scale(1); }}
+  to {{ opacity: 0; transform: scale(2); }}
+}}
 </style>
+
+<script>
+document.addEventListener('mousemove', e => {{
+  const trail = document.createElement('div');
+  trail.className = 'trail';
+  trail.style.left = e.clientX + 'px';
+  trail.style.top = e.clientY + 'px';
+  document.body.appendChild(trail);
+  setTimeout(() => trail.remove(), 600);
+}});
+</script>
 """, unsafe_allow_html=True)
 
 # ===== TIÊU ĐỀ =====
@@ -256,7 +245,7 @@ try:
         audio_bytes = f.read()
         st.markdown("""
         <div style='text-align:center; margin-top:5px;'>
-            <p style='font-family:Special Elite; color:#3e2723; font-size:17px;'>
+            <p style='font-family:Special Elite; color:#3e2723; font-size:18px;'>
                 🎵 Nhạc nền (hãy nhấn Play để thưởng thức)
             </p>
         </div>
@@ -288,13 +277,11 @@ if zone:
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
 
-            # === Giữ lại chọn Item ===
             if "ITEM" in df_desc.columns:
                 items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i])
                 item = st.selectbox("🔢 Bạn muốn tra cứu Item nào?", items)
                 df_desc = df_desc[df_desc["ITEM"] == item]
 
-            # === Làm sạch và xóa cột không cần ===
             df_desc = df_desc.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
             df_desc = df_desc.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
 
