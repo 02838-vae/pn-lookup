@@ -31,7 +31,7 @@ if not st.session_state.show_main:
             z-index:9999;
         }}
         video {{
-            width:100%; height:100%;
+            width:100vw; height:100vh;
             object-fit:contain;
         }}
         .intro-text {{
@@ -65,15 +65,18 @@ if not st.session_state.show_main:
 
         <script>
         const video = document.getElementById("introVideo");
+        // Khi video kết thúc -> lưu trạng thái và reload
         video.addEventListener("ended", () => {{
             localStorage.setItem("videoPlayed", "true");
-            window.location.reload();
-        }});
-
-        // Nếu video đã chạy -> bỏ qua intro
-        if (localStorage.getItem("videoPlayed") === "true") {{
             window.location.href = window.location.href + "?main=true";
-        }}
+        }});
+        // Dự phòng tự động sau 9 giây
+        setTimeout(() => {{
+            localStorage.setItem("videoPlayed", "true");
+            if (!window.location.href.includes("?main=true")) {{
+                window.location.href = window.location.href + "?main=true";
+            }}
+        }}, 9000);
         </script>
         """, unsafe_allow_html=True)
         st.stop()
