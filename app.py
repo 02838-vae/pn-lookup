@@ -5,17 +5,18 @@ import os
 
 st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1", layout="wide")
 
-# ===== HÀM LOAD FILE THÀNH BASE64 =====
+# ======= Hàm chuyển file sang base64 =======
 def get_base64(file_path):
     with open(file_path, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
 
-# ======== HIỂN THỊ VIDEO INTRO =========
+# ======= Cờ kiểm soát hiển thị =======
 if "show_main" not in st.session_state:
     st.session_state.show_main = False
 
 video_file = "airplane.mp4"
 
+# ======= Trang video intro =======
 if not st.session_state.show_main:
     if os.path.exists(video_file):
         video_data = get_base64(video_file)
@@ -64,9 +65,15 @@ if not st.session_state.show_main:
 
         <script>
         const video = document.getElementById("introVideo");
-        video.onended = () => {{
+        video.addEventListener("ended", () => {{
+            localStorage.setItem("videoPlayed", "true");
+            window.location.reload();
+        }});
+
+        // Nếu video đã chạy -> bỏ qua intro
+        if (localStorage.getItem("videoPlayed") === "true") {{
             window.location.href = window.location.href + "?main=true";
-        }};
+        }}
         </script>
         """, unsafe_allow_html=True)
         st.stop()
@@ -74,12 +81,12 @@ if not st.session_state.show_main:
         st.warning("⚠️ Không tìm thấy file airplane.mp4 trong thư mục app.")
         st.stop()
 
-# ====== XỬ LÝ SAU KHI VIDEO KẾT THÚC ======
+# ======= Kiểm tra query param =======
 query_params = st.query_params
 if "main" in query_params:
     st.session_state.show_main = True
 
-# ======== TRANG CHÍNH ========
+# ======= Trang chính =======
 excel_file = "A787.xlsx"
 if not os.path.exists(excel_file):
     st.error("⚠️ Không tìm thấy file A787.xlsx")
@@ -98,6 +105,7 @@ def load_and_clean(sheet):
 
 img_base64 = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else ""
 
+# ======= CSS VINTAGE =======
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
