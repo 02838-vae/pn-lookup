@@ -26,18 +26,44 @@ if not st.session_state.show_main:
 
         st.markdown(f"""
         <style>
-        html, body, [data-testid="stAppViewContainer"] {{
-            margin: 0; padding: 0;
-            background: black;
-            overflow: hidden;
+        html, body, [data-testid="stAppViewContainer"], [data-testid="stVerticalBlock"] {{
+            margin: 0 !important;
+            padding: 0 !important;
+            background: black !important;
+            overflow: hidden !important;
+            height: 100vh !important;
         }}
-        .video-bg {{
+        [data-testid="stHeader"] {{
+            display: none !important;
+        }}
+        .video-container {{
             position: fixed;
             inset: 0;
             width: 100vw;
             height: 100vh;
-            object-fit: cover;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 9998;
+            overflow: hidden;
+        }}
+        .video-bg {{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            z-index: 9997;
+            transition: object-fit 0.3s ease, object-position 0.3s ease;
+        }}
+        /* ⚙️ Điều chỉnh cho điện thoại */
+        @media (max-width: 768px) {{
+            .video-bg {{
+                object-fit: contain !important;
+                object-position: center center !important;
+                transform: scale(1.05);
+                background-color: black;
+            }}
         }}
         .intro-text {{
             position: absolute;
@@ -68,7 +94,7 @@ if not st.session_state.show_main:
         }}
         </style>
 
-        <div style="position:fixed; inset:0; background:black; display:flex; justify-content:center; align-items:center; z-index:9999;">
+        <div class="video-container">
             <video class="video-bg" autoplay muted playsinline>
                 <source src="data:video/mp4;base64,{video_data}" type="video/mp4">
             </video>
@@ -105,7 +131,7 @@ def load_and_clean(sheet):
 
 img_base64 = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else ""
 
-# ===== CSS PHONG CÁCH VINTAGE + PARALLAX + FONT TO =====
+# ===== CSS PHONG CÁCH VINTAGE (NỀN RÕ + FONT TO) =====
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -113,17 +139,16 @@ st.markdown(f"""
 .stApp {{
     font-family: 'Special Elite', cursive !important;
     background:
-        linear-gradient(rgba(245, 242, 230, 0.45), rgba(245, 242, 230, 0.45)),
+        linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
         url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
     background-size: cover;
-    background-attachment: fixed; /* Parallax effect */
 }}
 .stApp::after {{
     content: "";
     position: fixed;
     inset: 0;
     background: url("https://www.transparenttextures.com/patterns/aged-paper.png");
-    opacity: 0.18;
+    opacity: 0.2;
     pointer-events: none;
     z-index: -1;
 }}
@@ -133,32 +158,22 @@ header[data-testid="stHeader"] {{ display: none; }}
 
 /* ===== TIÊU ĐỀ ===== */
 .main-title {{
-    font-size: 50px;
+    font-size: 48px;
     font-weight: bold;
     text-align: center;
     color: #3e2723;
     margin-top: 25px;
-    transition: transform 0.3s ease;
     text-shadow: 2px 2px 0 #fff, 0 0 25px #f0d49b, 0 0 50px #bca27a;
 }}
-.main-title:hover {{
-    transform: scale(1.05);
-}}
-
 .sub-title {{
-    font-size: 36px;
+    font-size: 34px;
     text-align: center;
     color: #6d4c41;
     margin-top: 5px;
     margin-bottom: 25px;
     letter-spacing: 1px;
     animation: glowTitle 3s ease-in-out infinite alternate;
-    transition: transform 0.3s ease;
 }}
-.sub-title:hover {{
-    transform: scale(1.05);
-}}
-
 @keyframes glowTitle {{
     from {{ text-shadow: 0 0 10px #bfa67a, 0 0 20px #d2b48c, 0 0 30px #e6d5a8; color: #4e342e; }}
     to {{ text-shadow: 0 0 20px #f8e1b4, 0 0 40px #e0b97d, 0 0 60px #f7e7ce; color: #5d4037; }}
@@ -170,21 +185,19 @@ header[data-testid="stHeader"] {{ display: none; }}
     font-size: 22px !important;
     color: #4e342e !important;
 }}
-
 .stSelectbox div[data-baseweb="select"] {{
     font-size: 18px !important;
     color: #3e2723 !important;
     background: #fdfbf5 !important;
     border: 2px dashed #5d4037 !important;
     border-radius: 8px !important;
-    min-height: 52px !important;
-    transition: transform 0.25s ease, box-shadow 0.3s ease;
+    min-height: 50px !important;
+    transition: transform 0.2s ease;
 }}
 .stSelectbox div[data-baseweb="select"]:hover {{
-    transform: scale(1.03);
-    box-shadow: 0 0 15px rgba(93, 64, 55, 0.3);
+    transform: scale(1.02);
+    box-shadow: 0 0 12px rgba(100, 80, 60, 0.3);
 }}
-
 .stSelectbox span {{
     font-size: 18px !important;
 }}
@@ -193,11 +206,10 @@ header[data-testid="stHeader"] {{ display: none; }}
 table.dataframe {{
     width: 100%;
     border-collapse: collapse;
-    background: rgba(255,255,255,0.9);
-    backdrop-filter: blur(3px);
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(2px);
     font-size: 18px;
 }}
-
 table.dataframe thead th {{
     background: #6d4c41;
     color: #fff8e1;
@@ -206,7 +218,6 @@ table.dataframe thead th {{
     font-size: 19px;
     text-align: center;
 }}
-
 table.dataframe tbody td {{
     border: 1.8px solid #5d4037;
     padding: 12px;
@@ -214,16 +225,13 @@ table.dataframe tbody td {{
     color: #3e2723;
     text-align: center;
 }}
-
 table.dataframe tbody tr:nth-child(even) td {{
     background: rgba(248, 244, 236, 0.85);
 }}
-
 table.dataframe tbody tr:hover td {{
     background: rgba(241, 224, 198, 0.9);
     transition: 0.3s;
 }}
-
 .highlight-msg {{
     font-size: 20px;
     font-weight: bold;
@@ -280,11 +288,13 @@ if zone:
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
 
+            # === Giữ lại chọn Item ===
             if "ITEM" in df_desc.columns:
                 items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i])
                 item = st.selectbox("🔢 Bạn muốn tra cứu Item nào?", items)
                 df_desc = df_desc[df_desc["ITEM"] == item]
 
+            # === Làm sạch và xóa cột không cần ===
             df_desc = df_desc.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
             df_desc = df_desc.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
 
