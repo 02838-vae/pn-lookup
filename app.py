@@ -19,7 +19,7 @@ if "video_played" not in st.session_state:
 
 video_file = "airplane.mp4"
 
-# ===== MÀN HÌNH VIDEO INTRO =====
+# ===== MÀN HÌNH VIDEO INTRO (FULL SCREEN) =====
 if not st.session_state.show_main:
     if os.path.exists(video_file):
         video_data = get_base64(video_file)
@@ -31,10 +31,13 @@ if not st.session_state.show_main:
             background: black;
             overflow: hidden;
         }}
-        video {{
+        .video-bg {{
+            position: fixed;
+            inset: 0;
             width: 100vw;
             height: 100vh;
-            object-fit: contain;
+            object-fit: cover;
+            z-index: 9998;
         }}
         .intro-text {{
             position: absolute;
@@ -42,7 +45,7 @@ if not st.session_state.show_main:
             width: 100%;
             text-align: center;
             font-family: 'Special Elite', cursive;
-            font-size: 40px;
+            font-size: 44px;
             font-weight: bold;
             color: #ffffff;
             text-shadow:
@@ -53,6 +56,7 @@ if not st.session_state.show_main:
             animation:
                 appear 3s ease-in forwards,
                 floatFade 3s ease-in 5s forwards;
+            z-index: 9999;
         }}
         @keyframes appear {{
             0% {{ opacity: 0; filter: blur(8px); transform: translateY(40px); }}
@@ -65,7 +69,7 @@ if not st.session_state.show_main:
         </style>
 
         <div style="position:fixed; inset:0; background:black; display:flex; justify-content:center; align-items:center; z-index:9999;">
-            <video autoplay muted playsinline>
+            <video class="video-bg" autoplay muted playsinline>
                 <source src="data:video/mp4;base64,{video_data}" type="video/mp4">
             </video>
             <div class="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
@@ -101,7 +105,7 @@ def load_and_clean(sheet):
 
 img_base64 = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else ""
 
-# ===== CSS PHONG CÁCH VINTAGE — FONT TO, NỀN RÕ, HIỆU ỨNG HOVER =====
+# ===== CSS PHONG CÁCH VINTAGE + PARALLAX + FONT TO =====
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -109,16 +113,17 @@ st.markdown(f"""
 .stApp {{
     font-family: 'Special Elite', cursive !important;
     background:
-        linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
+        linear-gradient(rgba(245, 242, 230, 0.45), rgba(245, 242, 230, 0.45)),
         url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
     background-size: cover;
+    background-attachment: fixed; /* Parallax effect */
 }}
 .stApp::after {{
     content: "";
     position: fixed;
     inset: 0;
     background: url("https://www.transparenttextures.com/patterns/aged-paper.png");
-    opacity: 0.2;
+    opacity: 0.18;
     pointer-events: none;
     z-index: -1;
 }}
@@ -128,7 +133,7 @@ header[data-testid="stHeader"] {{ display: none; }}
 
 /* ===== TIÊU ĐỀ ===== */
 .main-title {{
-    font-size: 48px;
+    font-size: 50px;
     font-weight: bold;
     text-align: center;
     color: #3e2723;
@@ -141,7 +146,7 @@ header[data-testid="stHeader"] {{ display: none; }}
 }}
 
 .sub-title {{
-    font-size: 34px;
+    font-size: 36px;
     text-align: center;
     color: #6d4c41;
     margin-top: 5px;
@@ -172,11 +177,11 @@ header[data-testid="stHeader"] {{ display: none; }}
     background: #fdfbf5 !important;
     border: 2px dashed #5d4037 !important;
     border-radius: 8px !important;
-    min-height: 50px !important;
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    min-height: 52px !important;
+    transition: transform 0.25s ease, box-shadow 0.3s ease;
 }}
 .stSelectbox div[data-baseweb="select"]:hover {{
-    transform: scale(1.02);
+    transform: scale(1.03);
     box-shadow: 0 0 15px rgba(93, 64, 55, 0.3);
 }}
 
@@ -188,8 +193,8 @@ header[data-testid="stHeader"] {{ display: none; }}
 table.dataframe {{
     width: 100%;
     border-collapse: collapse;
-    background: rgba(255,255,255,0.88);
-    backdrop-filter: blur(2px);
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(3px);
     font-size: 18px;
 }}
 
@@ -275,13 +280,11 @@ if zone:
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
 
-            # === Giữ lại chọn Item ===
             if "ITEM" in df_desc.columns:
                 items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i])
                 item = st.selectbox("🔢 Bạn muốn tra cứu Item nào?", items)
                 df_desc = df_desc[df_desc["ITEM"] == item]
 
-            # === Làm sạch và xóa cột không cần ===
             df_desc = df_desc.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
             df_desc = df_desc.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
 
