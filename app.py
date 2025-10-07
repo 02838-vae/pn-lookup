@@ -101,7 +101,7 @@ def load_and_clean(sheet):
 
 img_base64 = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else ""
 
-# ===== CSS PHONG CÁCH VINTAGE =====
+# ===== CSS PHONG CÁCH VINTAGE — FONT TO, NỀN RÕ, HIỆU ỨNG HOVER =====
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -109,7 +109,7 @@ st.markdown(f"""
 .stApp {{
     font-family: 'Special Elite', cursive !important;
     background:
-        linear-gradient(rgba(245, 242, 230, 0.9), rgba(245, 242, 230, 0.9)),
+        linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
         url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
     background-size: cover;
 }}
@@ -118,30 +118,40 @@ st.markdown(f"""
     position: fixed;
     inset: 0;
     background: url("https://www.transparenttextures.com/patterns/aged-paper.png");
-    opacity: 0.35;
+    opacity: 0.2;
     pointer-events: none;
     z-index: -1;
 }}
+
 header[data-testid="stHeader"] {{ display: none; }}
 .block-container {{ padding-top: 0 !important; }}
 
+/* ===== TIÊU ĐỀ ===== */
 .main-title {{
-    font-size: 42px;
+    font-size: 48px;
     font-weight: bold;
     text-align: center;
     color: #3e2723;
     margin-top: 25px;
+    transition: transform 0.3s ease;
     text-shadow: 2px 2px 0 #fff, 0 0 25px #f0d49b, 0 0 50px #bca27a;
+}}
+.main-title:hover {{
+    transform: scale(1.05);
 }}
 
 .sub-title {{
-    font-size: 30px;
+    font-size: 34px;
     text-align: center;
     color: #6d4c41;
     margin-top: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     letter-spacing: 1px;
     animation: glowTitle 3s ease-in-out infinite alternate;
+    transition: transform 0.3s ease;
+}}
+.sub-title:hover {{
+    transform: scale(1.05);
 }}
 
 @keyframes glowTitle {{
@@ -152,54 +162,72 @@ header[data-testid="stHeader"] {{ display: none; }}
 /* ===== FORM ===== */
 .stSelectbox label {{
     font-weight: bold !important;
-    font-size: 18px !important;
+    font-size: 22px !important;
     color: #4e342e !important;
 }}
+
 .stSelectbox div[data-baseweb="select"] {{
-    font-size: 15px !important;
+    font-size: 18px !important;
     color: #3e2723 !important;
     background: #fdfbf5 !important;
-    border: 1.5px dashed #5d4037 !important;
-    border-radius: 6px !important;
+    border: 2px dashed #5d4037 !important;
+    border-radius: 8px !important;
+    min-height: 50px !important;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+}}
+.stSelectbox div[data-baseweb="select"]:hover {{
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(93, 64, 55, 0.3);
+}}
+
+.stSelectbox span {{
+    font-size: 18px !important;
 }}
 
 /* ===== BẢNG KẾT QUẢ ===== */
 table.dataframe {{
     width: 100%;
     border-collapse: collapse;
-    background: #fdfbf5;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(2px);
+    font-size: 18px;
 }}
+
 table.dataframe thead th {{
     background: #6d4c41;
     color: #fff8e1;
-    padding: 10px;
+    padding: 14px;
     border: 2px solid #3e2723;
-    font-size: 15px;
+    font-size: 19px;
     text-align: center;
 }}
+
 table.dataframe tbody td {{
-    border: 1.5px solid #5d4037;
-    padding: 10px;
-    font-size: 14px;
+    border: 1.8px solid #5d4037;
+    padding: 12px;
+    font-size: 18px;
     color: #3e2723;
     text-align: center;
 }}
+
 table.dataframe tbody tr:nth-child(even) td {{
-    background: #f8f4ec;
+    background: rgba(248, 244, 236, 0.85);
 }}
+
 table.dataframe tbody tr:hover td {{
-    background: #f1e0c6;
+    background: rgba(241, 224, 198, 0.9);
     transition: 0.3s;
 }}
+
 .highlight-msg {{
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     color: #3e2723;
-    background: #efebe9;
-    padding: 10px 15px;
+    background: rgba(239, 235, 233, 0.9);
+    padding: 12px 18px;
     border-left: 6px solid #6d4c41;
-    border-radius: 6px;
-    margin: 15px 0;
+    border-radius: 8px;
+    margin: 18px 0;
     text-align: center;
 }}
 </style>
