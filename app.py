@@ -31,16 +31,17 @@ if not st.session_state.show_main:
             z-index: 9999;
         }
         video {
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* ✅ Giúp video hiển thị đầy đủ, không bị cắt */
+            background-color: black;
         }
         .intro-text {
             position: absolute;
             bottom: 12vh;
             color: white;
             font-family: 'Special Elite', cursive;
-            font-size: 42px;
+            font-size: 40px;
             font-weight: bold;
             text-shadow: 0 0 25px #fff, 0 0 50px #00e6ff;
             opacity: 0;
@@ -57,7 +58,6 @@ if not st.session_state.show_main:
         </style>
     """, unsafe_allow_html=True)
 
-    # Autoplay video bằng thẻ HTML5
     if os.path.exists(video_path):
         video_html = f"""
         <div id="intro-container">
@@ -71,7 +71,7 @@ if not st.session_state.show_main:
     else:
         st.error("⚠️ Không tìm thấy video airplane.mp4.")
 
-    # Đợi video xong rồi chuyển
+    # Đợi xong video rồi chuyển
     time.sleep(9)
     st.session_state.show_main = True
     st.rerun()
@@ -162,8 +162,8 @@ if st.session_state.show_main:
         def load_and_clean(sheet):
             df = pd.read_excel(excel, sheet_name=sheet)
             df.columns = df.columns.str.strip().str.upper()
-            # Loại bỏ dòng trống (chỉ giữ dòng có dữ liệu thực)
-            df = df.dropna(how="all")
+            # ✅ Loại bỏ dòng trống & cột toàn ô trống
+            df = df.dropna(how="all").replace(r'^\s*$', None, regex=True).dropna(how="all")
             for col in df.columns:
                 if df[col].dtype == "object":
                     df[col] = df[col].fillna("").astype(str).str.strip()
@@ -189,6 +189,9 @@ if st.session_state.show_main:
                     if len(items) > 1:
                         item = st.selectbox("🔢 Item", items)
                         df = df[df["ITEM"] == item]
+                # ✅ Chỉ giữ các cột có dữ liệu thật
+                df = df.dropna(axis=1, how='all')
+                df = df.loc[:, (df != "").any(axis=0)]
                 df.insert(0, "STT", range(1, len(df)+1))
                 st.write(df.to_html(escape=False, index=False), unsafe_allow_html=True)
             else:
