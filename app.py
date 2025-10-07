@@ -2,15 +2,16 @@ import streamlit as st
 import pandas as pd
 import base64
 import os
+import time
 
 st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1", layout="wide")
 
-# ======= Hàm chuyển file sang base64 =======
+# ======= Hàm đọc file base64 =======
 def get_base64(file_path):
     with open(file_path, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
 
-# ======= Cờ kiểm soát hiển thị =======
+# ======= Quản lý trạng thái =======
 if "show_main" not in st.session_state:
     st.session_state.show_main = False
 
@@ -64,27 +65,19 @@ if not st.session_state.show_main:
         </div>
 
         <script>
-        const video = document.getElementById("introVideo");
-        // Khi video kết thúc -> lưu trạng thái và reload
-        video.addEventListener("ended", () => {{
-            localStorage.setItem("videoPlayed", "true");
-            window.location.href = window.location.href + "?main=true";
-        }});
-        // Dự phòng tự động sau 9 giây
+        // Chắc chắn chuyển sau 8.5s (phù hợp video 8s)
         setTimeout(() => {{
-            localStorage.setItem("videoPlayed", "true");
-            if (!window.location.href.includes("?main=true")) {{
-                window.location.href = window.location.href + "?main=true";
-            }}
-        }}, 9000);
+            fetch(window.location.href + "?main=true", {{method:'GET'}})
+            .then(() => window.location.reload());
+        }}, 8500);
         </script>
         """, unsafe_allow_html=True)
         st.stop()
     else:
-        st.warning("⚠️ Không tìm thấy file airplane.mp4 trong thư mục app.")
+        st.error("⚠️ Không tìm thấy file airplane.mp4")
         st.stop()
 
-# ======= Kiểm tra query param =======
+# ======= Kiểm tra tham số URL =======
 query_params = st.query_params
 if "main" in query_params:
     st.session_state.show_main = True
@@ -108,7 +101,7 @@ def load_and_clean(sheet):
 
 img_base64 = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else ""
 
-# ======= CSS VINTAGE =======
+# ======= CSS vintage =======
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -138,6 +131,7 @@ header[data-testid="stHeader"] {{display: none;}}
     margin: 20px auto 10px auto;
     color: #3e2723;
     text-shadow: 1px 1px 0px #fff;
+    animation: fadeIn 2s ease;
 }}
 .main-title {{
     font-size: 26px;
@@ -147,6 +141,11 @@ header[data-testid="stHeader"] {{display: none;}}
     margin-top: 5px;
     margin-bottom: 20px;
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    animation: fadeIn 3s ease;
+}}
+@keyframes fadeIn {{
+    from {{opacity:0; transform:translateY(20px);}}
+    to {{opacity:1; transform:translateY(0);}}
 }}
 
 table.dataframe {{
@@ -177,12 +176,15 @@ table.dataframe tbody tr:hover td {{background: #f1e0c6 !important; transition: 
 </style>
 """, unsafe_allow_html=True)
 
+# ======= Tiêu đề =======
 st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
+# ======= Dropdown & logic =======
 zone = st.selectbox("📂 Chọn zone:", xls.sheet_names)
 if zone:
     df = load_and_clean(zone)
+
     if "A/C" in df.columns:
         aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac])
         aircraft = st.selectbox("✈️ Loại máy bay:", aircrafts)
@@ -201,6 +203,7 @@ if zone:
             df_filtered = df_ac[df_ac["DESCRIPTION"] == desc].copy()
             df_filtered = df_filtered.drop(columns=["A/C", "ITEM"], errors="ignore")
             df_filtered = df_filtered.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
+
             if not df_filtered.empty:
                 df_filtered.insert(0, "STT", range(1, len(df_filtered) + 1))
                 st.write(df_filtered.to_html(escape=False, index=False), unsafe_allow_html=True)
