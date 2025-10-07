@@ -6,33 +6,33 @@ import time
 
 st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1", layout="wide")
 
-# ======= Hàm đọc file base64 =======
+# --- Hàm encode video ---
 def get_base64(file_path):
     with open(file_path, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
 
-# ======= Quản lý trạng thái =======
+# --- Quản lý trạng thái ---
 if "show_main" not in st.session_state:
     st.session_state.show_main = False
+if "video_played" not in st.session_state:
+    st.session_state.video_played = False
 
 video_file = "airplane.mp4"
 
-# ======= Trang video intro =======
+# --- Màn hình video intro ---
 if not st.session_state.show_main:
     if os.path.exists(video_file):
         video_data = get_base64(video_file)
+
+        # Hiển thị video toàn màn hình
         st.markdown(f"""
         <style>
         html, body, [data-testid="stAppViewContainer"] {{
-            margin:0; padding:0; overflow:hidden; background:black;
-        }}
-        #intro {{
-            position:fixed; inset:0; background:black;
-            display:flex; align-items:center; justify-content:center;
-            z-index:9999;
+            margin:0; padding:0; background:black; overflow:hidden;
         }}
         video {{
-            width:100vw; height:100vh;
+            width:100vw;
+            height:100vh;
             object-fit:contain;
         }}
         .intro-text {{
@@ -57,35 +57,29 @@ if not st.session_state.show_main:
         }}
         </style>
 
-        <div id="intro">
-            <video autoplay muted playsinline id="introVideo">
+        <div style="position:fixed; inset:0; background:black; display:flex; justify-content:center; align-items:center; z-index:9999;">
+            <video autoplay muted playsinline>
                 <source src="data:video/mp4;base64,{video_data}" type="video/mp4">
             </video>
             <div class="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
         </div>
-
-        <script>
-        // Chắc chắn chuyển sau 8.5s (phù hợp video 8s)
-        setTimeout(() => {{
-            fetch(window.location.href + "?main=true", {{method:'GET'}})
-            .then(() => window.location.reload());
-        }}, 8500);
-        </script>
         """, unsafe_allow_html=True)
+
+        # Sau 8.5 giây tự chuyển sang trang chính
+        if not st.session_state.video_played:
+            st.session_state.video_played = True
+            time.sleep(8.5)
+            st.session_state.show_main = True
+            st.rerun()
         st.stop()
     else:
-        st.error("⚠️ Không tìm thấy file airplane.mp4")
+        st.error("❌ Không tìm thấy file airplane.mp4")
         st.stop()
 
-# ======= Kiểm tra tham số URL =======
-query_params = st.query_params
-if "main" in query_params:
-    st.session_state.show_main = True
-
-# ======= Trang chính =======
+# --- Trang chính vintage ---
 excel_file = "A787.xlsx"
 if not os.path.exists(excel_file):
-    st.error("⚠️ Không tìm thấy file A787.xlsx")
+    st.error("❌ Không tìm thấy file A787.xlsx")
     st.stop()
 
 xls = pd.ExcelFile(excel_file)
@@ -101,7 +95,7 @@ def load_and_clean(sheet):
 
 img_base64 = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else ""
 
-# ======= CSS vintage =======
+# --- CSS vintage ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -115,27 +109,25 @@ st.markdown(f"""
 .stApp::after {{
     content: "";
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    inset: 0;
     background: url("https://www.transparenttextures.com/patterns/aged-paper.png");
     opacity: 0.35;
     pointer-events: none;
-    z-index: -1;
 }}
 header[data-testid="stHeader"] {{display: none;}}
-.block-container {{padding-top: 0rem !important;}}
+.block-container {{padding-top: 0 !important;}}
 
 .top-title {{
     font-size: 34px;
-    font-weight: bold;
     text-align: center;
-    margin: 20px auto 10px auto;
+    margin: 15px 0;
     color: #3e2723;
-    text-shadow: 1px 1px 0px #fff;
+    text-shadow: 1px 1px 0 #fff;
     animation: fadeIn 2s ease;
 }}
 .main-title {{
     font-size: 26px;
-    font-weight: 900;
+    font-weight: bold;
     text-align: center;
     color: #5d4037;
     margin-top: 5px;
@@ -147,44 +139,36 @@ header[data-testid="stHeader"] {{display: none;}}
     from {{opacity:0; transform:translateY(20px);}}
     to {{opacity:1; transform:translateY(0);}}
 }}
-
 table.dataframe {{
     width: 100%;
-    border-collapse: collapse !important;
-    border: 2px solid #5d4037;
+    border-collapse: collapse;
     background: #fdfbf5;
-    text-align: center;
 }}
 table.dataframe thead th {{
-    background: #795548 !important;
-    color: #fff8e1 !important;
-    font-weight: bold;
-    text-align: center;
-    padding: 10px !important;
+    background: #795548;
+    color: #fff8e1;
+    padding: 10px;
+    border: 2px solid #5d4037;
     font-size: 15px;
-    border: 2px solid #5d4037 !important;
 }}
 table.dataframe tbody td {{
-    text-align: center !important;
-    padding: 8px !important;
+    border: 1px dashed #5d4037;
+    padding: 8px;
     font-size: 14px;
-    color: #3e2723 !important;
-    border: 1.5px dashed #5d4037 !important;
+    color: #3e2723;
 }}
-table.dataframe tbody tr:nth-child(even) td {{background: #f8f4ec !important;}}
-table.dataframe tbody tr:hover td {{background: #f1e0c6 !important; transition: 0.3s ease-in-out;}}
+table.dataframe tbody tr:nth-child(even) td {{background: #f8f4ec;}}
+table.dataframe tbody tr:hover td {{background: #f1e0c6; transition: 0.3s;}}
 </style>
 """, unsafe_allow_html=True)
 
-# ======= Tiêu đề =======
+# --- Nội dung trang chính ---
 st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
-# ======= Dropdown & logic =======
 zone = st.selectbox("📂 Chọn zone:", xls.sheet_names)
 if zone:
     df = load_and_clean(zone)
-
     if "A/C" in df.columns:
         aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac])
         aircraft = st.selectbox("✈️ Loại máy bay:", aircrafts)
@@ -203,7 +187,6 @@ if zone:
             df_filtered = df_ac[df_ac["DESCRIPTION"] == desc].copy()
             df_filtered = df_filtered.drop(columns=["A/C", "ITEM"], errors="ignore")
             df_filtered = df_filtered.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
-
             if not df_filtered.empty:
                 df_filtered.insert(0, "STT", range(1, len(df_filtered) + 1))
                 st.write(df_filtered.to_html(escape=False, index=False), unsafe_allow_html=True)
