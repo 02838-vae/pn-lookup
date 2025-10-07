@@ -41,19 +41,25 @@ if not st.session_state.show_main:
             width:100%;
             text-align:center;
             font-family:'Special Elite', cursive;
-            font-size:38px;
+            font-size:40px;
+            font-weight:bold;
             color:#ffffff;
-            text-shadow:0 0 30px rgba(255,255,255,0.9);
+            text-shadow:
+                0 0 20px rgba(255,255,255,0.8),
+                0 0 40px rgba(180,220,255,0.6),
+                0 0 60px rgba(255,255,255,0.4);
             opacity:0;
-            animation: fadeIn 2.5s ease 1s forwards, fadeOut 2.5s ease 6s forwards;
+            animation:
+                appear 3s ease-in forwards,
+                floatFade 3s ease-in 5s forwards;
         }}
-        @keyframes fadeIn {{
-            from {{opacity:0; transform:translateY(20px) scale(0.98);}}
-            to {{opacity:1; transform:translateY(0) scale(1);}}
+        @keyframes appear {{
+            0% {{ opacity: 0; filter: blur(8px); transform: translateY(40px); }}
+            100% {{ opacity: 1; filter: blur(0); transform: translateY(0); }}
         }}
-        @keyframes fadeOut {{
-            from {{opacity:1;}}
-            to {{opacity:0; transform:translateY(-20px) scale(1.02); filter:blur(8px);}}
+        @keyframes floatFade {{
+            0% {{ opacity: 1; filter: blur(0); transform: translateY(0); }}
+            100% {{ opacity: 0; filter: blur(12px); transform: translateY(-30px) scale(1.05); }}
         }}
         </style>
 
@@ -122,7 +128,7 @@ header[data-testid="stHeader"] {{display: none;}}
     text-align: center;
     margin: 15px 0;
     color: #3e2723;
-    text-shadow: 1px 1px 0 #fff;
+    text-shadow: 2px 2px 0 #fff;
     animation: fadeIn 2s ease;
 }}
 .main-title {{
@@ -139,16 +145,17 @@ header[data-testid="stHeader"] {{display: none;}}
     from {{opacity:0; transform:translateY(20px);}}
     to {{opacity:1; transform:translateY(0);}}
 }}
+
 table.dataframe {{
     width: 100%;
     border-collapse: collapse;
     background: #fdfbf5;
 }}
 table.dataframe thead th {{
-    background: #795548;
+    background: #6d4c41;
     color: #fff8e1;
     padding: 10px;
-    border: 2px solid #5d4037;
+    border: 2px solid #3e2723;
     font-size: 15px;
 }}
 table.dataframe tbody td {{
