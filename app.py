@@ -160,6 +160,7 @@ header[data-testid="stHeader"] {{ display: none; }}
     border: 1.5px dashed #5d4037 !important;
     border-radius: 6px !important;
 }}
+/* ========== BẢNG KẾT QUẢ ========= */
 table.dataframe {{
     width: 100%;
     border-collapse: collapse;
@@ -171,16 +172,22 @@ table.dataframe thead th {{
     padding: 10px;
     border: 2px solid #3e2723;
     font-size: 15px;
+    text-align: center;
 }}
 table.dataframe tbody td {{
-    border: 1px dashed #5d4037;
-    padding: 8px;
+    border: 1.5px solid #5d4037;
+    padding: 10px;
     font-size: 14px;
     color: #3e2723;
+    text-align: center;
 }}
-table.dataframe tbody tr:nth-child(even) td {{ background: #f8f4ec; }}
-table.dataframe tbody tr:hover td {{ background: #f1e0c6; transition: 0.3s; }}
-
+table.dataframe tbody tr:nth-child(even) td {{
+    background: #f8f4ec;
+}}
+table.dataframe tbody tr:hover td {{
+    background: #f1e0c6;
+    transition: 0.3s;
+}}
 .highlight-msg {{
     font-size: 18px;
     font-weight: bold;
@@ -235,7 +242,7 @@ if zone:
 
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
-            df_desc = df_desc.drop(columns=["A/C", "ITEM"], errors="ignore")  # XÓA 2 CỘT NÀY
+            df_desc = df_desc.drop(columns=["A/C", "ITEM"], errors="ignore")
             df_desc = df_desc.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
 
             if not df_desc.empty:
