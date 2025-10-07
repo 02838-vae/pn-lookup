@@ -6,12 +6,12 @@ import time
 
 st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1", layout="wide")
 
-# ========== HÀM HỖ TRỢ ==========
+# ===== HÀM PHỤ TRỢ =====
 def get_base64(file_path):
     with open(file_path, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
 
-# ========== TRẠNG THÁI ==========
+# ===== TRẠNG THÁI =====
 if "show_main" not in st.session_state:
     st.session_state.show_main = False
 if "video_played" not in st.session_state:
@@ -19,7 +19,7 @@ if "video_played" not in st.session_state:
 
 video_file = "airplane.mp4"
 
-# ========== MÀN HÌNH VIDEO INTRO ==========
+# ===== MÀN HÌNH VIDEO INTRO =====
 if not st.session_state.show_main:
     if os.path.exists(video_file):
         video_data = get_base64(video_file)
@@ -82,7 +82,7 @@ if not st.session_state.show_main:
         st.error("❌ Không tìm thấy file airplane.mp4")
         st.stop()
 
-# ========== TRANG CHÍNH ==========
+# ===== TRANG CHÍNH =====
 excel_file = "A787.xlsx"
 if not os.path.exists(excel_file):
     st.error("❌ Không tìm thấy file A787.xlsx")
@@ -101,7 +101,7 @@ def load_and_clean(sheet):
 
 img_base64 = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else ""
 
-# ========== CSS PHONG CÁCH VINTAGE ==========
+# ===== CSS PHONG CÁCH VINTAGE =====
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -126,26 +126,25 @@ header[data-testid="stHeader"] {{ display: none; }}
 .block-container {{ padding-top: 0 !important; }}
 
 .top-title {{
-    font-size: 34px;
+    font-size: 38px;
     font-weight: bold;
     text-align: center;
-    margin: 20px auto 10px auto;
+    margin-top: 25px;
     color: #3e2723;
-    text-shadow: 2px 2px 0 #fff;
-    animation: fadeIn 2s ease;
+    text-shadow: 2px 2px 0 #fff, 0 0 25px #f0d49b, 0 0 50px #bca27a;
+    animation: glowTitle 3s ease-in-out infinite alternate;
 }}
+@keyframes glowTitle {{
+    from {{ text-shadow: 0 0 10px #bfa67a, 0 0 20px #d2b48c, 0 0 30px #e6d5a8; color: #4e342e; }}
+    to {{ text-shadow: 0 0 20px #f8e1b4, 0 0 40px #e0b97d, 0 0 60px #f7e7ce; color: #5d4037; }}
+}}
+
 .main-title {{
     font-size: 26px;
     text-align: center;
-    color: #5d4037;
-    margin-top: 5px;
+    color: #6d4c41;
     margin-bottom: 20px;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-    animation: fadeIn 3s ease;
-}}
-@keyframes fadeIn {{
-    from {{ opacity: 0; transform: translateY(20px); }}
-    to {{ opacity: 1; transform: translateY(0); }}
+    letter-spacing: 1px;
 }}
 
 .stSelectbox label {{
@@ -160,7 +159,8 @@ header[data-testid="stHeader"] {{ display: none; }}
     border: 1.5px dashed #5d4037 !important;
     border-radius: 6px !important;
 }}
-/* ========== BẢNG KẾT QUẢ ========= */
+
+/* ===== BẢNG KẾT QUẢ ===== */
 table.dataframe {{
     width: 100%;
     border-collapse: collapse;
@@ -202,11 +202,11 @@ table.dataframe tbody tr:hover td {{
 </style>
 """, unsafe_allow_html=True)
 
-# ========== HEADER ==========
-st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
-st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
+# ===== HEADER =====
+st.markdown('<div class="top-title">🔎 TRA CỨU PART NUMBER</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
 
-# ========== NHẠC NỀN ==========
+# ===== NHẠC NỀN =====
 try:
     with open("background.mp3", "rb") as f:
         audio_bytes = f.read()
@@ -221,7 +221,7 @@ try:
 except FileNotFoundError:
     st.warning("⚠️ Không tìm thấy file background.mp3 — vui lòng thêm file vào cùng thư mục.")
 
-# ========== NỘI DUNG CHÍNH ==========
+# ===== NỘI DUNG CHÍNH =====
 zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names)
 if zone:
     df = load_and_clean(zone)
@@ -242,7 +242,7 @@ if zone:
 
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
-            df_desc = df_desc.drop(columns=["A/C", "ITEM"], errors="ignore")
+            df_desc = df_desc.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
             df_desc = df_desc.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
 
             if not df_desc.empty:
