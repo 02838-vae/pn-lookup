@@ -5,7 +5,7 @@ import os
 
 st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1", layout="wide")
 
-# ======= VIDEO INTRO =======
+# ================= VIDEO INTRO =================
 video_path = "airplane.mp4"
 
 if os.path.exists(video_path):
@@ -20,7 +20,7 @@ if os.path.exists(video_path):
         padding: 0;
         overflow: hidden;
     }}
-    #video-container {{
+    #intro {{
         position: fixed;
         inset: 0;
         z-index: 9999;
@@ -44,76 +44,72 @@ if os.path.exists(video_path):
         font-size: 44px;
         font-weight: bold;
         color: #ffffff;
-        text-shadow: 0 0 20px #fff, 0 0 40px #0ff;
+        text-shadow: 0 0 25px #fff, 0 0 50px #00e6ff;
         opacity: 0;
         animation: fadeIn 3s ease-in-out 1s forwards, fadeOut 3s ease-in-out 5s forwards;
     }}
     @keyframes fadeIn {{
-        from {{opacity: 0; transform: translateY(40px) scale(0.95) blur(6px);}}
-        to {{opacity: 1; transform: translateY(0) scale(1); blur(0);}}
+        from {{opacity: 0; transform: translateY(40px) scale(0.95);}}
+        to {{opacity: 1; transform: translateY(0) scale(1);}}
     }}
     @keyframes fadeOut {{
         from {{opacity: 1;}}
-        to {{opacity: 0; transform: translateY(-30px) scale(1.05) blur(6px);}}
+        to {{opacity: 0; transform: translateY(-40px) scale(1.05);}}
     }}
-    @keyframes fadeOutContainer {{
+    @keyframes hideIntro {{
         from {{opacity: 1;}}
         to {{opacity: 0; visibility: hidden;}}
     }}
     </style>
 
-    <div id="video-container">
-        <video id="intro-video" autoplay muted playsinline>
+    <div id="intro">
+        <video id="introVideo" autoplay muted playsinline>
             <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
-            Video không hỗ trợ.
         </video>
-        <div id="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
+        <div id="intro-text">KHÁM PHÁ BẦU TRỜI CÙNG CHÚNG TÔI</div>
     </div>
 
     <script>
-    const video = document.getElementById("intro-video");
-    const container = document.getElementById("video-container");
-
-    function endIntro() {{
-        container.style.animation = "fadeOutContainer 2s ease forwards";
+    const video = document.getElementById('introVideo');
+    const intro = document.getElementById('intro');
+    function hideIntro() {{
+        intro.style.animation = "hideIntro 2s ease forwards";
         setTimeout(() => {{
-            container.remove();
+            intro.remove();
             const app = document.querySelector('.stApp');
-            if (app) {{
-                app.style.visibility = 'visible';
-                app.style.opacity = '0';
-                app.style.transition = 'opacity 2s ease';
-                setTimeout(() => app.style.opacity = '1', 100);
-            }}
+            app.style.visibility = 'visible';
+            app.style.opacity = '0';
+            app.style.transition = 'opacity 2s ease';
+            setTimeout(() => app.style.opacity = '1', 100);
         }}, 1800);
     }}
-
-    video.addEventListener("ended", endIntro);
-    setTimeout(endIntro, 9000);
+    video.addEventListener('ended', hideIntro);
+    setTimeout(hideIntro, 9000);
     </script>
     """, unsafe_allow_html=True)
 
-    st.markdown("<style>.stApp {visibility: hidden;}</style>", unsafe_allow_html=True)
+    # Ẩn phần app chính trong lúc intro chạy
+    st.markdown("<style>.stApp {visibility:hidden;}</style>", unsafe_allow_html=True)
 
-# ======= HÀM HỖ TRỢ =======
-def get_base64_of_file(file):
+# ================= CHƯƠNG TRÌNH CHÍNH =================
+
+# --- Hàm hỗ trợ ---
+def get_base64(file):
     with open(file, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-def load_and_clean(sheet, excel_file):
-    df = pd.read_excel(excel_file, sheet_name=sheet)
+def load_and_clean(sheet, excel):
+    df = pd.read_excel(excel, sheet_name=sheet)
     df.columns = df.columns.str.strip().str.upper()
     for col in df.columns:
         if df[col].dtype == "object":
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-# ======= ẢNH NỀN =======
-img_base64 = ""
-if os.path.exists("airplane.jpg"):
-    img_base64 = get_base64_of_file("airplane.jpg")
+# --- Ảnh nền ---
+bg_img = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else ""
 
-# ======= CSS PHONG CÁCH VINTAGE =======
+# --- CSS vintage chỉ áp dụng sau intro ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -122,7 +118,7 @@ st.markdown(f"""
     font-family: 'Special Elite', cursive !important;
     background:
         linear-gradient(rgba(245,242,230,0.9), rgba(245,242,230,0.9)),
-        url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
+        url("data:image/jpeg;base64,{bg_img}") no-repeat center center fixed;
     background-size: cover;
 }}
 .stApp::after {{
@@ -154,15 +150,15 @@ header[data-testid="stHeader"] {{display:none;}}
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }}
 
-/* === Bảng Vintage === */
+/* Bảng vintage */
 table.dataframe {{
     width: 100%;
     border-collapse: collapse;
     border: 2px solid #5d4037;
     background: #fbf7ed;
     color: #3e2723 !important;
-    font-size: 15px;
     text-align: center;
+    font-size: 15px;
     animation: fadeIn 1s ease;
 }}
 @keyframes fadeIn {{
@@ -188,37 +184,33 @@ table.dataframe tbody tr:hover td {{
 </style>
 """, unsafe_allow_html=True)
 
-# ======= GIAO DIỆN CHÍNH =======
-excel_file = "A787.xlsx"
-st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
-st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
-
-if not os.path.exists(excel_file):
-    st.error("⚠️ Không tìm thấy file A787.xlsx trong thư mục.")
+# --- Giao diện chính ---
+excel = "A787.xlsx"
+if not os.path.exists(excel):
+    st.error("⚠️ Không tìm thấy file A787.xlsx.")
 else:
-    xls = pd.ExcelFile(excel_file)
-    zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names)
+    xls = pd.ExcelFile(excel)
+    st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
+
+    zone = st.selectbox("📂 Zone", xls.sheet_names)
     if zone:
-        df = load_and_clean(zone, excel_file)
-
+        df = load_and_clean(zone, excel)
         if "A/C" in df.columns:
-            aircrafts = sorted([ac for ac in df["A/C"].dropna().unique() if ac])
-            aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts)
-            df = df[df["A/C"] == aircraft]
-
+            acs = sorted([a for a in df["A/C"].dropna().unique()])
+            ac = st.selectbox("✈️ Loại máy bay", acs)
+            df = df[df["A/C"] == ac]
         if "DESCRIPTION" in df.columns:
-            descs = sorted([d for d in df["DESCRIPTION"].dropna().unique() if d])
+            descs = sorted([d for d in df["DESCRIPTION"].dropna().unique()])
             desc = st.selectbox("📑 Phần mô tả", descs)
             df = df[df["DESCRIPTION"] == desc]
-
         if not df.empty:
             if "ITEM" in df.columns:
-                items = sorted([i for i in df["ITEM"].dropna().unique() if i])
+                items = sorted([i for i in df["ITEM"].dropna().unique()])
                 if len(items) > 1:
                     item = st.selectbox("🔢 Item", items)
                     df = df[df["ITEM"] == item]
-
-            df.insert(0, "STT", range(1, len(df) + 1))
+            df.insert(0, "STT", range(1, len(df)+1))
             st.write(df.to_html(escape=False, index=False), unsafe_allow_html=True)
         else:
             st.warning("📌 Không tìm thấy dữ liệu phù hợp.")
