@@ -3,10 +3,9 @@ import pandas as pd
 import base64
 import os
 
-# ========================= CẤU HÌNH CHUNG =========================
 st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1", layout="wide")
 
-# ========================= VIDEO INTRO =========================
+# ======= VIDEO INTRO =======
 video_path = "airplane.mp4"
 
 if os.path.exists(video_path):
@@ -23,41 +22,39 @@ if os.path.exists(video_path):
     }}
     #video-container {{
         position: fixed;
-        top: 0; left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: black;
+        inset: 0;
         z-index: 9999;
+        background: black;
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
         flex-direction: column;
     }}
     video {{
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         object-fit: cover;
     }}
     #intro-text {{
         position: absolute;
-        bottom: 13vh;
+        bottom: 12vh;
         width: 100%;
         text-align: center;
         font-family: 'Special Elite', cursive;
-        font-size: 42px;
+        font-size: 44px;
         font-weight: bold;
-        color: #fff;
+        color: #ffffff;
         text-shadow: 0 0 20px #fff, 0 0 40px #0ff;
         opacity: 0;
         animation: fadeIn 3s ease-in-out 1s forwards, fadeOut 3s ease-in-out 5s forwards;
     }}
     @keyframes fadeIn {{
-        from {{opacity: 0; transform: translateY(30px) scale(0.95); filter: blur(8px);}}
-        to {{opacity: 1; transform: translateY(0) scale(1); filter: blur(0);}}
+        from {{opacity: 0; transform: translateY(40px) scale(0.95) blur(6px);}}
+        to {{opacity: 1; transform: translateY(0) scale(1); blur(0);}}
     }}
     @keyframes fadeOut {{
         from {{opacity: 1;}}
-        to {{opacity: 0; transform: translateY(-20px) scale(1.05); filter: blur(8px);}}
+        to {{opacity: 0; transform: translateY(-30px) scale(1.05) blur(6px);}}
     }}
     @keyframes fadeOutContainer {{
         from {{opacity: 1;}}
@@ -68,14 +65,15 @@ if os.path.exists(video_path):
     <div id="video-container">
         <video id="intro-video" autoplay muted playsinline>
             <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
-            Video không hỗ trợ trên trình duyệt này.
+            Video không hỗ trợ.
         </video>
         <div id="intro-text">KHÁM PHÁ THẾ GIỚI CÙNG CHÚNG TÔI</div>
     </div>
 
     <script>
-    const container = document.getElementById("video-container");
     const video = document.getElementById("intro-video");
+    const container = document.getElementById("video-container");
+
     function endIntro() {{
         container.style.animation = "fadeOutContainer 2s ease forwards";
         setTimeout(() => {{
@@ -89,6 +87,7 @@ if os.path.exists(video_path):
             }}
         }}, 1800);
     }}
+
     video.addEventListener("ended", endIntro);
     setTimeout(endIntro, 9000);
     </script>
@@ -96,33 +95,32 @@ if os.path.exists(video_path):
 
     st.markdown("<style>.stApp {visibility: hidden;}</style>", unsafe_allow_html=True)
 
-# ========================= HÀM TIỆN ÍCH =========================
-def load_and_clean(sheet_name, excel_file):
-    df = pd.read_excel(excel_file, sheet_name=sheet_name)
+# ======= HÀM HỖ TRỢ =======
+def get_base64_of_file(file):
+    with open(file, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+def load_and_clean(sheet, excel_file):
+    df = pd.read_excel(excel_file, sheet_name=sheet)
     df.columns = df.columns.str.strip().str.upper()
     for col in df.columns:
         if df[col].dtype == "object":
             df[col] = df[col].fillna("").astype(str).str.strip()
     return df
 
-def get_base64(file):
-    with open(file, "rb") as f:
-        return base64.b64encode(f.read()).decode()
-
-# ========================= GIAO DIỆN CHÍNH (VINTAGE) =========================
-excel_file = "A787.xlsx"
+# ======= ẢNH NỀN =======
+img_base64 = ""
 if os.path.exists("airplane.jpg"):
-    img_base64 = get_base64("airplane.jpg")
-else:
-    img_base64 = ""
+    img_base64 = get_base64_of_file("airplane.jpg")
 
+# ======= CSS PHONG CÁCH VINTAGE =======
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
 .stApp {{
     font-family: 'Special Elite', cursive !important;
-    background: 
+    background:
         linear-gradient(rgba(245,242,230,0.9), rgba(245,242,230,0.9)),
         url("data:image/jpeg;base64,{img_base64}") no-repeat center center fixed;
     background-size: cover;
@@ -136,19 +134,33 @@ st.markdown(f"""
     pointer-events: none;
     z-index: -1;
 }}
-header[data-testid="stHeader"] {{display: none;}}
+header[data-testid="stHeader"] {{display:none;}}
+.block-container {{padding-top:0rem !important;}}
 
-h1,h2,h3,label {{
-    color: #3e2723 !important;
+.top-title {{
+    font-size: 34px;
+    font-weight: bold;
+    text-align: center;
+    color: #3e2723;
+    margin-top: 15px;
     text-shadow: 1px 1px 0px #fff;
 }}
+.main-title {{
+    font-size: 26px;
+    font-weight: 900;
+    text-align: center;
+    color: #5d4037;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+}}
 
+/* === Bảng Vintage === */
 table.dataframe {{
     width: 100%;
     border-collapse: collapse;
+    border: 2px solid #5d4037;
     background: #fbf7ed;
     color: #3e2723 !important;
-    border: 2px solid #5d4037;
     font-size: 15px;
     text-align: center;
     animation: fadeIn 1s ease;
@@ -168,7 +180,7 @@ table.dataframe tbody td {{
     border: 1px dashed #6d4c41 !important;
     padding: 8px !important;
 }}
-table.dataframe tbody tr:nth-child(even) td {{ background: #f3e9d2 !important; }}
+table.dataframe tbody tr:nth-child(even) td {{background: #f3e9d2 !important;}}
 table.dataframe tbody tr:hover td {{
     background: #f1d9b5 !important;
     transition: all 0.3s ease-in-out;
@@ -176,30 +188,37 @@ table.dataframe tbody tr:hover td {{
 </style>
 """, unsafe_allow_html=True)
 
-# ========================= GIAO DIỆN TRA CỨU =========================
-st.markdown("<h1 style='text-align:center;'>📜 TỔ BẢO DƯỠNG SỐ 1</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align:center;'>🔍 Tra cứu Part Number</h3>", unsafe_allow_html=True)
+# ======= GIAO DIỆN CHÍNH =======
+excel_file = "A787.xlsx"
+st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
 if not os.path.exists(excel_file):
-    st.error("❌ Không tìm thấy file A787.xlsx trong thư mục!")
+    st.error("⚠️ Không tìm thấy file A787.xlsx trong thư mục.")
 else:
     xls = pd.ExcelFile(excel_file)
-    zone = st.selectbox("📂 Chọn Zone", xls.sheet_names)
+    zone = st.selectbox("📂 Bạn muốn tra cứu zone nào?", xls.sheet_names)
     if zone:
         df = load_and_clean(zone, excel_file)
+
         if "A/C" in df.columns:
-            aircrafts = sorted(df["A/C"].dropna().unique())
-            aircraft = st.selectbox("✈️ Loại máy bay", aircrafts)
+            aircrafts = sorted([ac for ac in df["A/C"].dropna().unique() if ac])
+            aircraft = st.selectbox("✈️ Loại máy bay?", aircrafts)
             df = df[df["A/C"] == aircraft]
+
         if "DESCRIPTION" in df.columns:
-            descs = sorted(df["DESCRIPTION"].dropna().unique())
+            descs = sorted([d for d in df["DESCRIPTION"].dropna().unique() if d])
             desc = st.selectbox("📑 Phần mô tả", descs)
             df = df[df["DESCRIPTION"] == desc]
+
         if not df.empty:
             if "ITEM" in df.columns:
-                items = sorted(df["ITEM"].dropna().unique())
+                items = sorted([i for i in df["ITEM"].dropna().unique() if i])
                 if len(items) > 1:
                     item = st.selectbox("🔢 Item", items)
                     df = df[df["ITEM"] == item]
-            df.insert(0, "STT", range(1, len(df)+1))
+
+            df.insert(0, "STT", range(1, len(df) + 1))
             st.write(df.to_html(escape=False, index=False), unsafe_allow_html=True)
+        else:
+            st.warning("📌 Không tìm thấy dữ liệu phù hợp.")
