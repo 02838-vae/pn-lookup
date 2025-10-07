@@ -237,6 +237,7 @@ if zone:
 
     if aircraft:
         df_ac = df[df["A/C"] == aircraft]
+
         if "DESCRIPTION" in df_ac.columns:
             desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d])
             description = st.selectbox("📑 Bạn muốn tra cứu phần nào?", desc_list)
@@ -245,6 +246,14 @@ if zone:
 
         if description:
             df_desc = df_ac[df_ac["DESCRIPTION"] == description]
+
+            # === Giữ lại chọn Item ===
+            if "ITEM" in df_desc.columns:
+                items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i])
+                item = st.selectbox("🔢 Bạn muốn tra cứu Item nào?", items)
+                df_desc = df_desc[df_desc["ITEM"] == item]
+
+            # === Làm sạch và xóa cột không cần ===
             df_desc = df_desc.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
             df_desc = df_desc.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
 
