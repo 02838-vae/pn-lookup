@@ -8,6 +8,7 @@ st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1", layout="wide")
 
 # ================== VIDEO INTRO ==================
 video_path = "airplane.mp4"
+
 if "show_main" not in st.session_state:
     st.session_state.show_main = False
 
@@ -29,16 +30,21 @@ if not st.session_state.show_main:
             background: black;
             z-index: 9999;
         }
+        video {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+        }
         .intro-text {
             position: absolute;
-            bottom: 10vh;
+            bottom: 12vh;
             color: white;
             font-family: 'Special Elite', cursive;
             font-size: 42px;
             font-weight: bold;
             text-shadow: 0 0 25px #fff, 0 0 50px #00e6ff;
             opacity: 0;
-            animation: fadeIn 3s ease-in-out 1s forwards, fadeOut 3s ease-in-out 5s forwards;
+            animation: fadeIn 3s ease-in-out 1s forwards, fadeOut 3s ease-in-out 6s forwards;
         }
         @keyframes fadeIn {
             from {opacity: 0; transform: translateY(40px);}
@@ -51,34 +57,40 @@ if not st.session_state.show_main:
         </style>
     """, unsafe_allow_html=True)
 
-    # Hiển thị video
-    with st.container():
-        st.markdown('<div id="intro-container">', unsafe_allow_html=True)
-        st.video(video_path, start_time=0)
-        st.markdown('<div class="intro-text">KHÁM PHÁ BẦU TRỜI CÙNG CHÚNG TÔI</div></div>', unsafe_allow_html=True)
+    # Autoplay video bằng thẻ HTML5
+    if os.path.exists(video_path):
+        video_html = f"""
+        <div id="intro-container">
+            <video autoplay muted playsinline>
+                <source src="data:video/mp4;base64,{base64.b64encode(open(video_path, 'rb').read()).decode()}" type="video/mp4">
+            </video>
+            <div class="intro-text">KHÁM PHÁ BẦU TRỜI CÙNG CHÚNG TÔI</div>
+        </div>
+        """
+        st.markdown(video_html, unsafe_allow_html=True)
+    else:
+        st.error("⚠️ Không tìm thấy video airplane.mp4.")
 
-    # Đợi video kết thúc rồi chuyển trang
-    time.sleep(9)  # video khoảng 8s, thêm 1s cho mượt
+    # Đợi video xong rồi chuyển
+    time.sleep(9)
     st.session_state.show_main = True
     st.rerun()
 
 # ================== TRANG CHÍNH ==================
 if st.session_state.show_main:
-    # --- Load file Excel ---
     excel = "A787.xlsx"
     if not os.path.exists(excel):
         st.error("⚠️ Không tìm thấy file A787.xlsx.")
     else:
         xls = pd.ExcelFile(excel)
 
-        # --- Load ảnh nền ---
         def get_base64(file):
             with open(file, "rb") as f:
                 return base64.b64encode(f.read()).decode()
 
         bg_img = get_base64("airplane.jpg") if os.path.exists("airplane.jpg") else ""
 
-        # --- CSS Vintage ---
+        # ====== CSS Vintage ======
         st.markdown(f"""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -118,8 +130,6 @@ if st.session_state.show_main:
             margin-bottom: 20px;
             text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
         }}
-
-        /* Hiệu ứng bảng vintage */
         table.dataframe {{
             width: 100%;
             border-collapse: collapse;
@@ -129,10 +139,6 @@ if st.session_state.show_main:
             text-align: center;
             font-size: 15px;
             animation: fadeIn 1s ease;
-        }}
-        @keyframes fadeIn {{
-            from {{opacity: 0; transform: scale(0.97);}}
-            to {{opacity: 1; transform: scale(1);}}
         }}
         table.dataframe thead th {{
             background: linear-gradient(180deg, #8d6e63, #5d4037);
@@ -153,16 +159,16 @@ if st.session_state.show_main:
         </style>
         """, unsafe_allow_html=True)
 
-        # --- Load & clean ---
         def load_and_clean(sheet):
             df = pd.read_excel(excel, sheet_name=sheet)
             df.columns = df.columns.str.strip().str.upper()
+            # Loại bỏ dòng trống (chỉ giữ dòng có dữ liệu thực)
+            df = df.dropna(how="all")
             for col in df.columns:
                 if df[col].dtype == "object":
                     df[col] = df[col].fillna("").astype(str).str.strip()
             return df
 
-        # --- Giao diện vintage ---
         st.markdown('<div class="top-title">📜 Tổ bảo dưỡng số 1</div>', unsafe_allow_html=True)
         st.markdown('<div class="main-title">🔎 Tra cứu Part number</div>', unsafe_allow_html=True)
 
