@@ -17,264 +17,239 @@ def load_and_clean(excel_file, sheet):
     try:
         df = pd.read_excel(excel_file, sheet_name=sheet)
         df.columns = df.columns.str.strip().str.upper()
-        df = df.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
         for col in df.columns:
             if df[col].dtype == "object":
                 df[col] = df[col].fillna("").astype(str).str.strip()
-        return df
+        return df.dropna(how="all")
     except Exception:
         return pd.DataFrame()
 
-# --- NỀN ---
+# --- BACKGROUND ---
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS TOÀN BỘ ---
+# --- CSS ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
 
-#MainMenu, footer, header {{visibility: hidden;}}
-div.block-container {{padding-top: 0;}}
+#MainMenu, footer, header {{ visibility: hidden; }}
+div.block-container {{ padding-top: 0; }}
 
-/* === NỀN PC === */
+/* ===== BACKGROUND ===== */
 .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
-    background: url("data:image/jpeg;base64,{bg_pc_base64}") no-repeat center top fixed !important;
-    background-size: cover !important;
-    font-family: 'Oswald', sans-serif !important;
+  background: url("data:image/jpeg;base64,{bg_pc_base64}") no-repeat center top fixed !important;
+  background-size: cover !important;
+  font-family: 'Oswald', sans-serif !important;
 }}
 
-/* === HIỆU ỨNG CHỮ === */
-@keyframes scrollText {{
-  0% {{ transform: translateX(100vw); }}
-  100% {{ transform: translateX(-100%); }}
+/* ===== MARQUEE TITLE (seamless, continuous, right->left) ===== */
+#main-animated-title-container {{
+  width: 100%;
+  overflow: hidden;
+  text-align: center;
+  margin: 18px 0 6px 0;
+  height: auto;
 }}
+.marquee {{
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}}
+.marquee__inner {{
+  display: inline-block;
+  white-space: nowrap;
+  box-sizing: content-box;
+  /* duplicated content technique: width 200% so that translateX(-50%) moves exactly one copy */
+  width: 200%;
+  animation: marqueeScroll 4s linear infinite; /* faster: 4s for full loop (adjust if needed) */
+}}
+.marquee__item {{
+  display: inline-block;
+  padding-right: 4rem; /* spacing between repeats */
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 3.6rem; /* safe size so not clipped */
+  letter-spacing: 6px;
+  vertical-align: middle;
+  background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.65);
+  box-sizing: border-box;
+}
+/* Duplicate item style handled by rendering two identical spans */
+
+@keyframes marqueeScroll {{
+  0% {{ transform: translateX(0%); }}
+  100% {{ transform: translateX(-50%); }} /* move one full copy (200% -> -50% = shift by 100% of viewport) */
+}}
+
+/* color shift effect (kept on top of marquee using background position animation) */
 @keyframes colorShift {{
   0% {{ background-position: 0% 50%; }}
   50% {{ background-position: 100% 50%; }}
   100% {{ background-position: 0% 50%; }}
 }}
+.marquee__item {{
+  animation: colorShift 8s ease-in-out infinite;
+}
 
-/* === TIÊU ĐỀ CHÍNH (PC) === */
-#main-animated-title-container {{
-  width: 100%;
-  height: 110px;
-  overflow: hidden;
-  text-align: center;
-  margin-top: 35px;
-}}
-#main-animated-title-container h1 {{
-  font-family: 'Oswald', sans-serif;
-  font-size: 4.5rem;
-  font-weight: 700;
-  letter-spacing: 6px;
-  text-transform: uppercase;
-  display: inline-block;
-  background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
-  background-size: 400% 400%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: colorShift 10s ease infinite, scrollText 18s linear infinite;
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
-  line-height: 1.3;
-  padding-bottom: 10px;
-}}
-
-/* === TIÊU ĐỀ PHỤ === */
+/* ===== SUBTITLE ===== */
 #sub-static-title h2 {{
   font-family: 'Playfair Display', serif;
-  font-size: 2.4rem;
+  font-size: 2.3rem;
   color: #FFD54F;
   text-align: center;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-  margin-top: 35px;
-  margin-bottom: 20px;
+  margin-top: 16px;
+  margin-bottom: 18px;
 }}
 
-/* === MOBILE === */
+/* ===== MOBILE ADJUST ===== */
 @media (max-width: 768px) {{
+  .marquee__item {{
+    font-size: 7.5vw; /* responsive */
+    letter-spacing: 3px;
+  }}
+  #sub-static-title h2 {{
+    font-size: 4.8vw;
+    margin-top: 8px;
+  }}
   .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
     background: url("data:image/jpeg;base64,{bg_mobile_base64}") no-repeat center top scroll !important;
     background-size: cover !important;
   }}
-
-  #main-animated-title-container {{
-    margin-top: 10px !important;
-    overflow: hidden;
-    height: auto;
-    white-space: nowrap;
-  }}
-
-  #main-animated-title-container h1 {{
-    font-size: 8vw;
-    line-height: 1.1;
-    letter-spacing: 3px;
-    display: inline-block;
-    white-space: nowrap;
-    animation: colorShift 10s ease infinite, scrollText 15s linear infinite;
-    text-shadow: 2px 2px 7px rgba(0,0,0,0.8);
-  }}
-
-  #sub-static-title h2 {{
-    font-size: 5vw;
-    color: #FFD54F;
-    margin-top: 10px;
-  }}
 }}
 
-/* === LABEL SELECTBOX === */
+/* ===== SELECTBOX LABELS (bigger + centered) ===== */
 .stSelectbox label {{
   color: #FFEB3B !important;
-  font-weight: 700;
+  font-weight: 800;
   text-align: center;
   display: block;
-  font-size: 1.5rem;
-}}
-div[data-baseweb="select"] {{
-  min-width: 250px !important;
+  font-size: 1.6rem; /* larger on PC */
 }}
 div[data-baseweb="select"] > div {{
   text-align: center;
-  font-size: 1.1rem;
 }}
-
-/* === CANH GIỮA DROPBOX CONTAINER === */
-.element-container:has(.stSelectbox) {{
+/* center the column containers */
+[data-testid="column"] {{
   display: flex;
   justify-content: center;
+  align-items: center;
 }}
 
-/* === BẢNG HTML TÙY CHỈNH === */
-.custom-table {{
-  width: 100%;
+/* ===== TABLE (center all content, header + cells) ===== */
+.stDataFrame table {{
+  width: 100% !important;
   border-collapse: collapse;
-  margin: 20px auto;
-  background-color: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }}
-
-.custom-table th {{
-  background-color: #2E7D32;
-  color: white;
-  padding: 14px;
+.stDataFrame thead th, .stDataFrame tbody td {{
   text-align: center !important;
-  font-weight: bold;
-  border: 1px solid #ddd;
-  font-size: 1.05rem;
+  vertical-align: middle !important;
+  padding: 8px !important;
+  white-space: nowrap;
+}
+/* ensure header style readable on image background */
+.stDataFrame thead th {{
+  background: rgba(255,255,255,0.85) !important;
+  font-weight: 700;
 }}
 
-.custom-table td {{
-  padding: 12px;
-  text-align: center !important;
-  border: 1px solid #ddd;
-  vertical-align: middle;
-  font-size: 1rem;
+/* allow horizontal scroll of table container (mobile) */
+.stDataFrame div[data-testid="stDataFrameContainer"] > div {{
+  overflow-x: auto !important;
 }}
 
-.custom-table tr:nth-child(even) {{
-  background-color: #f9f9f9;
-}}
-
-.custom-table tr:hover {{
-  background-color: #f5f5f5;
-}}
-
-.table-container {{
-  overflow-x: auto;
-  margin: 20px 0;
-}}
-
-/* === Cuộn ngang khi màn hình nhỏ === */
-@media (max-width: 768px) {{
-  .custom-table {{
-    font-size: 0.9rem;
-  }}
-  .custom-table th, .custom-table td {{
-    padding: 8px;
-  }}
-}}
 </style>
 """, unsafe_allow_html=True)
 
-# --- TIÊU ĐỀ ---
-st.markdown('<div id="main-animated-title-container"><h1>TỔ BẢO DƯỠNG SỐ 1</h1></div>', unsafe_allow_html=True)
+# --- RENDER TITLES ---
+st.markdown(
+    """
+    <div id="main-animated-title-container">
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__inner">
+          <span class="marquee__item">TỔ BẢO DƯỠNG SỐ 1</span>
+          <span class="marquee__item">TỔ BẢO DƯỠNG SỐ 1</span>
+        </div>
+      </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.markdown('<div id="sub-static-title"><h2>🔎 TRA CỨU PART NUMBER</h2></div>', unsafe_allow_html=True)
 st.markdown("---")
 
-# --- TRA CỨU ---
+# === DATA / UI ===
 excel_file = "A787.xlsx"
 if not os.path.exists(excel_file):
     st.error("❌ Không tìm thấy file A787.xlsx trong thư mục hiện tại.")
 else:
     try:
         xls = pd.ExcelFile(excel_file)
-        sheet_names = [name for name in xls.sheet_names if not name.startswith("Sheet")]
+        sheet_names = [n for n in xls.sheet_names if not n.startswith("Sheet")]
 
-        # --- CANH GIỮA DROPBOX ---
+        # Select boxes centered
         st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
+
         with col1:
-            zone = st.selectbox("📂 Zone", sheet_names)
+            zone = st.selectbox("📂 Zone", sheet_names, key="zone")
         df = load_and_clean(excel_file, zone)
 
         with col2:
-            aircrafts = sorted(df["A/C"].dropna().unique().tolist()) if "A/C" in df.columns else []
-            aircraft = st.selectbox("✈️ Loại máy bay", aircrafts) if aircrafts else None
+            if "A/C" in df.columns:
+                aircrafts = sorted(df["A/C"].dropna().unique().tolist())
+                aircraft = st.selectbox("✈️ Loại máy bay", aircrafts, key="ac")
+            else:
+                aircraft = None
         df = df[df["A/C"] == aircraft] if aircraft else df
 
         with col3:
-            descs = sorted(df["DESCRIPTION"].dropna().unique().tolist()) if "DESCRIPTION" in df.columns else []
-            desc = st.selectbox("📑 Mô tả chi tiết", descs) if descs else None
+            if "DESCRIPTION" in df.columns:
+                descs = sorted(df["DESCRIPTION"].dropna().unique().tolist())
+                desc = st.selectbox("📑 Mô tả chi tiết", descs, key="desc")
+            else:
+                desc = None
         df = df[df["DESCRIPTION"] == desc] if desc else df
 
         with col4:
-            items = sorted(df["ITEM"].dropna().unique().tolist()) if "ITEM" in df.columns else []
-            item = st.selectbox("🔢 Item", items) if items else None
+            if "ITEM" in df.columns:
+                items = sorted(df["ITEM"].dropna().unique().tolist())
+                item = st.selectbox("🔢 Item", items, key="item")
+            else:
+                item = None
         df = df[df["ITEM"] == item] if item else df
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # --- HIỂN THỊ KẾT QUẢ ---
-        df_display = df.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
-        df_display = df_display.dropna(axis=1, how="all")
+        st.markdown("---")
+        # Only show result header + table when dataframe has rows
+        if not df.empty:
+            # prepare display frame (drop internal columns)
+            df_display = df.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
+            df_display = df_display.dropna(axis=1, how="all")
 
-        if not df_display.empty and len(df_display) > 0:
-            st.markdown("---")
-            st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
-            
-            df_display = df_display.reset_index(drop=True)
+            if not df_display.empty:
+                # reset index and add STT before PART NUMBER if exists
+                df_display = df_display.reset_index(drop=True)
+                cols = list(df_display.columns)
+                if "PART NUMBER" in cols:
+                    idx = cols.index("PART NUMBER")
+                    df_display.insert(idx, "STT", range(1, len(df_display) + 1))
+                else:
+                    df_display.insert(0, "STT", range(1, len(df_display) + 1))
 
-            # Thêm cột STT vào trước PART NUMBER
-            cols = list(df_display.columns)
-            if "PART NUMBER" in cols:
-                idx = cols.index("PART NUMBER")
-                df_display.insert(idx, "STT", range(1, len(df_display) + 1))
-            else:
-                df_display.insert(0, "STT", range(1, len(df_display) + 1))
-
-            # Tạo HTML table hoàn toàn custom
-            html_parts = ['<div class="table-container">']
-            html_parts.append('<table class="custom-table">')
-            
-            # Header
-            html_parts.append('<thead><tr>')
-            for col in df_display.columns:
-                html_parts.append(f'<th>{col}</th>')
-            html_parts.append('</tr></thead>')
-            
-            # Body
-            html_parts.append('<tbody>')
-            for _, row in df_display.iterrows():
-                html_parts.append('<tr>')
-                for val in row:
-                    html_parts.append(f'<td>{val}</td>')
-                html_parts.append('</tr>')
-            html_parts.append('</tbody>')
-            
-            html_parts.append('</table>')
-            html_parts.append('</div>')
-            
-            st.markdown(''.join(html_parts), unsafe_allow_html=True)
-            
+                # center header and cells via CSS above; hide dataframe index
+                st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
+                st.dataframe(df_display, hide_index=True, use_container_width=True)
+        else:
+            st.warning("📌 Không có dữ liệu phù hợp với các lựa chọn.")
     except Exception as e:
         st.error(f"Lỗi khi đọc file Excel: {e}")
