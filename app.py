@@ -23,19 +23,22 @@ def navigate_to(page_name):
         st.session_state.page = page_name
         st.rerun()
 
-# --- CÁC HÀM TIỆN ÍCH DÙNG CHUNG (Giữ nguyên) ---
+# --- CÁC HÀM TIỆN ÍCH DÙNG CHUNG ---
 
 def get_base64_encoded_file(file_path, mime_type=""):
-    """Đọc file và trả về Base64 encoded string."""
+    """Đọc file và trả về Base64 encoded string. Thêm log nếu file không tồn tại."""
     fallback_base64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" 
     if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+        # st.warning(f"File không tồn tại hoặc rỗng: {file_path}") # Có thể mở comment để debug
         return fallback_base64
     try:
         with open(file_path, "rb") as f:
             data = f.read()
         return base64.b64encode(data).decode("utf-8")
     except Exception as e:
+        # st.error(f"Lỗi đọc file {file_path}: {e}") # Có thể mở comment để debug
         return fallback_base64
+
 
 def load_and_clean(excel_file, sheet):
     """Tải và làm sạch DataFrame từ Excel sheet."""
@@ -51,16 +54,17 @@ def load_and_clean(excel_file, sheet):
         return pd.DataFrame()
 
 
-# --- TẢI FILE ẢNH NỀN ---
-# Đảm bảo các file này tồn tại trong cùng thư mục với script Streamlit
-bg_pc_base64 = get_base64_encoded_file("cabbase.jpg") 
-bg_mobile_base64 = get_base64_encoded_file("mobile.jpg")
+# --- TẢI FILE ẢNH NỀN MỚI ---
+# Yêu cầu: Đổi background PC thành PN_PC.jpg
+bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg") 
+# Giữ mobile background để hiển thị tốt trên điện thoại
+bg_mobile_base64 = get_base64_encoded_file("PN_MOBILE.jpg") 
 
 
-# --- HÀM RENDER TRANG CHỦ (Tĩnh hoàn toàn) ---
+# --- HÀM RENDER TRANG CHỦ (Đã fix lỗi màn hình đen và loại bỏ nút quiz) ---
 def render_home_page():
     
-    # 1. CSS CHUNG (Đã tinh giản tối đa, khôi phục background)
+    # 1. CSS CHUNG (Đã tinh giản, xóa filter, đảm bảo hình nền hiển thị)
     hide_streamlit_style = f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
@@ -68,25 +72,24 @@ def render_home_page():
     /* Ẩn Streamlit mặc định */
     #MainMenu, footer, header {{visibility: hidden;}}
     .main {{ padding: 0; margin: 0; }}
-    div.block-container {{ padding: 0; margin: 0; max-width: 100% !important; }}
+    /* Bắt buộc phải đặt padding-top thành 0 để title hiển thị ở đỉnh */
+    div.block-container {{ padding: 0; margin: 0; max-width: 100% !important; }} 
 
-    /* Nền tĩnh - Đã khôi phục */
+    /* Nền tĩnh - Đã fix và xóa filter */
     .stApp {{
         --main-bg-url-pc: url('data:image/jpeg;base64,{bg_pc_base64}');
         --main-bg-url-mobile: url('data:image/jpeg;base64,{bg_mobile_base64}');
-        background-color: black; /* Màu dự phòng */
-        background-image: var(--main-bg-url-pc); /* Hình nền cho PC */
+        background-color: black; 
+        background-image: var(--main-bg-url-pc); 
         background-size: cover; 
         background-position: center;
         background-attachment: fixed; 
-        /* Hiệu ứng màu nền */
-        filter: sepia(60%) grayscale(20%) brightness(85%) contrast(110%);
-        /* Transition nhẹ nhàng khi tải */
-        transition: background-image 1s ease-in-out, filter 1s ease-in-out;
+        filter: none; /* Xóa hiệu ứng filter để ảnh nền hiển thị rõ */
+        transition: none; /* Xóa transition để tránh trễ hiển thị */
     }}
     @media (max-width: 768px) {{ 
         .stApp {{ 
-            background-image: var(--main-bg-url-mobile); /* Hình nền cho Mobile */
+            background-image: var(--main-bg-url-mobile); 
         }} 
     }}
     
@@ -107,10 +110,10 @@ def render_home_page():
         animation: colorShift 10s ease infinite, scrollText 15s linear infinite; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }}
     
-    /* Container nút: Luôn hiển thị, chỉ còn 1 nút nên center */
+    /* Container nút: Căn giữa vì chỉ còn 1 nút */
     .button-container-fixed {{
         position: fixed; top: 45vh; width: 100%; z-index: 100;
-        display: flex; justify-content: center; /* Đã thay đổi thành center */
+        display: flex; justify-content: center; 
         align-items: center; padding: 0 5vw; 
         box-sizing: border-box; opacity: 1; 
     }}
@@ -123,7 +126,7 @@ def render_home_page():
         text-shadow: 0 0 4px rgba(0, 255, 255, 0.8), 0 0 10px rgba(34, 141, 255, 0.6);
         box-shadow: 0 0 5px #00ffff, 0 0 15px rgba(0, 255, 255, 0.5);
         transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        white-space: nowrap; flex-grow: 0; /* Đã thay đổi thành 0 vì chỉ có 1 nút */
+        white-space: nowrap; flex-grow: 0; 
         max-width: 400px; min-height: 60px; line-height: 1.2;
     }}
     .stButton > button:hover {{
@@ -151,14 +154,13 @@ def render_home_page():
     # --- NÚT CHUYỂN TRANG (Chỉ còn nút Part Number) ---
     st.markdown('<div class="button-container-fixed">', unsafe_allow_html=True)
     
-    # Chỉ giữ lại nút "Tra cứu Part Number"
     if st.button("Tra cứu Part Number 🔍", key="btn_part_number_home", help="Chuyển đến trang tra cứu"):
         navigate_to('part_number')
 
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-# --- HÀM RENDER TRANG TRA CỨU PART NUMBER (Giữ nguyên logic) ---
+# --- HÀM RENDER TRANG TRA CỨU PART NUMBER ---
 def render_part_number_page():
     
     excel_file = "A787.xlsx"
@@ -166,8 +168,9 @@ def render_part_number_page():
         st.error("❌ Không tìm thấy file A787.xlsx")
         st.stop()
     
-    # === CSS PHONG CÁCH VINTAGE ===
-    bg_img_base64 = get_base64_encoded_file("cabbase.jpg")
+    # === CSS PHONG CÁCH VINTAGE (Đảm bảo dùng PN_PC.jpg cho phong cách) ===
+    # Sử dụng PN_PC.jpg cho trang tra cứu (thay thế cabbase.jpg)
+    bg_img_base64 = get_base64_encoded_file("PN_PC.jpg")
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -241,9 +244,7 @@ def render_part_number_page():
         st.error(f"Lỗi khi xử lý file Excel: {e}")
 
 
-# --- HÀM RENDER TRANG QUIZ BANK (Không còn được dùng trực tiếp) ---
-# Hàm này vẫn tồn tại nhưng không có nút nào dẫn tới nó từ trang chủ.
-# Tuy nhiên, nếu bạn muốn dùng nó sau này, nó vẫn sẽ hoạt động khi điều hướng trực tiếp
+# --- HÀM RENDER TRANG QUIZ BANK (Giữ nguyên cho mục đích điều hướng) ---
 def render_quiz_bank_page():
     st.markdown("""
     <style>
