@@ -29,14 +29,17 @@ def load_and_clean(excel_file, sheet):
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS TOÀN BỘ (Đã tinh chỉnh lại phần Table CSS để ổn định hơn trên Mobile) ---
+# --- CSS TOÀN BỘ (Đã chỉnh lại nền mobile) ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
 
 #MainMenu, footer, header {{visibility: hidden;}}
-div.block-container {{padding-top: 0;}}
+/* Đặt nền trong suốt cho container chính của Streamlit */
+div.block-container {{padding-top: 0; background-color: transparent !important;}} 
+[data-testid="stVerticalBlock"] > div:first-child {{background-color: transparent !important;}}
+
 
 /* === NỀN PC === */
 .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
@@ -93,11 +96,16 @@ div.block-container {{padding-top: 0;}}
     margin-bottom: 20px;
 }}
 
-/* === MOBILE === */
+/* === MOBILE (Đã thêm background-color: transparent) === */
 @media (max-width: 768px) {{
     .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
         background: url("data:image/jpeg;base64,{bg_mobile_base64}") no-repeat center top scroll !important;
         background-size: cover !important;
+    }}
+    
+    /* Đảm bảo toàn bộ nội dung trong container không có nền trắng */
+    .main > div {{
+        background-color: transparent !important;
     }}
 
     #main-animated-title-container {{
@@ -159,9 +167,15 @@ div[data-baseweb="select"] > div {{
 .element-container:has(.stSelectbox) {{
     display: flex;
     justify-content: center;
+    background-color: transparent !important; /* Đảm bảo khu vực selectbox không có nền trắng */
+}}
+/* Loại bỏ nền trắng xung quanh các container Streamlit */
+[data-testid^="stHorizontalBlock"] {{
+    background-color: transparent !important;
 }}
 
-/* === BẢNG HTML TÙY CHỈNH (Đã tối ưu hóa lại cho mobile) === */
+
+/* === BẢNG HTML TÙY CHỈNH === */
 .table-container {{
     overflow-x: auto;
     margin: 20px 0;
@@ -172,10 +186,10 @@ div[data-baseweb="select"] > div {{
     width: 100%;
     border-collapse: collapse;
     margin: 20px auto;
-    background-color: white;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3); /* Tạo bóng rõ hơn */
-    border-radius: 8px; /* Bo góc */
-    overflow: hidden; /* Quan trọng để bo góc và tránh tràn */
+    background-color: white; /* Giữ nền trắng cho chính bảng để dễ đọc */
+    box-shadow: 0 0 15px rgba(0,0,0,0.3); 
+    border-radius: 8px; 
+    overflow: hidden; 
 }}
 
 .custom-table th {{
@@ -214,7 +228,7 @@ div[data-baseweb="select"] > div {{
     .custom-table {{
         font-size: 0.85rem;
         min-width: 100%;
-        box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Bóng tối hơn trên mobile */
+        box-shadow: 0 0 10px rgba(0,0,0,0.5); 
     }}
     
     .custom-table th, .custom-table td {{
@@ -244,13 +258,11 @@ else:
         sheet_names = [name for name in xls.sheet_names if not name.startswith("Sheet")]
 
         # --- KHỞI TẠO GIÁ TRỊ BAN ĐẦU ---
-        # Sử dụng dictionary để lưu trữ các lựa chọn Selectbox
         selection = {"Zone": None, "A/C": None, "DESCRIPTION": None, "ITEM": None}
         current_df = pd.DataFrame()
         
         # --- CANH GIỮA DROPBOX ---
         st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
-        # Sử dụng st.columns(4) cố định vị trí, nhưng chỉ hiển thị selectbox nếu cột đó tồn tại
         cols = st.columns(4)
         
         # 1. Zone Selectbox (Luôn hiển thị)
@@ -263,7 +275,7 @@ else:
         if selection["Zone"]:
             current_df = load_and_clean(excel_file, selection["Zone"])
         else:
-            current_df = pd.DataFrame() # Đảm bảo df rỗng nếu chưa chọn zone
+            current_df = pd.DataFrame() 
 
         # Lọc các cột cần thiết có trong sheet hiện tại
         available_cols = [col for col in REQUIRED_COLS if col in current_df.columns]
@@ -275,12 +287,11 @@ else:
         for i, col_name in enumerate(REQUIRED_COLS):
             if col_name in available_cols:
                 selectbox_count += 1
-                with cols[i + 1]: # Sử dụng cột 1, 2, 3 trong st.columns(4)
+                # Sử dụng cột tiếp theo trong st.columns(4)
+                with cols[i + 1]: 
                     
-                    # Lấy dữ liệu duy nhất cho selectbox hiện tại
                     options = sorted(current_df[col_name].dropna().unique().tolist()) if not current_df.empty else []
                     
-                    # Đặt tên label và placeholder tùy theo cột
                     label = ""
                     placeholder = ""
                     if col_name == "A/C":
@@ -301,22 +312,21 @@ else:
                     if selected != placeholder:
                         selection[col_name] = selected
 
-                    # Lọc DataFrame dựa trên lựa chọn hiện tại (Chỉ lọc nếu đã chọn giá trị)
+                    # Lọc DataFrame dựa trên lựa chọn hiện tại
                     if selection[col_name]:
                         current_df = current_df[current_df[col_name] == selection[col_name]]
                     else:
-                        # Nếu chưa chọn giá trị nào, giữ nguyên df đã lọc bởi các Selectbox trước đó
                         pass
 
         st.markdown("</div>", unsafe_allow_html=True)
         
         # --- HIỂN THỊ KẾT QUẢ ---
         
-        # Đếm số Selectbox đã được chọn (Zone luôn phải chọn)
+        # Đếm số Selectbox đã được chọn
         selected_count = sum(1 for key, value in selection.items() if key == "Zone" and value is not None)
         selected_count += sum(1 for col in available_cols if selection[col] is not None)
         
-        # Điều kiện hiển thị: Số lượng đã chọn phải bằng tổng số Selectbox đã tạo
+        # Điều kiện hiển thị
         is_fully_selected = (selected_count == selectbox_count)
         is_result_available = not current_df.empty and len(current_df) > 0
 
@@ -324,7 +334,6 @@ else:
             st.markdown("---")
             st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
             
-            # Chuẩn bị DataFrame để hiển thị
             df_display = current_df.drop(columns=available_cols, errors="ignore")
             df_display = df_display.dropna(axis=1, how="all")
             df_display = df_display.reset_index(drop=True)
@@ -365,8 +374,6 @@ else:
         elif is_fully_selected and not is_result_available:
              st.markdown("---")
              st.info("⚠️ **Không tìm thấy kết quả** nào phù hợp với tất cả các lựa chọn của bạn.")
-
-        # Trường hợp chưa chọn đủ Selectbox: Không hiển thị gì
 
     except Exception as e:
         st.error(f"Lỗi khi xử lý dữ liệu: {e}")
