@@ -29,7 +29,7 @@ def load_and_clean(excel_file, sheet):
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS TOÀN BỘ ---
+# --- CSS ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -76,20 +76,20 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     background-size: 400% 400%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: colorShift 10s ease infinite, scrollText 10s linear infinite; /* ✅ Nhanh hơn */
+    animation: colorShift 8s ease infinite, scrollText 7s linear infinite; /* ✅ chạy nhanh hơn */
     text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
     line-height: 1.3;
     padding-bottom: 10px;
 }}
 
-/* === TIÊU ĐỀ PHỤ (TRA CỨU...) DỊCH XUỐNG HƠN) === */
+/* === TIÊU ĐỀ PHỤ (TRA CỨU...) TO HƠN, DỊCH XUỐNG HƠN) === */
 #sub-static-title h2 {{
     font-family: 'Playfair Display', serif;
-    font-size: 2.4rem;
+    font-size: 3rem;  /* ✅ tăng kích cỡ chữ */
     color: #FFD54F;
     text-align: center;
     text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-    margin-top: 70px; /* ✅ Dịch xuống thêm nữa */
+    margin-top: 110px;  /* ✅ hạ thấp mạnh hơn */
     margin-bottom: 20px;
 }}
 
@@ -97,7 +97,7 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
 h3.dropdown-label {{
     color: #FFD700;
     text-align: center;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 800;
     text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
     margin-bottom: 0.4rem;
@@ -117,20 +117,20 @@ h3.dropdown-label {{
     }}
 
     #main-animated-title-container h1 {{
-        font-size: 7vw;
+        font-size: 6.5vw;
         letter-spacing: 3px;
-        animation: colorShift 10s ease infinite, scrollText 9s linear infinite; /* ✅ Mobile cũng nhanh hơn */
+        animation: colorShift 8s ease infinite, scrollText 6s linear infinite; /* ✅ nhanh hơn mobile */
         text-shadow: 2px 2px 7px rgba(0,0,0,0.8);
     }}
 
     #sub-static-title h2 {{
-        font-size: 5vw;
+        font-size: 6vw;  /* ✅ to hơn */
         color: #FFD54F;
-        margin-top: 50px; /* ✅ Dịch xuống thêm nữa */
+        margin-top: 90px;  /* ✅ dịch xuống thêm */
     }}
 
     h3.dropdown-label {{
-        font-size: 4.8vw;
+        font-size: 4.5vw; /* ✅ dropdown to hơn xíu */
         line-height: 1.1;
         margin-bottom: 0.5rem;
     }}
