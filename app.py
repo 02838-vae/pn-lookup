@@ -52,8 +52,10 @@ def render_main_interface():
         st.error("❌ Không tìm thấy file A787.xlsx. Vui lòng đặt file này vào cùng thư mục với script.")
         st.stop()
     
-    # === CSS PHONG CÁCH VINTAGE VÀ BACKGROUND MẶC ĐỊNH (Đã điều chỉnh Tiêu đề) ===
+    # === CSS PHONG CÁCH VINTAGE VÀ BACKGROUND MẶC ĐỊNH (Đã điều chỉnh Mobile CSS) ===
     bg_img_base64 = get_base64_encoded_file("PN_PC.jpg")
+    bg_mobile_img_base64 = get_base64_encoded_file("PN_MOBILE.jpg")
+    
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
@@ -64,11 +66,14 @@ def render_main_interface():
     .main {{ padding: 0; margin: 0; }}
     div.block-container {{ padding-top: 20px; }} 
 
-    /* Nền tĩnh */
+    /* Nền tĩnh PC */
     .stApp {{
         font-family: 'Special Elite', cursive !important;
+        --main-bg-url-pc: url("data:image/jpeg;base64,{bg_img_base64}");
+        --main-bg-url-mobile: url("data:image/jpeg;base64,{bg_mobile_img_base64}");
+        
         background: linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
-            url("data:image/jpeg;base64,{bg_img_base64}") no-repeat center center fixed;
+            var(--main-bg-url-pc) no-repeat center center fixed;
         background-size: cover;
     }}
     .stApp::after {{
@@ -83,44 +88,61 @@ def render_main_interface():
 
     /* Tiêu đề 1: TỔ BẢO DƯỠNG SỐ 1 - Chạy và Đổi màu */
     #main-animated-title-container {{ 
-        /* Container tràn hết chiều rộng để tiêu đề có thể chạy */
         width: 100%; height: 60px; overflow: hidden; white-space: nowrap; 
         margin: 0 auto; padding: 0; 
     }}
     #main-animated-title-container h1 {{
         font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 900;
-        letter-spacing: 5px; margin: 0; padding: 0 50px; /* Thêm padding để không bị dính mép */
-        display: inline-block; /* Bắt buộc để animation chạy */
+        letter-spacing: 5px; margin: 0; padding: 0 50px; 
+        display: inline-block; 
         
-        /* Hiệu ứng gradient và animation */
         background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
         background-size: 400% 400%; 
         -webkit-background-clip: text; 
         -webkit-text-fill-color: transparent;
         
-        animation: colorShift 10s ease infinite, scrollText 20s linear infinite; /* Điều chỉnh tốc độ chạy */
+        animation: colorShift 10s ease infinite, scrollText 20s linear infinite; 
         text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
     }}
 
     /* Tiêu đề 2: TRA CỨU PART NUMBER - Căn giữa */
     #sub-static-title h2 {{
         font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700;
-        color: #1f77b4; /* Màu xanh nổi bật */
+        color: #1f77b4; 
         text-align: center;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         margin: 10px 0 20px 0;
-        white-space: nowrap; /* Đảm bảo vừa 1 dòng */
+        white-space: nowrap; 
     }}
     
     /* Điều chỉnh font và màu cho các lựa chọn tra cứu */
     .stSelectbox label, .stMarkdown h3 {{
-        color: #000080; /* Màu xanh đậm cho label */
+        color: #000080; 
         font-weight: bold;
     }}
 
+    /* === MEDIA QUERY CHO MOBILE (<= 768px) === */
     @media (max-width: 768px) {{
-        #main-animated-title-container h1 {{ font-size: 8vw; letter-spacing: 3px; }}
-        #sub-static-title h2 {{ font-size: 5vw; }}
+        /* Đảm bảo dùng PN_MOBILE.jpg */
+        .stApp {{ 
+            background: linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
+                var(--main-bg-url-mobile) no-repeat center center fixed;
+            background-size: cover;
+        }}
+
+        /* Khắc phục lỗi thu nhỏ số 1 (Tăng font size) */
+        #main-animated-title-container h1 {{ 
+            font-size: 10vw; 
+            letter-spacing: 3px; 
+            height: 10vw; /* Tăng chiều cao container để chứa đủ font */
+        }}
+
+        /* Đẩy tiêu đề Tra Cứu Part Number xuống dưới */
+        #sub-static-title h2 {{ 
+            font-size: 6vw; 
+            margin-top: 30px; /* Thêm khoảng cách phía trên */
+            margin-bottom: 20px;
+        }}
     }}
     
     </style>
@@ -144,7 +166,7 @@ def render_main_interface():
         with selection_container:
             st.markdown("### Chọn thông số để tra cứu:")
             
-            # Chia cột cho selectbox
+            # Chia cột cho selectbox (trên mobile sẽ tự động xếp chồng)
             col1, col2, col3, col4 = st.columns(4)
             
             # Chọn Zone
