@@ -29,7 +29,7 @@ def load_and_clean(excel_file, sheet):
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS ---
+# --- CSS TOÀN BỘ ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -62,11 +62,11 @@ div.block-container {{padding-top: 0;}}
   height: 85px;
   overflow: hidden;
   text-align: center;
-  margin-top: 25px; /* ✅ đẩy tiêu đề xuống để không bị mất nét */
+  margin-top: 35px;
 }}
 #main-animated-title-container h1 {{
   font-family: 'Oswald', sans-serif;
-  font-size: 5rem;
+  font-size: 4.3rem; /* ✅ Giảm nhẹ để không bị mất nét dưới */
   font-weight: 700;
   letter-spacing: 6px;
   text-transform: uppercase;
@@ -86,7 +86,7 @@ div.block-container {{padding-top: 0;}}
   color: #FFD54F;
   text-align: center;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-  margin-top: 25px; /* ✅ hạ thấp hơn một chút */
+  margin-top: 35px; /* ✅ Hạ thấp một chút */
   margin-bottom: 20px;
 }}
 
@@ -98,14 +98,14 @@ div.block-container {{padding-top: 0;}}
   }}
 
   #main-animated-title-container {{
-    margin-top: 0 !important;
+    margin-top: 10px !important;
     overflow: hidden;
     height: auto;
     white-space: nowrap;
   }}
 
   #main-animated-title-container h1 {{
-    font-size: 8.5vw;
+    font-size: 8vw;
     line-height: 1.1;
     letter-spacing: 3px;
     display: inline-block;
@@ -121,11 +121,21 @@ div.block-container {{padding-top: 0;}}
   }}
 }}
 
-/* === CĂN GIỮA NỘI DUNG TRONG BẢNG === */
+/* === LABEL SELECTBOX === */
+.stSelectbox label {{
+  color: #FFEB3B !important; /* ✅ màu vàng nổi bật hơn */
+  font-weight: 700;
+  text-align: center;
+  display: block;
+}}
+div[data-baseweb="select"] > div {{
+  text-align: center;
+}}
+
+/* === CĂN GIỮA BẢNG DỮ LIỆU === */
 table.dataframe, .stDataFrame table {{
   width: 100%;
   border-collapse: collapse;
-  text-align: center !important;
 }}
 .stDataFrame tbody td, .stDataFrame thead th {{
   text-align: center !important;
@@ -133,9 +143,10 @@ table.dataframe, .stDataFrame table {{
 }}
 .stDataFrame table th, .stDataFrame table td {{
   text-align: center !important;
+  vertical-align: middle !important;
 }}
 
-/* === Cho phép cuộn ngang bảng trên mobile === */
+/* === Cuộn ngang khi màn hình nhỏ === */
 .stDataFrame div[data-testid="stDataFrameContainer"] > div {{
   overflow-x: auto !important;
 }}
@@ -156,6 +167,8 @@ else:
         xls = pd.ExcelFile(excel_file)
         sheet_names = [name for name in xls.sheet_names if not name.startswith("Sheet")]
 
+        # --- CANH GIỮA DROPBOX ---
+        st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             zone = st.selectbox("📂 Zone", sheet_names)
@@ -175,11 +188,12 @@ else:
             items = sorted(df["ITEM"].dropna().unique().tolist()) if "ITEM" in df.columns else []
             item = st.selectbox("🔢 Item", items) if items else None
         df = df[df["ITEM"] == item] if item else df
+        st.markdown("</div>", unsafe_allow_html=True)
 
+        # --- HIỂN THỊ KẾT QUẢ ---
         st.markdown("---")
         st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
 
-        # Xử lý DataFrame hiển thị
         df_display = df.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
         df_display = df_display.dropna(axis=1, how="all")
 
@@ -196,7 +210,5 @@ else:
 
             # Hiển thị bảng
             st.dataframe(df_display, hide_index=True, use_container_width=True)
-        else:
-            st.warning("📌 Không có dữ liệu phù hợp với các lựa chọn.")
     except Exception as e:
         st.error(f"Lỗi khi đọc file Excel: {e}")
