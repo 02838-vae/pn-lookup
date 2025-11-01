@@ -3,10 +3,10 @@ import pandas as pd
 import base64
 import os
 
-# --- CẤU HÌNH ---
+# --- CẤU HÌNH CHUNG ---
 st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1 - Tra Cứu PN", layout="wide")
 
-# --- HÀM HỖ TRỢ ---
+# === HÀM PHỤ TRỢ ===
 def get_base64_encoded_file(file_path):
     if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
         return ""
@@ -25,11 +25,11 @@ def load_and_clean(excel_file, sheet):
     except Exception:
         return pd.DataFrame()
 
-# --- NỀN ---
+# === NỀN ===
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS ---
+# === CSS ===
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -38,14 +38,14 @@ st.markdown(f"""
 #MainMenu, footer, header {{visibility: hidden;}}
 div.block-container {{padding-top: 0;}}
 
-/* === NỀN PC === */
+/* --- NỀN PC --- */
 .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
     background: url("data:image/jpeg;base64,{bg_pc_base64}") no-repeat center top fixed !important;
     background-size: cover !important;
     font-family: 'Oswald', sans-serif !important;
 }}
 
-/* === HIỆU ỨNG TIÊU ĐỀ === */
+/* --- TIÊU ĐỀ CHÍNH --- */
 @keyframes scrollText {{
   0% {{ transform: translateX(100%); }}
   100% {{ transform: translateX(-100%); }}
@@ -56,7 +56,6 @@ div.block-container {{padding-top: 0;}}
   100% {{ background-position: 0% 50%; }}
 }}
 
-/* === TIÊU ĐỀ CHÍNH === */
 #main-animated-title-container {{
   width: 100%;
   overflow: hidden;
@@ -67,7 +66,7 @@ div.block-container {{padding-top: 0;}}
 }}
 #main-animated-title-container h1 {{
   font-family: 'Oswald', sans-serif;
-  font-size: 4rem;
+  font-size: 3.8rem; /* nhỏ hơn 1 chút để tránh mất nét */
   font-weight: 700;
   text-transform: uppercase;
   display: inline-block;
@@ -76,64 +75,54 @@ div.block-container {{padding-top: 0;}}
   background-size: 400% 400%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: colorShift 10s ease infinite, scrollText 20s linear infinite;
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+  animation: colorShift 10s ease infinite, scrollText 10s linear infinite; /* ⚡ chạy nhanh gấp đôi */
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
 }}
 
-/* === TIÊU ĐỀ PHỤ === */
+/* --- TIÊU ĐỀ PHỤ --- */
 #sub-static-title h2 {{
   font-family: 'Playfair Display', serif;
-  font-size: 2.4rem;
+  font-size: 2.3rem;
   color: #FFD54F;
   text-align: center;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-  margin-top: 30px;
-  margin-bottom: 25px;
+  margin-top: 25px;
+  margin-bottom: 20px;
 }}
 
-/* === MOBILE === */
+/* --- MOBILE --- */
 @media (max-width: 768px) {{
   .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
     background: url("data:image/jpeg;base64,{bg_mobile_base64}") no-repeat center top scroll !important;
     background-size: cover !important;
   }}
-
-  #main-animated-title-container {{
-    margin-top: 10px;
-    height: auto;
-  }}
   #main-animated-title-container h1 {{
     font-size: 8vw;
+    animation: colorShift 10s ease infinite, scrollText 8s linear infinite; /* chạy nhanh hơn cả mobile */
     line-height: 1.2;
-    white-space: nowrap;
-    animation: colorShift 10s ease infinite, scrollText 15s linear infinite;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
   }}
   #sub-static-title h2 {{
     font-size: 5vw;
-    margin-top: 10px;
   }}
 }}
 
-/* === LABEL SELECTBOX === */
+/* --- LABEL SELECTBOX --- */
 .stSelectbox label {{
   color: #FFEB3B !important;
   font-weight: 700;
   text-align: center;
   display: block;
-  font-size: 1.5rem; /* ✅ To hơn rõ ràng hơn trên PC */
+  font-size: 1.6rem; /* to hơn chút */
 }}
 div[data-baseweb="select"] > div {{
   text-align: center;
 }}
-
-/* === CANH GIỮA DROPBOX === */
 div[data-testid="column"] {{
   display: flex;
   justify-content: center;
 }}
 
-/* === BẢNG DỮ LIỆU CANH GIỮA === */
+/* --- BẢNG DỮ LIỆU --- */
 .stDataFrame table {{
   width: 100% !important;
   text-align: center !important;
@@ -145,26 +134,22 @@ div[data-testid="column"] {{
 .stDataFrame tbody td {{
   padding: 10px !important;
   white-space: nowrap;
-  text-align: center !important;
 }}
 .stDataFrame thead th {{
-  background-color: rgba(255,255,255,0.8);
-  text-align: center !important;
+  background-color: rgba(255,255,255,0.85);
 }}
-
-/* === Cho phép cuộn ngang === */
 .stDataFrame div[data-testid="stDataFrameContainer"] > div {{
   overflow-x: auto !important;
 }}
 </style>
 """, unsafe_allow_html=True)
 
-# --- TIÊU ĐỀ ---
+# === TIÊU ĐỀ ===
 st.markdown('<div id="main-animated-title-container"><h1>TỔ BẢO DƯỠNG SỐ 1</h1></div>', unsafe_allow_html=True)
 st.markdown('<div id="sub-static-title"><h2>🔎 TRA CỨU PART NUMBER</h2></div>', unsafe_allow_html=True)
 st.markdown("---")
 
-# --- TRA CỨU ---
+# === TRA CỨU ===
 excel_file = "A787.xlsx"
 if not os.path.exists(excel_file):
     st.error("❌ Không tìm thấy file A787.xlsx trong thư mục hiện tại.")
@@ -173,9 +158,9 @@ else:
         xls = pd.ExcelFile(excel_file)
         sheet_names = [name for name in xls.sheet_names if not name.startswith("Sheet")]
 
-        # --- DROPBOX CANH GIỮA ---
         st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
+
         with col1:
             zone = st.selectbox("📂 Zone", sheet_names)
         df = load_and_clean(excel_file, zone)
@@ -196,7 +181,7 @@ else:
         df = df[df["ITEM"] == item] if item else df
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # --- KẾT QUẢ ---
+        # === KẾT QUẢ ===
         st.markdown("---")
         if not df.empty:
             st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
@@ -218,6 +203,5 @@ else:
                     hide_index=True,
                     use_container_width=True
                 )
-        # ❌ Không có dữ liệu thì bảng không hiển thị
     except Exception as e:
         st.error(f"Lỗi khi đọc file Excel: {e}")
