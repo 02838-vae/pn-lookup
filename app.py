@@ -3,33 +3,19 @@ import pandas as pd
 import base64
 import os
 
-# --- CẤU HÌNH ---
-st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1 - Tra Cứu PN", layout="wide")
+# ======== HÀM ĐỌC ẢNH NỀN ========
+def load_image_base64(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
 
-# --- HÀM HỖ TRỢ ---
-def get_base64_encoded_file(file_path):
-    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
-        return ""
-    with open(file_path, "rb") as f:
-        return base64.b64encode(f.read()).decode("utf-8")
+# ======== ẢNH NỀN PC & MOBILE ========
+bg_pc_path = "background_pc.jpg"
+bg_mobile_path = "background_mobile.jpg"
 
-def load_and_clean(excel_file, sheet):
-    try:
-        df = pd.read_excel(excel_file, sheet_name=sheet)
-        df.columns = df.columns.str.strip().str.upper()
-        df = df.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
-        for col in df.columns:
-            if df[col].dtype == "object":
-                df[col] = df[col].fillna("").astype(str).str.strip()
-        return df
-    except Exception:
-        return pd.DataFrame()
+bg_pc_base64 = load_image_base64(bg_pc_path) if os.path.exists(bg_pc_path) else ""
+bg_mobile_base64 = load_image_base64(bg_mobile_path) if os.path.exists(bg_mobile_path) else ""
 
-# --- NỀN ---
-bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
-bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
-
-# --- CSS TOÀN CỤC ---
+# ======== TIÊU ĐỀ CHẠY & CSS ========
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -38,26 +24,37 @@ st.markdown(f"""
 #MainMenu, footer, header {{visibility: hidden;}}
 div.block-container {{padding-top: 0; background-color: transparent !important;}}
 
-/* === NỀN === */
+/* === NỀN PC === */
 .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
     background: url("data:image/jpeg;base64,{bg_pc_base64}") no-repeat center top fixed !important;
     background-size: cover !important;
     font-family: 'Oswald', sans-serif !important;
 }}
 
-/* === TIÊU ĐỀ CHÍNH === */
+/* === HIỆU ỨNG CHẠY === */
+@keyframes scrollText {{
+    0% {{ transform: translateX(100vw); }}
+    100% {{ transform: translateX(-100%); }}
+}}
+@keyframes colorShift {{
+    0% {{ background-position: 0% 50%; }}
+    50% {{ background-position: 100% 50%; }}
+    100% {{ background-position: 0% 50%; }}
+}}
+
+/* === TIÊU ĐỀ CHÍNH (PC) === */
 #main-animated-title-container {{
     width: 100%;
-    height: auto;
+    height: 100px;
     overflow: hidden;
     text-align: center;
-    margin-top: 35px;
+    margin-top: 25px;
 }}
 #main-animated-title-container h1 {{
     font-family: 'Oswald', sans-serif;
-    font-size: 4rem; /* nhỏ hơn trước 1 chút */
+    font-size: 3.5rem;
     font-weight: 700;
-    letter-spacing: 6px;
+    letter-spacing: 5px;
     text-transform: uppercase;
     white-space: nowrap;
     display: inline-block;
@@ -65,20 +62,30 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     background-size: 400% 400%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: colorShift 10s ease infinite, scrollText 12s linear infinite;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
-    line-height: 1.3;
-    padding-bottom: 10px;
+    animation: colorShift 10s ease infinite, scrollText 16s linear infinite;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
 }}
 
+/* === TIÊU ĐỀ PHỤ (PC) === */
 #sub-static-title h2 {{
     font-family: 'Playfair Display', serif;
-    font-size: 2.1rem; /* nhỏ hơn trước */
+    font-size: 1.8rem;
     color: #FFD54F;
     text-align: center;
     text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
     margin-top: 25px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+}}
+
+/* === DROPDOWN LABEL === */
+h3.dropdown-label {{
+    color: #FFD700;
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 800;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
 }}
 
 /* === MOBILE === */
@@ -89,26 +96,79 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     }}
 
     #main-animated-title-container h1 {{
-        font-size: 7vw; /* nhỏ lại để vừa 1 dòng */
-        letter-spacing: 3px;
-        line-height: 1.1;
-        white-space: nowrap;
+        font-size: 7vw;
+        letter-spacing: 2px;
+        animation: colorShift 10s ease infinite, scrollText 14s linear infinite;
+        text-shadow: 2px 2px 7px rgba(0,0,0,0.8);
     }}
 
     #sub-static-title h2 {{
-        font-size: 5vw; /* vừa 1 dòng trên mobile */
+        font-size: 4.2vw;
         margin-top: 10px;
     }}
+
+    h3.dropdown-label {{
+        font-size: 4.5vw;
+        line-height: 1.2;
+        margin-bottom: 0.4rem;
+    }}
 }}
+
+/* === BẢNG === */
+.table-container {{
+    overflow-x: auto;
+    margin: 20px 0;
+    width: 100%;
+}}
+.custom-table {{
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px auto;
+    background-color: white;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    border-radius: 8px;
+    overflow: hidden;
+}}
+.custom-table th {{
+    background-color: #2E7D32;
+    color: white;
+    padding: 14px;
+    text-align: center !important;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    font-size: 1.05rem;
+}}
+.custom-table td {{
+    padding: 12px;
+    text-align: center !important;
+    border: 1px solid #ddd;
+    vertical-align: middle;
+    font-size: 1rem;
+    color: #000000;
+}}
+.custom-table tr:nth-child(even) {{ background-color: #f9f9f9; }}
+.custom-table tr:hover {{ background-color: #e0e0e0; }}
 </style>
 """, unsafe_allow_html=True)
 
-# --- TIÊU ĐỀ ---
-st.markdown('<div id="main-animated-title-container"><h1>TỔ BẢO DƯỠNG SỐ 1</h1></div>', unsafe_allow_html=True)
-st.markdown('<div id="sub-static-title"><h2>🔎 TRA CỨU PART NUMBER</h2></div>', unsafe_allow_html=True)
-st.markdown("---")
+# ======== TIÊU ĐỀ CHẠY + PHỤ ========
+st.markdown("""
+<div id="main-animated-title-container">
+  <h1>✈️ TỔ BẢO DƯỠNG SỐ 1 ✈️</h1>
+</div>
+<div id="sub-static-title">
+  <h2>🔍 TRA CỨU PART NUMBER</h2>
+</div>
+""", unsafe_allow_html=True)
 
-# --- TRA CỨU ---
+# ======== HÀM XỬ LÝ EXCEL ========
+def load_and_clean(file_path, sheet_name):
+    df = pd.read_excel(file_path, sheet_name=sheet_name)
+    df = df.dropna(how="all")
+    df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
+    return df
+
+# ======== TRA CỨU ========
 excel_file = "A787.xlsx"
 REQUIRED_COLS = ["A/C", "DESCRIPTION", "ITEM"]
 
@@ -127,7 +187,7 @@ else:
         
         # --- 1️⃣ Zone ---
         with cols[0]:
-            st.markdown("<h3 style='color:#FFD700; text-align:center; font-size:2.2rem; font-weight:900;'>📂 Zone</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 class='dropdown-label'>📂 Zone</h3>", unsafe_allow_html=True)
             zone_options = ["Chọn Zone..."] + sheet_names
             zone_selected = st.selectbox("", zone_options, label_visibility="collapsed")
             if zone_selected != "Chọn Zone...":
@@ -150,8 +210,7 @@ else:
         for i, col_name in enumerate(REQUIRED_COLS):
             if col_name in available_cols:
                 with cols[i + 1]:
-                    label_html = f"<h3 style='color:#FFD700; text-align:center; font-size:2.2rem; font-weight:900;'>{col_labels[col_name]}</h3>"
-                    st.markdown(label_html, unsafe_allow_html=True)
+                    st.markdown(f"<h3 class='dropdown-label'>{col_labels[col_name]}</h3>", unsafe_allow_html=True)
 
                     if not current_df.empty:
                         options = current_df[col_name].astype(str).str.strip().unique().tolist()
@@ -170,7 +229,7 @@ else:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # --- HIỂN THỊ KẾT QUẢ ---
+        # --- KẾT QUẢ ---
         if selection["Zone"] and all(selection.get(col) for col in available_cols) and not current_df.empty:
             st.markdown("---")
             st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
@@ -180,15 +239,7 @@ else:
             df_display = df_display.reset_index(drop=True)
             df_display.insert(0, "STT", range(1, len(df_display) + 1))
 
-            html_parts = ['<div class="table-container"><table class="custom-table"><thead><tr>']
-            for col in df_display.columns:
-                html_parts.append(f'<th>{col}</th>')
-            html_parts.append('</tr></thead><tbody>')
-            for _, row in df_display.iterrows():
-                html_parts.append('<tr>' + ''.join(f'<td>{val}</td>' for val in row) + '</tr>')
-            html_parts.append('</tbody></table></div>')
-            st.markdown(''.join(html_parts), unsafe_allow_html=True)
-
+            st.dataframe(df_display, use_container_width=True)
         elif selection["Zone"] and all(selection.get(col) for col in available_cols) and current_df.empty:
             st.markdown("---")
             st.info("⚠️ Không tìm thấy kết quả nào phù hợp với lựa chọn của bạn.")
