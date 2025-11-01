@@ -17,9 +17,11 @@ def load_and_clean(excel_file, sheet):
     try:
         df = pd.read_excel(excel_file, sheet_name=sheet)
         df.columns = df.columns.str.strip().str.upper()
+        # **LƯU Ý:** Giữ lại các cột object rỗng (NA) để logic lọc chuỗi rỗng bên dưới xử lý, tránh lỗi nếu fillna("") bị gọi hai lần.
         df = df.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
         for col in df.columns:
             if df[col].dtype == "object":
+                # Chuyển NA thành chuỗi rỗng để lọc dễ hơn
                 df[col] = df[col].fillna("").astype(str).str.strip()
         return df
     except Exception:
@@ -132,7 +134,7 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
 }}
 
 /* === LABEL SELECTBOX (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V9) === */
-/* Nhắm mục tiêu vào label thông qua container cha Streamlit để tăng độ ưu tiên */
+/* Nhắm mục tiêu thông qua container cha Streamlit để tăng độ ưu tiên */
 [data-testid="stHorizontalBlock"] .stSelectbox label, 
 .stSelectbox label 
 {{
@@ -140,13 +142,13 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     font-weight: 700 !important;
     text-align: center;
     display: block;
-    font-size: 2rem !important; /* Đã tăng lên 2rem */
-    line-height: 2.2rem !important;
+    font-size: **3.5rem** !important; /* Đã tăng lên 3.5rem */
+    line-height: 2.5rem !important;
 }}
 
 /* Force override Streamlit default (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V9) */
 [data-testid="stWidgetLabel"] {{
-    font-size: 2rem !important; /* Đã tăng lên 2rem */
+    font-size: **3.5rem** !important; /* Đã tăng lên 3.5rem */
     color: #FFEB3B !important;
     font-weight: 700 !important;
 }}
@@ -159,13 +161,13 @@ div[data-baseweb="select"] > div {{
     font-size: 1.1rem;
 }}
 
-/* Mobile label size - Tăng kích thước chữ và ưu tiên CSS cao hơn (V8) */
+/* Mobile label size - Tăng kích thước chữ và ưu tiên CSS cao hơn (V9) */
 @media (max-width: 768px) {{
     [data-testid="stHorizontalBlock"] .stSelectbox label,
     .stSelectbox label, 
     [data-testid="stWidgetLabel"] 
     {{
-        font-size: **2rem** !important; /* Đã tăng lên 2rem */
+        font-size: **2.2rem** !important; /* Đã tăng lên 2.2rem */
     }}
 }}
 
@@ -298,7 +300,13 @@ else:
                 # Sử dụng cột tiếp theo trong st.columns(4)
                 with cols[i + 1]: 
                     
-                    options = sorted(current_df[col_name].dropna().unique().tolist()) if not current_df.empty else []
+                    if not current_df.empty:
+                        # Lấy giá trị duy nhất, chuyển sang chuỗi, loại bỏ chuỗi rỗng
+                        options = current_df[col_name].astype(str).str.strip().unique().tolist()
+                        options = [opt for opt in options if opt != ""] # <--- LỌC CHUỖI RỖNG
+                        options.sort()
+                    else:
+                        options = []
                     
                     label = ""
                     placeholder = ""
@@ -385,4 +393,3 @@ else:
 
     except Exception as e:
         st.error(f"Lỗi khi xử lý dữ liệu: {e}")
-
