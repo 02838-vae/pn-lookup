@@ -29,7 +29,7 @@ def load_and_clean(excel_file, sheet):
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS TOÀN BỘ (Đã chỉnh lại nền mobile) ---
+# --- CSS TOÀN BỘ (Đã chỉnh màu chữ dòng kết quả trên mobile thành màu đen) ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -96,7 +96,7 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     margin-bottom: 20px;
 }}
 
-/* === MOBILE (Đã thêm background-color: transparent) === */
+/* === MOBILE === */
 @media (max-width: 768px) {{
     .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
         background: url("data:image/jpeg;base64,{bg_mobile_base64}") no-repeat center top scroll !important;
@@ -167,7 +167,7 @@ div[data-baseweb="select"] > div {{
 .element-container:has(.stSelectbox) {{
     display: flex;
     justify-content: center;
-    background-color: transparent !important; /* Đảm bảo khu vực selectbox không có nền trắng */
+    background-color: transparent !important; 
 }}
 /* Loại bỏ nền trắng xung quanh các container Streamlit */
 [data-testid^="stHorizontalBlock"] {{
@@ -194,7 +194,7 @@ div[data-baseweb="select"] > div {{
 
 .custom-table th {{
     background-color: #2E7D32;
-    color: white;
+    color: white; /* Giữ màu chữ trắng cho tiêu đề bảng */
     padding: 14px;
     text-align: center !important;
     font-weight: bold;
@@ -208,6 +208,7 @@ div[data-baseweb="select"] > div {{
     border: 1px solid #ddd;
     vertical-align: middle;
     font-size: 1rem;
+    color: #000000; /* Đặt màu chữ đen cho nội dung bảng (PC) */
 }}
 
 .custom-table tr:nth-child(even) {{
@@ -218,7 +219,7 @@ div[data-baseweb="select"] > div {{
     background-color: #e0e0e0;
 }}
 
-/* === Mobile optimization === */
+/* === Mobile optimization (Đã thêm màu chữ đen cho dòng kết quả) === */
 @media (max-width: 768px) {{
     .table-container {{
         overflow-x: scroll;
@@ -236,6 +237,7 @@ div[data-baseweb="select"] > div {{
         font-size: 0.85rem;
         white-space: normal; 
         word-wrap: break-word; 
+        color: #000000; /* ⬅️ Đã thêm: Đặt màu chữ đen cho dòng kết quả trên mobile */
     }}
 }}
 </style>
