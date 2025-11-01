@@ -89,7 +89,7 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     color: #FFD54F;
     text-align: center;
     text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-    margin-top: 35px;
+    margin-top: 50px; /* ✅ Dịch xuống thêm */
     margin-bottom: 20px;
 }}
 
@@ -97,7 +97,7 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
 h3.dropdown-label {{
     color: #FFD700;
     text-align: center;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 800;
     text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
     margin-bottom: 0.4rem;
@@ -126,7 +126,7 @@ h3.dropdown-label {{
     #sub-static-title h2 {{
         font-size: 5vw;
         color: #FFD54F;
-        margin-top: 25px; /* Dịch xuống thêm */
+        margin-top: 35px; /* ✅ Dịch xuống thêm chút nữa */
     }}
 
     h3.dropdown-label {{
@@ -143,7 +143,7 @@ h3.dropdown-label {{
     }}
 }}
 
-/* === BẢNG HTML TÙY CHỈNH === */
+/* === BẢNG HTML === */
 .table-container {{
     overflow-x: auto;
     margin: 20px 0;
@@ -241,7 +241,15 @@ else:
                         options.sort()
                     else:
                         options = []
-                    placeholder = f"Chọn {col_labels[col_name].split()[-1]}..."
+
+                    # ✅ Tùy placeholder cho từng dropdown
+                    if col_name == "A/C":
+                        placeholder = "Chọn máy bay..."
+                    elif col_name == "DESCRIPTION":
+                        placeholder = "Chọn Mô tả..."
+                    else:
+                        placeholder = f"Chọn {col_labels[col_name].split()[-1]}..."
+
                     select_options = [placeholder] + options
                     selected = st.selectbox("", select_options, label_visibility="collapsed")
                     if selected != placeholder:
