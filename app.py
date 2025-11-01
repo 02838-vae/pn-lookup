@@ -6,9 +6,9 @@ import os
 # --- CẤU HÌNH ---
 st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1 - Tra Cứu PN", layout="wide")
 
-# --- HÀM PHỤ ---
+# --- HÀM HỖ TRỢ ---
 def get_base64_encoded_file(file_path):
-    if not os.path.exists(file_path):
+    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
         return ""
     with open(file_path, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
@@ -17,18 +17,19 @@ def load_and_clean(excel_file, sheet):
     try:
         df = pd.read_excel(excel_file, sheet_name=sheet)
         df.columns = df.columns.str.strip().str.upper()
+        df = df.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
         for col in df.columns:
             if df[col].dtype == "object":
                 df[col] = df[col].fillna("").astype(str).str.strip()
-        return df.dropna(how="all")
+        return df
     except Exception:
         return pd.DataFrame()
 
-# --- BACKGROUND ---
+# --- NỀN ---
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS ---
+# --- CSS TOÀN BỘ ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -37,16 +38,16 @@ st.markdown(f"""
 #MainMenu, footer, header {{visibility: hidden;}}
 div.block-container {{padding-top: 0;}}
 
-/* ===== BACKGROUND ===== */
+/* === NỀN PC === */
 .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
     background: url("data:image/jpeg;base64,{bg_pc_base64}") no-repeat center top fixed !important;
     background-size: cover !important;
     font-family: 'Oswald', sans-serif !important;
 }}
 
-/* ===== ANIMATION ===== */
+/* === HIỆU ỨNG CHỮ === */
 @keyframes scrollText {{
-  0% {{ transform: translateX(100%); }}
+  0% {{ transform: translateX(100vw); }}
   100% {{ transform: translateX(-100%); }}
 }}
 @keyframes colorShift {{
@@ -55,90 +56,143 @@ div.block-container {{padding-top: 0;}}
   100% {{ background-position: 0% 50%; }}
 }}
 
-/* ===== TIÊU ĐỀ CHÍNH ===== */
+/* === TIÊU ĐỀ CHÍNH (PC) === */
 #main-animated-title-container {{
   width: 100%;
+  height: 110px;
   overflow: hidden;
   text-align: center;
-  margin-top: 30px;
-  height: 95px;
+  margin-top: 35px;
 }}
 #main-animated-title-container h1 {{
   font-family: 'Oswald', sans-serif;
-  font-size: 3.6rem; /* thu nhỏ xíu để tránh mất nét */
+  font-size: 4.5rem;
   font-weight: 700;
+  letter-spacing: 6px;
   text-transform: uppercase;
   display: inline-block;
-  white-space: nowrap;
   background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
   background-size: 400% 400%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: colorShift 10s ease infinite, scrollText 5s linear infinite; /* ⚡ chạy nhanh gấp đôi bản trước */
+  animation: colorShift 10s ease infinite, scrollText 18s linear infinite;
   text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+  line-height: 1.3;
+  padding-bottom: 10px;
 }}
 
-/* ===== TIÊU ĐỀ PHỤ ===== */
+/* === TIÊU ĐỀ PHỤ === */
 #sub-static-title h2 {{
   font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
+  font-size: 2.4rem;
   color: #FFD54F;
   text-align: center;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-  margin-top: 30px; /* xuống xíu cho cân */
-  margin-bottom: 25px;
+  margin-top: 35px;
+  margin-bottom: 20px;
 }}
 
-/* ===== MOBILE ===== */
+/* === MOBILE === */
 @media (max-width: 768px) {{
   .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
     background: url("data:image/jpeg;base64,{bg_mobile_base64}") no-repeat center top scroll !important;
     background-size: cover !important;
   }}
-  #main-animated-title-container h1 {{
-    font-size: 7.5vw;
-    line-height: 1.2;
-    animation: colorShift 10s ease infinite, scrollText 4s linear infinite;
+
+  #main-animated-title-container {{
+    margin-top: 10px !important;
+    overflow: hidden;
+    height: auto;
+    white-space: nowrap;
   }}
+
+  #main-animated-title-container h1 {{
+    font-size: 8vw;
+    line-height: 1.1;
+    letter-spacing: 3px;
+    display: inline-block;
+    white-space: nowrap;
+    animation: colorShift 10s ease infinite, scrollText 15s linear infinite;
+    text-shadow: 2px 2px 7px rgba(0,0,0,0.8);
+  }}
+
   #sub-static-title h2 {{
     font-size: 5vw;
+    color: #FFD54F;
+    margin-top: 10px;
   }}
 }}
 
-/* ===== LABEL SELECTBOX ===== */
+/* === LABEL SELECTBOX === */
 .stSelectbox label {{
   color: #FFEB3B !important;
   font-weight: 700;
   text-align: center;
   display: block;
-  font-size: 1.7rem;
+  font-size: 1.5rem;
 }}
-div[data-testid="column"] {{
-  display: flex;
-  justify-content: center;
+div[data-baseweb="select"] {{
+  min-width: 250px !important;
 }}
 div[data-baseweb="select"] > div {{
   text-align: center;
+  font-size: 1.1rem;
 }}
 
-/* ===== BẢNG DỮ LIỆU ===== */
-.stDataFrame table {{
-  width: 100% !important;
+/* === CANH GIỮA DROPBOX CONTAINER === */
+.element-container:has(.stSelectbox) {{
+  display: flex;
+  justify-content: center;
+}}
+
+/* === BẢNG HTML TÙY CHỈNH === */
+.custom-table {{
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px auto;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}}
+
+.custom-table th {{
+  background-color: #2E7D32;
+  color: white;
+  padding: 14px;
   text-align: center !important;
+  font-weight: bold;
+  border: 1px solid #ddd;
+  font-size: 1.05rem;
 }}
-.stDataFrame tbody td, .stDataFrame thead th {{
+
+.custom-table td {{
+  padding: 12px;
   text-align: center !important;
-  vertical-align: middle !important;
+  border: 1px solid #ddd;
+  vertical-align: middle;
+  font-size: 1rem;
 }}
-.stDataFrame tbody td {{
-  padding: 10px !important;
-  white-space: nowrap;
+
+.custom-table tr:nth-child(even) {{
+  background-color: #f9f9f9;
 }}
-.stDataFrame thead th {{
-  background-color: rgba(255,255,255,0.85);
+
+.custom-table tr:hover {{
+  background-color: #f5f5f5;
 }}
-.stDataFrame div[data-testid="stDataFrameContainer"] > div {{
-  overflow-x: auto !important;
+
+.table-container {{
+  overflow-x: auto;
+  margin: 20px 0;
+}}
+
+/* === Cuộn ngang khi màn hình nhỏ === */
+@media (max-width: 768px) {{
+  .custom-table {{
+    font-size: 0.9rem;
+  }}
+  .custom-table th, .custom-table td {{
+    padding: 8px;
+  }}
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -155,11 +209,11 @@ if not os.path.exists(excel_file):
 else:
     try:
         xls = pd.ExcelFile(excel_file)
-        sheet_names = [n for n in xls.sheet_names if not n.startswith("Sheet")]
+        sheet_names = [name for name in xls.sheet_names if not name.startswith("Sheet")]
 
+        # --- CANH GIỮA DROPBOX ---
         st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
-
         with col1:
             zone = st.selectbox("📂 Zone", sheet_names)
         df = load_and_clean(excel_file, zone)
@@ -180,23 +234,47 @@ else:
         df = df[df["ITEM"] == item] if item else df
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # --- KẾT QUẢ ---
-        st.markdown("---")
-        if not df.empty:
+        # --- HIỂN THỊ KẾT QUẢ ---
+        df_display = df.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
+        df_display = df_display.dropna(axis=1, how="all")
+
+        if not df_display.empty and len(df_display) > 0:
+            st.markdown("---")
             st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
+            
+            df_display = df_display.reset_index(drop=True)
 
-            df_display = df.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
-            df_display = df_display.dropna(axis=1, how="all")
+            # Thêm cột STT vào trước PART NUMBER
+            cols = list(df_display.columns)
+            if "PART NUMBER" in cols:
+                idx = cols.index("PART NUMBER")
+                df_display.insert(idx, "STT", range(1, len(df_display) + 1))
+            else:
+                df_display.insert(0, "STT", range(1, len(df_display) + 1))
 
-            if not df_display.empty:
-                df_display = df_display.reset_index(drop=True)
-                cols = list(df_display.columns)
-                if "PART NUMBER" in cols:
-                    idx = cols.index("PART NUMBER")
-                    df_display.insert(idx, "STT", range(1, len(df_display) + 1))
-                else:
-                    df_display.insert(0, "STT", range(1, len(df_display) + 1))
-
-                st.dataframe(df_display, hide_index=True, use_container_width=True)
+            # Tạo HTML table hoàn toàn custom
+            html_parts = ['<div class="table-container">']
+            html_parts.append('<table class="custom-table">')
+            
+            # Header
+            html_parts.append('<thead><tr>')
+            for col in df_display.columns:
+                html_parts.append(f'<th>{col}</th>')
+            html_parts.append('</tr></thead>')
+            
+            # Body
+            html_parts.append('<tbody>')
+            for _, row in df_display.iterrows():
+                html_parts.append('<tr>')
+                for val in row:
+                    html_parts.append(f'<td>{val}</td>')
+                html_parts.append('</tr>')
+            html_parts.append('</tbody>')
+            
+            html_parts.append('</table>')
+            html_parts.append('</div>')
+            
+            st.markdown(''.join(html_parts), unsafe_allow_html=True)
+            
     except Exception as e:
         st.error(f"Lỗi khi đọc file Excel: {e}")
