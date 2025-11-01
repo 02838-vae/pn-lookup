@@ -3,7 +3,7 @@ import pandas as pd
 import base64
 import os
 
-# --- CẤU HÌNH ---
+# --- CẤU HÌNH BAN ĐẦU ---
 st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1 - Tra Cứu PN", layout="wide")
 
 # --- HÀM HỖ TRỢ ---
@@ -26,11 +26,11 @@ def load_and_clean(excel_file, sheet):
     except Exception:
         return pd.DataFrame()
 
-# --- ẢNH NỀN ---
+# --- ẢNH NỀN (chú ý: tên file đúng là PN_MOBILE.jpg) ---
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS CHÍNH ---
+# --- CSS CHÍNH (tăng size title, đổi màu subtitle) ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -39,14 +39,14 @@ st.markdown(f"""
 #MainMenu, footer, header {{visibility: hidden;}}
 div.block-container {{padding-top: 20px;}}
 
-/* === FIX NỀN PC === */
+/* Gắn background lên container chính để tránh bị override */
 .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
     background: url("data:image/jpeg;base64,{bg_pc_base64}") no-repeat center center fixed !important;
     background-size: cover !important;
     font-family: 'Oswald', sans-serif !important;
 }}
 
-/* Hiệu ứng chạy chữ */
+/* Hiệu ứng chữ */
 @keyframes scrollText {{
   0% {{ transform: translateX(100vw); }}
   100% {{ transform: translateX(-100%); }}
@@ -57,19 +57,19 @@ div.block-container {{padding-top: 20px;}}
   100% {{ background-position: 0% 50%; }}
 }}
 
-/* === TIÊU ĐỀ CHÍNH (PC) === */
+/* TIÊU ĐỀ CHÍNH (PC) - Tăng kích cỡ */
 #main-animated-title-container {{
   width: 100%;
-  height: 70px;
+  height: 90px;
   overflow: hidden;
   text-align: center;
-  margin-top: 25px;
+  margin-top: 30px;
 }}
 #main-animated-title-container h1 {{
   font-family: 'Oswald', sans-serif;
-  font-size: 3.5rem;
+  font-size: 5rem;                 /* Tăng to hơn */
   font-weight: 700;
-  letter-spacing: 5px;
+  letter-spacing: 6px;
   text-transform: uppercase;
   display: inline-block;
   background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
@@ -77,19 +77,20 @@ div.block-container {{padding-top: 20px;}}
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: colorShift 10s ease infinite, scrollText 18s linear infinite;
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-}}
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.65);
+}
 
+/* TIÊU ĐỀ PHỤ - màu vàng sáng, shadow dày để nổi trên nền */
 #sub-static-title h2 {{
   font-family: 'Playfair Display', serif;
-  font-size: 2.2rem;
-  color: #1f77b4;
+  font-size: 2.4rem;
+  color: #FFD54F;                  /* vàng sáng (đỡ lẫn với nền xanh nước biển) */
   text-align: center;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-  margin: 10px 0 20px 0;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+  margin: 12px 0 22px 0;
 }}
 
-/* === MOBILE === */
+/* MOBILE */
 @media (max-width: 768px) {{
   .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
     background: url("data:image/jpeg;base64,{bg_mobile_base64}") no-repeat center center scroll !important;
@@ -97,19 +98,25 @@ div.block-container {{padding-top: 20px;}}
   }}
 
   #main-animated-title-container {{
-    margin-top: 100px !important;
+    margin-top: 110px !important;   /* vẫn đảm bảo không bị che; có thể điều chỉnh nhỏ nếu cần */
+    overflow: hidden;
+    height: auto;
+    white-space: nowrap;
   }}
 
   #main-animated-title-container h1 {{
-    font-size: 7vw;       /* ✅ giảm nhẹ để tránh bị che dấu */
-    line-height: 1.3;
+    font-size: 9.5vw;                /* tăng chút so với trước, nhưng vẫn an toàn với margin-top */
+    line-height: 1.15;
     letter-spacing: 3px;
+    display: inline-block;
+    white-space: nowrap;
     animation: colorShift 10s ease infinite, scrollText 15s linear infinite;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.75);
   }}
 
   #sub-static-title h2 {{
-    font-size: 4.5vw;
+    font-size: 5.2vw;
+    color: #FFD54F;                  /* giữ màu nổi trên mobile */
     margin-top: 40px;
   }}
 }}
@@ -124,43 +131,4 @@ st.markdown("---")
 # --- TRA CỨU DỮ LIỆU ---
 excel_file = "A787.xlsx"
 if not os.path.exists(excel_file):
-    st.error("❌ Không tìm thấy file A787.xlsx trong thư mục hiện tại.")
-else:
-    try:
-        xls = pd.ExcelFile(excel_file)
-        sheet_names = [name for name in xls.sheet_names if not name.startswith("Sheet")]
-
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            zone = st.selectbox("📂 Zone", sheet_names)
-        df = load_and_clean(excel_file, zone)
-
-        with col2:
-            aircrafts = sorted(df["A/C"].dropna().unique().tolist()) if "A/C" in df.columns else []
-            aircraft = st.selectbox("✈️ Loại máy bay", aircrafts) if aircrafts else None
-        df = df[df["A/C"] == aircraft] if aircraft else df
-
-        with col3:
-            descs = sorted(df["DESCRIPTION"].dropna().unique().tolist()) if "DESCRIPTION" in df.columns else []
-            desc = st.selectbox("📑 Mô tả chi tiết", descs) if descs else None
-        df = df[df["DESCRIPTION"] == desc] if desc else df
-
-        with col4:
-            items = sorted(df["ITEM"].dropna().unique().tolist()) if "ITEM" in df.columns else []
-            item = st.selectbox("🔢 Item", items) if items else None
-        df = df[df["ITEM"] == item] if item else df
-
-        st.markdown("---")
-        st.markdown("### 📋 Kết quả tra cứu:")
-
-        df_display = df.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
-        df_display = df_display.dropna(axis=1, how="all")
-
-        if not df_display.empty:
-            df_display.insert(0, "STT", range(1, len(df_display)+1))
-            st.success(f"✅ Tìm thấy {len(df_display)} dòng dữ liệu.")
-            st.dataframe(df_display)
-        else:
-            st.warning("📌 Không có dữ liệu phù hợp với các lựa chọn.")
-    except Exception as e:
-        st.error(f"Lỗi khi đọc file Excel: {e}")
+    st
