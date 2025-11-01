@@ -56,7 +56,7 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     100% {{ background-position: 0% 50%; }}
 }}
 
-/* === TIÊU ĐỀ CHÍNH === */
+/* === TIÊU ĐỀ CHÍNH (CHẠY NHANH HƠN) === */
 #main-animated-title-container {{
     width: 100%;
     height: 110px;
@@ -76,20 +76,20 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     background-size: 400% 400%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: colorShift 10s ease infinite, scrollText 14s linear infinite;
+    animation: colorShift 10s ease infinite, scrollText 10s linear infinite; /* ✅ Nhanh hơn */
     text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
     line-height: 1.3;
     padding-bottom: 10px;
 }}
 
-/* === TIÊU ĐỀ PHỤ === */
+/* === TIÊU ĐỀ PHỤ (TRA CỨU...) DỊCH XUỐNG HƠN) === */
 #sub-static-title h2 {{
     font-family: 'Playfair Display', serif;
     font-size: 2.4rem;
     color: #FFD54F;
     text-align: center;
     text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-    margin-top: 50px; /* ✅ Dịch xuống thêm */
+    margin-top: 70px; /* ✅ Dịch xuống thêm nữa */
     margin-bottom: 20px;
 }}
 
@@ -119,18 +119,18 @@ h3.dropdown-label {{
     #main-animated-title-container h1 {{
         font-size: 7vw;
         letter-spacing: 3px;
-        animation: colorShift 10s ease infinite, scrollText 12s linear infinite;
+        animation: colorShift 10s ease infinite, scrollText 9s linear infinite; /* ✅ Mobile cũng nhanh hơn */
         text-shadow: 2px 2px 7px rgba(0,0,0,0.8);
     }}
 
     #sub-static-title h2 {{
         font-size: 5vw;
         color: #FFD54F;
-        margin-top: 35px; /* ✅ Dịch xuống thêm chút nữa */
+        margin-top: 50px; /* ✅ Dịch xuống thêm nữa */
     }}
 
     h3.dropdown-label {{
-        font-size: 4.8vw; /* To hơn xíu */
+        font-size: 4.8vw;
         line-height: 1.1;
         margin-bottom: 0.5rem;
     }}
@@ -209,7 +209,6 @@ else:
         st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
         cols = st.columns(4)
         
-        # --- Zone ---
         with cols[0]:
             st.markdown("<h3 class='dropdown-label'>📂 Zone</h3>", unsafe_allow_html=True)
             zone_options = ["Chọn Zone..."] + sheet_names
@@ -224,7 +223,6 @@ else:
 
         available_cols = [col for col in REQUIRED_COLS if col in current_df.columns]
 
-        # --- Các dropdown còn lại ---
         col_labels = {
             "A/C": "✈️ Loại máy bay",
             "DESCRIPTION": "📑 Mô tả chi tiết",
@@ -242,7 +240,6 @@ else:
                     else:
                         options = []
 
-                    # ✅ Tùy placeholder cho từng dropdown
                     if col_name == "A/C":
                         placeholder = "Chọn máy bay..."
                     elif col_name == "DESCRIPTION":
@@ -259,7 +256,6 @@ else:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # --- KẾT QUẢ ---
         if selection["Zone"] and all(selection.get(col) for col in available_cols) and not current_df.empty:
             st.markdown("---")
             st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
