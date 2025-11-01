@@ -9,8 +9,8 @@ def load_image_base64(image_path):
         return base64.b64encode(img_file.read()).decode()
 
 # ======== ẢNH NỀN PC & MOBILE ========
-bg_pc_path = "background_pc.jpg"
-bg_mobile_path = "background_mobile.jpg"
+bg_pc_path = "PN_PC.jpg"
+bg_mobile_path = "PN_mobile.jpg"
 
 bg_pc_base64 = load_image_base64(bg_pc_path) if os.path.exists(bg_pc_path) else ""
 bg_mobile_base64 = load_image_base64(bg_mobile_path) if os.path.exists(bg_mobile_path) else ""
@@ -245,3 +245,4 @@ else:
             st.info("⚠️ Không tìm thấy kết quả nào phù hợp với lựa chọn của bạn.")
     except Exception as e:
         st.error(f"Lỗi khi xử lý dữ liệu: {e}")
+
