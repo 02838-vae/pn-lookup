@@ -56,7 +56,7 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     100% {{ background-position: 0% 50%; }}
 }}
 
-/* === TIÊU ĐỀ CHÍNH (PC) === */
+/* === TIÊU ĐỀ CHÍNH === */
 #main-animated-title-container {{
     width: 100%;
     height: 110px;
@@ -126,12 +126,20 @@ h3.dropdown-label {{
     #sub-static-title h2 {{
         font-size: 5vw;
         color: #FFD54F;
-        margin-top: 10px;
+        margin-top: 25px; /* Dịch xuống thêm */
     }}
 
     h3.dropdown-label {{
-        font-size: 4.3vw;
+        font-size: 4.8vw; /* To hơn xíu */
         line-height: 1.1;
+        margin-bottom: 0.5rem;
+    }}
+
+    /* Giúp bảng có thể vuốt ngang */
+    .table-container {{
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
     }}
 }}
 
@@ -150,6 +158,7 @@ h3.dropdown-label {{
     box-shadow: 0 0 15px rgba(0,0,0,0.3); 
     border-radius: 8px; 
     overflow: hidden; 
+    table-layout: auto;
 }}
 
 .custom-table th {{
@@ -160,6 +169,7 @@ h3.dropdown-label {{
     font-weight: bold;
     border: 1px solid #ddd;
     font-size: 1.05rem;
+    white-space: nowrap;
 }}
 
 .custom-table td {{
@@ -169,6 +179,7 @@ h3.dropdown-label {{
     vertical-align: middle;
     font-size: 1rem;
     color: #000000;
+    white-space: nowrap;
 }}
 
 .custom-table tr:nth-child(even) {{background-color: #f9f9f9;}}
@@ -250,7 +261,6 @@ else:
             df_display = df_display.reset_index(drop=True)
             df_display.insert(0, "STT", range(1, len(df_display) + 1))
 
-            # hiển thị bảng HTML (định dạng đẹp như cũ)
             html_parts = ['<div class="table-container"><table class="custom-table">']
             html_parts.append('<thead><tr>')
             for col in df_display.columns:
