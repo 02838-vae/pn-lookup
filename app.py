@@ -52,6 +52,7 @@ def load_and_clean(excel_file, sheet):
 
 
 # --- TẢI FILE ẢNH NỀN ---
+# Đảm bảo các file này tồn tại trong cùng thư mục với script Streamlit
 bg_pc_base64 = get_base64_encoded_file("cabbase.jpg") 
 bg_mobile_base64 = get_base64_encoded_file("mobile.jpg")
 
@@ -59,7 +60,7 @@ bg_mobile_base64 = get_base64_encoded_file("mobile.jpg")
 # --- HÀM RENDER TRANG CHỦ (Tĩnh hoàn toàn) ---
 def render_home_page():
     
-    # 1. CSS CHUNG (Đã tinh giản tối đa)
+    # 1. CSS CHUNG (Đã tinh giản tối đa, khôi phục background)
     hide_streamlit_style = f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
@@ -69,19 +70,25 @@ def render_home_page():
     .main {{ padding: 0; margin: 0; }}
     div.block-container {{ padding: 0; margin: 0; max-width: 100% !important; }}
 
-    /* Nền tĩnh */
+    /* Nền tĩnh - Đã khôi phục */
     .stApp {{
         --main-bg-url-pc: url('data:image/jpeg;base64,{bg_pc_base64}');
         --main-bg-url-mobile: url('data:image/jpeg;base64,{bg_mobile_base64}');
-        background-color: black;
-        background-image: var(--main-bg-url-pc); 
+        background-color: black; /* Màu dự phòng */
+        background-image: var(--main-bg-url-pc); /* Hình nền cho PC */
         background-size: cover; 
         background-position: center;
         background-attachment: fixed; 
         /* Hiệu ứng màu nền */
         filter: sepia(60%) grayscale(20%) brightness(85%) contrast(110%);
+        /* Transition nhẹ nhàng khi tải */
+        transition: background-image 1s ease-in-out, filter 1s ease-in-out;
     }}
-    @media (max-width: 768px) {{ .stApp {{ background-image: var(--main-bg-url-mobile); }} }}
+    @media (max-width: 768px) {{ 
+        .stApp {{ 
+            background-image: var(--main-bg-url-mobile); /* Hình nền cho Mobile */
+        }} 
+    }}
     
     /* Animation cho tiêu đề chính */
     @keyframes scrollText {{ 0% {{ transform: translate(100vw, 0); }} 100% {{ transform: translate(-100%, 0); }} }}
@@ -100,10 +107,10 @@ def render_home_page():
         animation: colorShift 10s ease infinite, scrollText 15s linear infinite; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }}
     
-    /* Container nút: Luôn hiển thị */
+    /* Container nút: Luôn hiển thị, chỉ còn 1 nút nên center */
     .button-container-fixed {{
         position: fixed; top: 45vh; width: 100%; z-index: 100;
-        display: flex; justify-content: center; gap: 60px;
+        display: flex; justify-content: center; /* Đã thay đổi thành center */
         align-items: center; padding: 0 5vw; 
         box-sizing: border-box; opacity: 1; 
     }}
@@ -116,7 +123,8 @@ def render_home_page():
         text-shadow: 0 0 4px rgba(0, 255, 255, 0.8), 0 0 10px rgba(34, 141, 255, 0.6);
         box-shadow: 0 0 5px #00ffff, 0 0 15px rgba(0, 255, 255, 0.5);
         transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        white-space: nowrap; flex-grow: 1; max-width: 400px; min-height: 60px; line-height: 1.2;
+        white-space: nowrap; flex-grow: 0; /* Đã thay đổi thành 0 vì chỉ có 1 nút */
+        max-width: 400px; min-height: 60px; line-height: 1.2;
     }}
     .stButton > button:hover {{
         transform: scale(1.05); color: #ffd700; border-color: #ffd700;
@@ -140,17 +148,13 @@ def render_home_page():
     </div>
     """, unsafe_allow_html=True)
 
-    # --- NÚT CHUYỂN TRANG ---
+    # --- NÚT CHUYỂN TRANG (Chỉ còn nút Part Number) ---
     st.markdown('<div class="button-container-fixed">', unsafe_allow_html=True)
-    col_part, col_quiz = st.columns([1, 1])
+    
+    # Chỉ giữ lại nút "Tra cứu Part Number"
+    if st.button("Tra cứu Part Number 🔍", key="btn_part_number_home", help="Chuyển đến trang tra cứu"):
+        navigate_to('part_number')
 
-    with col_part:
-        if st.button("Tra cứu Part Number 🔍", key="btn_part_number_home", help="Chuyển đến trang tra cứu"):
-            navigate_to('part_number')
-
-    with col_quiz:
-        if st.button("Ngân hàng trắc nghiệm 📋✅", key="btn_quiz_bank_home", help="Chuyển đến trang trắc nghiệm"):
-            navigate_to('quiz_bank')
     st.markdown('</div>', unsafe_allow_html=True)
 
 
@@ -237,7 +241,9 @@ def render_part_number_page():
         st.error(f"Lỗi khi xử lý file Excel: {e}")
 
 
-# --- HÀM RENDER TRANG QUIZ BANK (Giữ nguyên logic) ---
+# --- HÀM RENDER TRANG QUIZ BANK (Không còn được dùng trực tiếp) ---
+# Hàm này vẫn tồn tại nhưng không có nút nào dẫn tới nó từ trang chủ.
+# Tuy nhiên, nếu bạn muốn dùng nó sau này, nó vẫn sẽ hoạt động khi điều hướng trực tiếp
 def render_quiz_bank_page():
     st.markdown("""
     <style>
