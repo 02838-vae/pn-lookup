@@ -10,7 +10,7 @@ st.set_page_config(
 )
 
 # --- CÁC HÀM TIỆN ÍCH DÙNG CHUNG ---
-def get_base64_encoded_file(file_path, mime_type=""):
+def get_base64_encoded_file(file_path):
     """Đọc file và trả về Base64 encoded string."""
     fallback_base64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
     if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
@@ -37,7 +37,7 @@ def load_and_clean(excel_file, sheet):
         return pd.DataFrame()
 
 
-# --- TẢI FILE ẢNH NỀN ---
+# --- TẢI ẢNH NỀN ---
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_MOBILE.jpg")
 
@@ -49,7 +49,7 @@ def render_main_interface():
         st.error("❌ Không tìm thấy file A787.xlsx. Vui lòng đặt file này vào cùng thư mục với script.")
         st.stop()
 
-    # --- CSS TÙY CHỈNH ---
+    # --- CSS ---
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -86,11 +86,11 @@ def render_main_interface():
         overflow: hidden;
         white-space: nowrap;
         text-align: center;
-        margin-top: 15px;
+        margin-top: 20px;
     }}
     #main-animated-title-container h1 {{
         font-family: 'Oswald', sans-serif;
-        font-size: 4rem;
+        font-size: 3.5rem;
         font-weight: 700;
         letter-spacing: 5px;
         margin: 0;
@@ -120,7 +120,7 @@ def render_main_interface():
         .stApp {{
             background-image: url("data:image/jpeg;base64,{bg_mobile_base64}") !important;
             background-repeat: no-repeat !important;
-            background-attachment: scroll !important;
+            background-attachment: scroll !important; /* ✅ tránh lỗi mất nền */
             background-position: center center !important;
             background-size: cover !important;
         }}
@@ -129,22 +129,23 @@ def render_main_interface():
             overflow: hidden;
             height: auto;
             white-space: nowrap;
-            margin-top: 70px !important; /* ✅ Đẩy xuống xa hơn để không bị che dấu */
+            margin-top: 90px !important; /* ✅ đẩy tiêu đề xuống xa hơn để không bị che dấu */
         }}
 
         #main-animated-title-container h1 {{
-            font-size: 8.5vw;
+            font-size: 7.5vw; /* ✅ giảm nhẹ để tránh bị cắt dấu */
             letter-spacing: 3px;
             padding: 0 10px;
-            line-height: 1.1;
+            line-height: 1.2;
             display: inline-block;
             white-space: nowrap;
             animation: colorShift 10s ease infinite, scrollText 15s linear infinite;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
         }}
 
         #sub-static-title h2 {{
             font-size: 4.5vw;
-            margin-top: 35px;
+            margin-top: 40px;
         }}
     }}
     </style>
@@ -165,12 +166,10 @@ def render_main_interface():
             st.markdown("### Chọn thông số để tra cứu:")
             col1, col2, col3, col4 = st.columns(4)
 
-            # Zone
             with col1:
                 zone = st.selectbox("📂 Zone", sheet_names, key="select_zone")
             df = load_and_clean(excel_file, zone)
 
-            # Aircraft
             with col2:
                 if "A/C" in df.columns:
                     aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac])
@@ -179,7 +178,6 @@ def render_main_interface():
                     aircraft = None
             df_ac = df[df["A/C"] == aircraft] if aircraft else df
 
-            # Description
             with col3:
                 if "DESCRIPTION" in df_ac.columns:
                     desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d])
@@ -188,7 +186,6 @@ def render_main_interface():
                     description = None
             df_desc = df_ac[df_ac["DESCRIPTION"] == description] if description else df_ac
 
-            # Item
             with col4:
                 if "ITEM" in df_desc.columns:
                     items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i])
@@ -213,5 +210,5 @@ def render_main_interface():
         st.error(f"Lỗi khi xử lý file Excel: {e}")
 
 
-# --- LOGIC CHÍNH ---
+# --- CHẠY ỨNG DỤNG ---
 render_main_interface()
