@@ -131,35 +131,36 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     }}
 }}
 
-/* === LABEL SELECTBOX (PC) - Ghi đè CSS tuyệt đối (V10) === */
-
-/* Selector chung có độ ưu tiên cao */
-div[data-testid*="stSelectbox"] label, 
-[data-testid="stWidgetLabel"] {{
+/* === LABEL SELECTBOX (PC) - ép phông chữ lớn thật === */
+div[data-testid="stSelectbox"] > label,
+[data-testid="stSelectbox"] label,
+[data-testid="stWidgetLabel"],
+[data-testid="stSelectboxLabel"],
+.css-16idsys.e16nr0p33, /* lớp ẩn danh của Streamlit cho label */
+.css-1offfwp.e1fqkh3o4 /* fallback lớp khác */ 
+{
+    font-size: 2.8rem !important;
+    font-weight: 800 !important;
     color: #FFEB3B !important;
-    font-weight: 700 !important;
-    text-align: center;
-    display: block;
-    font-size: **3.6rem** !important; /* Tăng lên 3.6rem */
-    line-height: 2.5rem !important;
-}}
+    text-align: center !important;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.7) !important;
+    line-height: 3.2rem !important;
+    display: block !important;
+    margin-bottom: 0.6rem !important;
+    letter-spacing: 1px !important;
+}
 
-div[data-baseweb="select"] {{
-    min-width: 250px !important;
-}}
-div[data-baseweb="select"] > div {{
-    text-align: center;
-    font-size: 1.1rem;
-}}
+/* === MOBILE - thu nhỏ lại cho vừa màn hình === */
+@media (max-width: 768px) {
+    div[data-testid="stSelectbox"] > label,
+    [data-testid="stWidgetLabel"],
+    .css-16idsys.e16nr0p33,
+    .css-1offfwp.e1fqkh3o4 {
+        font-size: 1.8rem !important;
+        line-height: 2rem !important;
+    }
+}
 
-/* Mobile label size - Ghi đè CSS tuyệt đối (V10) */
-@media (max-width: 768px) {{
-    div[data-testid*="stSelectbox"] label,
-    [data-testid="stWidgetLabel"] 
-    {{
-        font-size: **2.4rem** !important; /* Tăng lên 2.4rem */
-    }}
-}}
 
 /* === CANH GIỮA DROPBOX CONTAINER === */
 .element-container:has(.stSelectbox) {{
@@ -383,3 +384,4 @@ else:
 
     except Exception as e:
         st.error(f"Lỗi khi xử lý dữ liệu: {e}")
+
