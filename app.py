@@ -29,7 +29,7 @@ def load_and_clean(excel_file, sheet):
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS TOÀN BỘ (Đã áp dụng CSS cực đoan cho tiêu đề dropbox V10) ---
+# --- CSS TOÀN BỘ (Đã áp dụng CSS cực đoan cho tiêu đề dropbox V11) ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -131,36 +131,33 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     }}
 }}
 
-/* === LABEL SELECTBOX (PC) - ép phông chữ lớn thật === */
-div[data-testid="stSelectbox"] > label,
-[data-testid="stSelectbox"] label,
-[data-testid="stWidgetLabel"],
-[data-testid="stSelectboxLabel"],
-.css-16idsys.e16nr0p33, /* lớp ẩn danh của Streamlit cho label */
-.css-1offfwp.e1fqkh3o4 /* fallback lớp khác */ 
-{
-    font-size: 2.8rem !important;
-    font-weight: 800 !important;
+/* === LABEL SELECTBOX (PC) - Ghi đè CSS tuyệt đối (V11) === */
+
+/* Nhắm mục tiêu tất cả các label trong mọi div Streamlit với độ ưu tiên cao nhất */
+div label, [data-testid="stWidgetLabel"] {{
     color: #FFEB3B !important;
-    text-align: center !important;
-    text-shadow: 2px 2px 6px rgba(0,0,0,0.7) !important;
-    line-height: 3.2rem !important;
-    display: block !important;
-    margin-bottom: 0.6rem !important;
-    letter-spacing: 1px !important;
-}
+    font-weight: 700 !important;
+    text-align: center;
+    display: block;
+    font-size: **4rem** !important; /* Tăng lên 4rem */
+    line-height: 2.5rem !important;
+}}
 
-/* === MOBILE - thu nhỏ lại cho vừa màn hình === */
-@media (max-width: 768px) {
-    div[data-testid="stSelectbox"] > label,
-    [data-testid="stWidgetLabel"],
-    .css-16idsys.e16nr0p33,
-    .css-1offfwp.e1fqkh3o4 {
-        font-size: 1.8rem !important;
-        line-height: 2rem !important;
-    }
-}
+div[data-baseweb="select"] {{
+    min-width: 250px !important;
+}}
+div[data-baseweb="select"] > div {{
+    text-align: center;
+    font-size: 1.1rem;
+}}
 
+/* Mobile label size - Ghi đè CSS tuyệt đối (V11) */
+@media (max-width: 768px) {{
+    div label, [data-testid="stWidgetLabel"] 
+    {{
+        font-size: **2.5rem** !important; /* Tăng lên 2.5rem */
+    }}
+}}
 
 /* === CANH GIỮA DROPBOX CONTAINER === */
 .element-container:has(.stSelectbox) {{
@@ -260,7 +257,6 @@ else:
 
         # --- KHỞI TẠO GIÁ TRỊ BAN ĐẦU ---
         selection = {"Zone": None, "A/C": None, "DESCRIPTION": None, "ITEM": None}
-        current_df = pd.DataFrame()
         
         # --- CANH GIỮA DROPBOX ---
         st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
@@ -273,13 +269,17 @@ else:
             if zone_selected != "Chọn Zone...":
                 selection["Zone"] = zone_selected
         
+        # Tải DF cho sheet được chọn
         if selection["Zone"]:
-            current_df = load_and_clean(excel_file, selection["Zone"])
+            full_df = load_and_clean(excel_file, selection["Zone"])
         else:
-            current_df = pd.DataFrame() 
+            full_df = pd.DataFrame() 
+
+        # Tạo DataFrame tạm thời để lọc cho Selectbox tiếp theo
+        current_df = full_df.copy()
 
         # Lọc các cột cần thiết có trong sheet hiện tại
-        available_cols = [col for col in REQUIRED_COLS if col in current_df.columns]
+        available_cols = [col for col in REQUIRED_COLS if col in full_df.columns]
         
         # Biến đếm số Selectbox đã được tạo (bao gồm Zone)
         selectbox_count = 1
@@ -288,6 +288,7 @@ else:
         for i, col_name in enumerate(REQUIRED_COLS):
             if col_name in available_cols:
                 selectbox_count += 1
+                
                 # Sử dụng cột tiếp theo trong st.columns(4)
                 with cols[i + 1]: 
                     
@@ -319,11 +320,11 @@ else:
                     if selected != placeholder:
                         selection[col_name] = selected
 
-                    # Lọc DataFrame dựa trên lựa chọn hiện tại
+                    # Lọc DataFrame cho các Selectbox tiếp theo
                     if selection[col_name]:
-                        current_df = current_df[current_df[col_name] == selection[col_name]]
-                    else:
-                        pass
+                        current_df = current_df[current_df[col_name] == selection[col_name]].copy()
+                    # else:
+                        # Nếu chưa chọn, giữ nguyên current_df (đã được lọc bởi các Selectbox trước)
 
         st.markdown("</div>", unsafe_allow_html=True)
         
@@ -334,6 +335,7 @@ else:
         selected_count += sum(1 for col in available_cols if selection[col] is not None)
         
         # Điều kiện hiển thị
+        # Chỉ hiển thị khi chọn đủ (Zone + tất cả các Selectbox con có sẵn)
         is_fully_selected = (selected_count == selectbox_count)
         is_result_available = not current_df.empty and len(current_df) > 0
 
@@ -384,4 +386,3 @@ else:
 
     except Exception as e:
         st.error(f"Lỗi khi xử lý dữ liệu: {e}")
-
