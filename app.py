@@ -131,19 +131,19 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     }}
 }}
 
-/* === LABEL SELECTBOX (PC) - Đã tăng kích thước chữ === */
+/* === LABEL SELECTBOX (PC) - Đã tăng kích thước chữ (V6) === */
 .stSelectbox label {{
     color: #FFEB3B !important;
     font-weight: 700 !important;
     text-align: center;
     display: block;
-    font-size: **2.6rem** !important; /* Đã tăng */
+    font-size: **2.8rem** !important; /* Đã tăng */
     line-height: 2.5rem !important;
 }}
 
-/* Force override Streamlit default (PC) - Đã tăng kích thước chữ */
+/* Force override Streamlit default (PC) - Đã tăng kích thước chữ (V6) */
 [data-testid="stWidgetLabel"] {{
-    font-size: **2.6rem** !important; /* Đã tăng */
+    font-size: **2.8rem** !important; /* Đã tăng */
     color: #FFEB3B !important;
     font-weight: 700 !important;
 }}
@@ -156,10 +156,10 @@ div[data-baseweb="select"] > div {{
     font-size: 1.1rem;
 }}
 
-/* Mobile label size - Đã tăng kích thước chữ */
+/* Mobile label size - Đã tăng kích thước chữ (V6) */
 @media (max-width: 768px) {{
     .stSelectbox label, [data-testid="stWidgetLabel"] {{
-        font-size: **1.5rem** !important; /* Đã tăng */
+        font-size: **1.6rem** !important; /* Đã tăng */
     }}
 }}
 
