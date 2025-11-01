@@ -159,15 +159,26 @@ else:
         df = df[df["ITEM"] == item] if item else df
 
         st.markdown("---")
-        st.markdown("### 📋 Kết quả tra cứu:")
+        # 🟩 Tiêu đề Kết quả tra cứu căn giữa
+        st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
 
+        # Xử lý DataFrame hiển thị
         df_display = df.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
         df_display = df_display.dropna(axis=1, how="all")
 
         if not df_display.empty:
-            df_display.insert(0, "STT", range(1, len(df_display)+1))
+            df_display = df_display.reset_index(drop=True)
+
+            # Thêm cột STT vào trước cột PART NUMBER
+            cols = list(df_display.columns)
+            if "PART NUMBER" in cols:
+                idx = cols.index("PART NUMBER")
+                df_display.insert(idx, "STT", range(1, len(df_display) + 1))
+            else:
+                df_display.insert(0, "STT", range(1, len(df_display) + 1))
+
             st.success(f"✅ Tìm thấy {len(df_display)} dòng dữ liệu.")
-            st.dataframe(df_display)
+            st.dataframe(df_display, hide_index=True)
         else:
             st.warning("📌 Không có dữ liệu phù hợp với các lựa chọn.")
     except Exception as e:
