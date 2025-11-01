@@ -121,6 +121,22 @@ div.block-container {{padding-top: 0;}}
     margin-top: 10px;
   }}
 }}
+
+/* === CĂN GIỮA NỘI DUNG TRONG BẢNG === */
+table.dataframe, .stDataFrame table {{
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center !important;
+}}
+.stDataFrame tbody td, .stDataFrame thead th {{
+  text-align: center !important;
+  vertical-align: middle !important;
+}}
+
+/* === Cho phép cuộn ngang bảng trên mobile === */
+.stDataFrame div[data-testid="stDataFrameContainer"] > div {{
+  overflow-x: auto !important;
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -159,7 +175,6 @@ else:
         df = df[df["ITEM"] == item] if item else df
 
         st.markdown("---")
-        # 🟩 Tiêu đề Kết quả tra cứu căn giữa
         st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
 
         # Xử lý DataFrame hiển thị
@@ -169,7 +184,7 @@ else:
         if not df_display.empty:
             df_display = df_display.reset_index(drop=True)
 
-            # Thêm cột STT vào trước cột PART NUMBER
+            # Thêm cột STT vào trước PART NUMBER
             cols = list(df_display.columns)
             if "PART NUMBER" in cols:
                 idx = cols.index("PART NUMBER")
@@ -177,8 +192,8 @@ else:
             else:
                 df_display.insert(0, "STT", range(1, len(df_display) + 1))
 
-            st.success(f"✅ Tìm thấy {len(df_display)} dòng dữ liệu.")
-            st.dataframe(df_display, hide_index=True)
+            # Hiển thị bảng — tất cả nội dung canh giữa, có thể vuốt ngang trên mobile
+            st.dataframe(df_display, hide_index=True, use_container_width=True)
         else:
             st.warning("📌 Không có dữ liệu phù hợp với các lựa chọn.")
     except Exception as e:
