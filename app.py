@@ -131,7 +131,7 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     }}
 }}
 
-/* === LABEL SELECTBOX (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V8) === */
+/* === LABEL SELECTBOX (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V9) === */
 /* Nhắm mục tiêu vào label thông qua container cha Streamlit để tăng độ ưu tiên */
 [data-testid="stHorizontalBlock"] .stSelectbox label, 
 .stSelectbox label 
@@ -140,13 +140,13 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     font-weight: 700 !important;
     text-align: center;
     display: block;
-    font-size: **3.2rem** !important; /* Đã tăng lên 3.2rem */
-    line-height: 2.5rem !important;
+    font-size: 2rem !important; /* Đã tăng lên 2rem */
+    line-height: 2.2rem !important;
 }}
 
-/* Force override Streamlit default (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V8) */
+/* Force override Streamlit default (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V9) */
 [data-testid="stWidgetLabel"] {{
-    font-size: **3.2rem** !important; /* Đã tăng lên 3.2rem */
+    font-size: 2rem !important; /* Đã tăng lên 2rem */
     color: #FFEB3B !important;
     font-weight: 700 !important;
 }}
@@ -385,3 +385,4 @@ else:
 
     except Exception as e:
         st.error(f"Lỗi khi xử lý dữ liệu: {e}")
+
