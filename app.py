@@ -3,14 +3,15 @@ import pandas as pd
 import base64
 import os
 
-# --- CẤU HÌNH ---
+# --- CẤU HÌNH BAN ĐẦU ---
 st.set_page_config(
     page_title="Tổ Bảo Dưỡng Số 1 - Tra Cứu PN",
     layout="wide",
 )
 
-# --- HÀM TIỆN ÍCH ---
-def get_base64_encoded_file(file_path):
+# --- CÁC HÀM TIỆN ÍCH DÙNG CHUNG ---
+def get_base64_encoded_file(file_path, mime_type=""):
+    """Đọc file và trả về Base64 encoded string."""
     fallback_base64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
     if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
         return fallback_base64
@@ -18,10 +19,12 @@ def get_base64_encoded_file(file_path):
         with open(file_path, "rb") as f:
             data = f.read()
         return base64.b64encode(data).decode("utf-8")
-    except:
+    except Exception:
         return fallback_base64
 
+
 def load_and_clean(excel_file, sheet):
+    """Tải và làm sạch DataFrame từ Excel sheet."""
     try:
         df = pd.read_excel(excel_file, sheet_name=sheet)
         df.columns = df.columns.str.strip().str.upper()
@@ -30,21 +33,23 @@ def load_and_clean(excel_file, sheet):
             if df[col].dtype == "object":
                 df[col] = df[col].fillna("").astype(str).str.strip()
         return df
-    except:
+    except Exception:
         return pd.DataFrame()
 
-# --- ẢNH NỀN ---
+
+# --- TẢI FILE ẢNH NỀN ---
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
-bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
+bg_mobile_base64 = get_base64_encoded_file("PN_MOBILE.jpg")
+
 
 # --- GIAO DIỆN CHÍNH ---
 def render_main_interface():
     excel_file = "A787.xlsx"
     if not os.path.exists(excel_file):
-        st.error("❌ Không tìm thấy file A787.xlsx.")
+        st.error("❌ Không tìm thấy file A787.xlsx. Vui lòng đặt file này vào cùng thư mục với script.")
         st.stop()
 
-    # --- CSS ---
+    # --- CSS TÙY CHỈNH ---
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -81,7 +86,7 @@ def render_main_interface():
         overflow: hidden;
         white-space: nowrap;
         text-align: center;
-        margin-top: 15px; /* đẩy nhẹ xuống để tránh bị che */
+        margin-top: 15px;
     }}
     #main-animated-title-container h1 {{
         font-family: 'Oswald', sans-serif;
@@ -124,7 +129,7 @@ def render_main_interface():
             overflow: hidden;
             height: auto;
             white-space: nowrap;
-            margin-top: 50px !important; /* ✅ đẩy xuống xa hơn để tránh lớp chồng */
+            margin-top: 70px !important; /* ✅ Đẩy xuống xa hơn để không bị che dấu */
         }}
 
         #main-animated-title-container h1 {{
@@ -150,43 +155,63 @@ def render_main_interface():
     st.markdown('<div id="sub-static-title"><h2>🔎 TRA CỨU PART NUMBER</h2></div>', unsafe_allow_html=True)
     st.markdown("---")
 
-    # --- TRA CỨU EXCEL ---
+    # --- TRA CỨU DỮ LIỆU ---
     try:
         xls = pd.ExcelFile(excel_file)
-        sheet_names = [s for s in xls.sheet_names if not s.startswith("Sheet")]
+        sheet_names = [name for name in xls.sheet_names if not name.startswith("Sheet")]
 
-        st.markdown("### Chọn thông số để tra cứu:")
-        col1, col2, col3, col4 = st.columns(4)
+        selection_container = st.container()
+        with selection_container:
+            st.markdown("### Chọn thông số để tra cứu:")
+            col1, col2, col3, col4 = st.columns(4)
 
-        with col1:
-            zone = st.selectbox("📂 Zone", sheet_names, key="select_zone")
+            # Zone
+            with col1:
+                zone = st.selectbox("📂 Zone", sheet_names, key="select_zone")
+            df = load_and_clean(excel_file, zone)
 
-        df = load_and_clean(excel_file, zone)
+            # Aircraft
+            with col2:
+                if "A/C" in df.columns:
+                    aircrafts = sorted([ac for ac in df["A/C"].dropna().unique().tolist() if ac])
+                    aircraft = st.selectbox("✈️ Loại máy bay", aircrafts, key="select_ac")
+                else:
+                    aircraft = None
+            df_ac = df[df["A/C"] == aircraft] if aircraft else df
 
-        with col2:
-            aircraft = st.selectbox("✈️ Loại máy bay", sorted(df["A/C"].dropna().unique())) if "A/C" in df.columns else None
-        df_ac = df[df["A/C"] == aircraft] if aircraft else df
+            # Description
+            with col3:
+                if "DESCRIPTION" in df_ac.columns:
+                    desc_list = sorted([d for d in df_ac["DESCRIPTION"].dropna().unique().tolist() if d])
+                    description = st.selectbox("📑 Mô tả chi tiết", desc_list, key="select_desc")
+                else:
+                    description = None
+            df_desc = df_ac[df_ac["DESCRIPTION"] == description] if description else df_ac
 
-        with col3:
-            description = st.selectbox("📑 Mô tả chi tiết", sorted(df_ac["DESCRIPTION"].dropna().unique())) if "DESCRIPTION" in df_ac.columns else None
-        df_desc = df_ac[df_ac["DESCRIPTION"] == description] if description else df_ac
-
-        with col4:
-            item = st.selectbox("🔢 Item", sorted(df_desc["ITEM"].dropna().unique())) if "ITEM" in df_desc.columns else None
-            df_desc = df_desc[df_desc["ITEM"] == item] if item else df_desc
+            # Item
+            with col4:
+                if "ITEM" in df_desc.columns:
+                    items = sorted([i for i in df_desc["ITEM"].dropna().unique().tolist() if i])
+                    item = st.selectbox("🔢 Item", items, key="select_item")
+                    df_desc = df_desc[df_desc["ITEM"] == item] if item else df_desc
+                else:
+                    item = None
 
         st.markdown("---")
         st.markdown("### Kết quả tra cứu:")
+        df_display = df_desc.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
+        df_display = df_display.dropna(axis=1, how="all")
 
-        df_display = df_desc.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore").dropna(axis=1, how='all')
         if not df_display.empty:
             df_display.insert(0, "STT", range(1, len(df_display) + 1))
-            st.markdown(f'<p style="color:green;font-weight:bold;">✅ Tìm thấy {len(df_display)} dòng dữ liệu</p>', unsafe_allow_html=True)
+            st.markdown(f'<p style="color: green; font-weight: bold;">✅ Tìm thấy {len(df_display)} dòng dữ liệu</p>', unsafe_allow_html=True)
             st.dataframe(df_display)
         else:
-            st.warning("📌 Không có dữ liệu phù hợp.")
+            st.warning("📌 Không có dữ liệu phù hợp với các lựa chọn trên.")
+
     except Exception as e:
         st.error(f"Lỗi khi xử lý file Excel: {e}")
 
-# --- CHẠY ---
+
+# --- LOGIC CHÍNH ---
 render_main_interface()
