@@ -86,10 +86,10 @@ def render_main_interface():
     @keyframes scrollText {{ 0% {{ transform: translate(100vw, 0); }} 100% {{ transform: translate(-100%, 0); }} }}
     @keyframes colorShift {{ 0% {{ background-position: 0% 50%; }} 50% {{ background-position: 100% 50%; }} 100% {{ background-position: 0% 50%; }} }}
 
-    /* Tiêu đề 1: TỔ BẢO DƯỠNG SỐ 1 - Chạy và Đổi màu */
+    /* Tiêu đề 1: TỔ BẢO DƯỠNG SỐ 1 - Chạy và Đổi màu (PC) */
     #main-animated-title-container {{ 
         width: 100%; height: 60px; overflow: hidden; white-space: nowrap; 
-        margin: 0 auto; padding: 0; 
+        margin: 0 auto; padding: 0; text-align: center; /* Cần thiết cho mobile */
     }}
     #main-animated-title-container h1 {{
         font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 900;
@@ -101,7 +101,7 @@ def render_main_interface():
         -webkit-background-clip: text; 
         -webkit-text-fill-color: transparent;
         
-        animation: colorShift 10s ease infinite, scrollText 20s linear infinite; 
+        animation: colorShift 10s ease infinite, scrollText 20s linear infinite; /* Hiệu ứng chạy cho PC */
         text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
     }}
 
@@ -129,18 +129,27 @@ def render_main_interface():
                 var(--main-bg-url-mobile) no-repeat center center fixed;
             background-size: cover;
         }}
-
-        /* Khắc phục lỗi thu nhỏ số 1 (Tăng font size) */
+        
+        /* Tiêu đề 1: TỔ BẢO DƯỠNG SỐ 1 */
+        #main-animated-title-container {{ 
+            height: auto; /* Cho phép chiều cao tự động co giãn */
+            overflow: visible; /* Cho phép hiển thị tiêu đề tĩnh */
+        }}
+        
+        /* SỬA LỖI 1: Tiêu đề Tổ bảo dưỡng số 1 thu nhỏ thành 1 hàng */
         #main-animated-title-container h1 {{ 
-            font-size: 10vw; 
-            letter-spacing: 3px; 
-            height: 10vw; /* Tăng chiều cao container để chứa đủ font */
+            font-size: 6vw; /* Giảm size để vừa 1 hàng */
+            padding: 0 10px; 
+            white-space: normal; /* Cho phép ngắt dòng nếu cần, nhưng 6vw nên vừa */
+            animation: colorShift 10s ease infinite; /* BỎ hiệu ứng chạy (scrollText) */
+            display: block; /* Căn giữa */
+            text-align: center; /* Căn giữa */
         }}
 
-        /* Đẩy tiêu đề Tra Cứu Part Number xuống dưới */
+        /* SỬA LỖI 2: Tiêu đề Tra Cứu Part Number dịch xuống dưới */
         #sub-static-title h2 {{ 
-            font-size: 6vw; 
-            margin-top: 30px; /* Thêm khoảng cách phía trên */
+            font-size: 5vw; /* Điều chỉnh kích thước */
+            margin-top: 50px; /* Tăng khoảng cách phía trên */
             margin-bottom: 20px;
         }}
     }}
@@ -148,7 +157,7 @@ def render_main_interface():
     </style>
     """, unsafe_allow_html=True)
     
-    # ===== TIÊU ĐỀ 1: CHẠY VÀ ĐỔI MÀU =====
+    # ===== TIÊU ĐỀ 1: CHẠY VÀ ĐỔI MÀU (Tĩnh trên Mobile) =====
     st.markdown('<div id="main-animated-title-container"><h1>TỔ BẢO DƯỠNG SỐ 1</h1></div>', unsafe_allow_html=True)
     
     # ===== TIÊU ĐỀ 2: CĂN GIỮA VÀ TĨNH =====
