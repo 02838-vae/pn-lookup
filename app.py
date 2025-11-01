@@ -8,7 +8,6 @@ st.set_page_config(page_title="Tổ Bảo Dưỡng Số 1 - Tra Cứu PN", layou
 
 # --- HÀM HỖ TRỢ ---
 def get_base64_encoded_file(file_path):
-    """Đọc file và trả về base64 encoded string."""
     if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
         return ""
     with open(file_path, "rb") as f:
@@ -28,7 +27,7 @@ def load_and_clean(excel_file, sheet):
 
 # --- NỀN ---
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
-bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")  # chữ thường
+bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
 # --- CSS ---
 st.markdown(f"""
@@ -63,7 +62,7 @@ div.block-container {{padding-top: 0;}}
   height: 85px;
   overflow: hidden;
   text-align: center;
-  margin-top: 0;
+  margin-top: 25px; /* ✅ đẩy tiêu đề xuống để không bị mất nét */
 }}
 #main-animated-title-container h1 {{
   font-family: 'Oswald', sans-serif;
@@ -87,7 +86,7 @@ div.block-container {{padding-top: 0;}}
   color: #FFD54F;
   text-align: center;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-  margin-top: 5px;
+  margin-top: 25px; /* ✅ hạ thấp hơn một chút */
   margin-bottom: 20px;
 }}
 
@@ -131,6 +130,9 @@ table.dataframe, .stDataFrame table {{
 .stDataFrame tbody td, .stDataFrame thead th {{
   text-align: center !important;
   vertical-align: middle !important;
+}}
+.stDataFrame table th, .stDataFrame table td {{
+  text-align: center !important;
 }}
 
 /* === Cho phép cuộn ngang bảng trên mobile === */
@@ -192,7 +194,7 @@ else:
             else:
                 df_display.insert(0, "STT", range(1, len(df_display) + 1))
 
-            # Hiển thị bảng — tất cả nội dung canh giữa, có thể vuốt ngang trên mobile
+            # Hiển thị bảng
             st.dataframe(df_display, hide_index=True, use_container_width=True)
         else:
             st.warning("📌 Không có dữ liệu phù hợp với các lựa chọn.")
