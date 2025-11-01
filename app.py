@@ -31,7 +31,7 @@ def load_and_clean(excel_file, sheet):
         df = pd.read_excel(excel_file, sheet_name=sheet)
         df.columns = df.columns.str.strip().str.upper()
         df = df.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
-        for col in df.columns:
+        for col in col in df.columns:
             if df[col].dtype == "object":
                 df[col] = df[col].fillna("").astype(str).str.strip()
         return df
@@ -52,7 +52,7 @@ def render_main_interface():
         st.error("❌ Không tìm thấy file A787.xlsx. Vui lòng đặt file này vào cùng thư mục với script.")
         st.stop()
     
-    # === CSS PHONG CÁCH VINTAGE VÀ BACKGROUND MẶC ĐỊNH (Đã điều chỉnh Mobile CSS) ===
+    # === CSS ĐÃ TỐI ƯU HÓA LẠI ĐỂ KHẮC PHỤC LỖI MOBILE ===
     bg_img_base64 = get_base64_encoded_file("PN_PC.jpg")
     bg_mobile_img_base64 = get_base64_encoded_file("PN_MOBILE.jpg")
     
@@ -66,16 +66,11 @@ def render_main_interface():
     .main {{ padding: 0; margin: 0; }}
     div.block-container {{ padding-top: 20px; }} 
 
-    /* Nền tĩnh PC */
+    /* Nền tĩnh PC - Áp dụng trực tiếp vào stApp */
     .stApp {{
         font-family: 'Special Elite', cursive !important;
-        /* Định nghĩa biến CSS */
-        --main-bg-url-pc: url("data:image/jpeg;base64,{bg_img_base64}");
-        --main-bg-url-mobile: url("data:image/jpeg;base64,{bg_mobile_img_base64}");
-        
-        /* Áp dụng cho PC */
         background: linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
-            var(--main-bg-url-pc) no-repeat center center fixed;
+            url("data:image/jpeg;base64,{bg_img_base64}") no-repeat center center fixed;
         background-size: cover;
     }}
     .stApp::after {{
@@ -125,10 +120,11 @@ def render_main_interface():
 
     /* === MEDIA QUERY CHO MOBILE (<= 768px) === */
     @media (max-width: 768px) {{
-        /* SỬA LỖI 3: Khôi phục Background trên mobile */
+        
+        /* SỬA LỖI 3: Khôi phục Background trên mobile (Ghi đè bằng Base64 Mobile) */
         .stApp {{ 
             background: linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
-                var(--main-bg-url-mobile) no-repeat center center fixed !important; /* Dùng !important để ghi đè */
+                url("data:image/jpeg;base64,{bg_mobile_img_base64}") no-repeat center center fixed !important; 
             background-size: cover !important;
         }}
         
@@ -136,14 +132,14 @@ def render_main_interface():
         #main-animated-title-container {{ 
             height: auto; 
             overflow: visible; 
-            white-space: normal; /* Cho phép ngắt dòng */
+            white-space: normal; 
         }}
         
-        /* SỬA LỖI 1 & 2: Tiêu đề Tổ bảo dưỡng số 1 vừa 1 hàng và KHÔNG chạy */
+        /* SỬA LỖI 1: Tiêu đề Tổ bảo dưỡng số 1 vừa 1 hàng, chữ số '1' không bị nén, và KHÔNG chạy */
         #main-animated-title-container h1 {{ 
-            font-size: 8vw; /* Tăng nhẹ để chữ số 1 to hơn nhưng vẫn vừa */
-            padding: 0 10px; 
-            white-space: normal; /* Đảm bảo chữ số 1 không bị nén */
+            font-size: 5.5vw; /* Giảm size cực nhỏ để đảm bảo 100% vừa 1 hàng trên mọi điện thoại */
+            padding: 0 5px; 
+            white-space: normal; 
             animation: colorShift 10s ease infinite; /* CHỈ giữ hiệu ứng đổi màu */
             display: block; 
             text-align: center; 
@@ -151,8 +147,8 @@ def render_main_interface():
 
         /* SỬA LỖI 2: Tiêu đề Tra Cứu Part Number dịch xuống dưới */
         #sub-static-title h2 {{ 
-            font-size: 5vw; 
-            margin-top: 50px; /* Tăng khoảng cách để dịch xuống */
+            font-size: 4.5vw; /* Giảm size để vừa vặn hơn */
+            margin-top: 60px; /* Tăng tối đa khoảng cách để dịch xuống dưới */
             margin-bottom: 20px;
         }}
     }}
