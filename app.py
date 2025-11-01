@@ -44,7 +44,7 @@ div.block-container {{ padding-top: 0; }}
   font-family: 'Oswald', sans-serif !important;
 }}
 
-/* ===== MARQUEE TITLE (seamless, continuous, right->left) ===== */
+/* ===== MARQUEE TITLE ===== */
 #main-animated-title-container {{
   width: 100%;
   overflow: hidden;
@@ -62,17 +62,16 @@ div.block-container {{ padding-top: 0; }}
   display: inline-block;
   white-space: nowrap;
   box-sizing: content-box;
-  /* duplicated content technique: width 200% so that translateX(-50%) moves exactly one copy */
   width: 200%;
-  animation: marqueeScroll 4s linear infinite; /* faster: 4s for full loop (adjust if needed) */
+  animation: marqueeScroll 4s linear infinite;
 }}
 .marquee__item {{
   display: inline-block;
-  padding-right: 4rem; /* spacing between repeats */
+  padding-right: 4rem;
   font-family: 'Oswald', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
-  font-size: 3.6rem; /* safe size so not clipped */
+  font-size: 3.6rem;
   letter-spacing: 6px;
   vertical-align: middle;
   background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
@@ -81,15 +80,13 @@ div.block-container {{ padding-top: 0; }}
   -webkit-text-fill-color: transparent;
   text-shadow: 2px 2px 8px rgba(0,0,0,0.65);
   box-sizing: border-box;
-}
-/* Duplicate item style handled by rendering two identical spans */
+}}
 
 @keyframes marqueeScroll {{
   0% {{ transform: translateX(0%); }}
-  100% {{ transform: translateX(-50%); }} /* move one full copy (200% -> -50% = shift by 100% of viewport) */
+  100% {{ transform: translateX(-50%); }}
 }}
 
-/* color shift effect (kept on top of marquee using background position animation) */
 @keyframes colorShift {{
   0% {{ background-position: 0% 50%; }}
   50% {{ background-position: 100% 50%; }}
@@ -97,7 +94,7 @@ div.block-container {{ padding-top: 0; }}
 }}
 .marquee__item {{
   animation: colorShift 8s ease-in-out infinite;
-}
+}}
 
 /* ===== SUBTITLE ===== */
 #sub-static-title h2 {{
@@ -113,7 +110,7 @@ div.block-container {{ padding-top: 0; }}
 /* ===== MOBILE ADJUST ===== */
 @media (max-width: 768px) {{
   .marquee__item {{
-    font-size: 7.5vw; /* responsive */
+    font-size: 7.5vw;
     letter-spacing: 3px;
   }}
   #sub-static-title h2 {{
@@ -126,25 +123,24 @@ div.block-container {{ padding-top: 0; }}
   }}
 }}
 
-/* ===== SELECTBOX LABELS (bigger + centered) ===== */
+/* ===== SELECTBOX LABELS ===== */
 .stSelectbox label {{
   color: #FFEB3B !important;
   font-weight: 800;
   text-align: center;
   display: block;
-  font-size: 1.6rem; /* larger on PC */
+  font-size: 1.6rem;
 }}
 div[data-baseweb="select"] > div {{
   text-align: center;
 }}
-/* center the column containers */
 [data-testid="column"] {{
   display: flex;
   justify-content: center;
   align-items: center;
 }}
 
-/* ===== TABLE (center all content, header + cells) ===== */
+/* ===== TABLE ===== */
 .stDataFrame table {{
   width: 100% !important;
   border-collapse: collapse;
@@ -154,40 +150,33 @@ div[data-baseweb="select"] > div {{
   vertical-align: middle !important;
   padding: 8px !important;
   white-space: nowrap;
-}
-/* ensure header style readable on image background */
+}}
 .stDataFrame thead th {{
   background: rgba(255,255,255,0.85) !important;
   font-weight: 700;
 }}
-
-/* allow horizontal scroll of table container (mobile) */
 .stDataFrame div[data-testid="stDataFrameContainer"] > div {{
   overflow-x: auto !important;
 }}
-
 </style>
 """, unsafe_allow_html=True)
 
-# --- RENDER TITLES ---
-st.markdown(
-    """
-    <div id="main-animated-title-container">
-      <div class="marquee" aria-hidden="true">
-        <div class="marquee__inner">
-          <span class="marquee__item">TỔ BẢO DƯỠNG SỐ 1</span>
-          <span class="marquee__item">TỔ BẢO DƯỠNG SỐ 1</span>
-        </div>
-      </div>
+# --- TIÊU ĐỀ ---
+st.markdown("""
+<div id="main-animated-title-container">
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__inner">
+      <span class="marquee__item">TỔ BẢO DƯỠNG SỐ 1</span>
+      <span class="marquee__item">TỔ BẢO DƯỠNG SỐ 1</span>
     </div>
-    """,
-    unsafe_allow_html=True,
-)
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown('<div id="sub-static-title"><h2>🔎 TRA CỨU PART NUMBER</h2></div>', unsafe_allow_html=True)
 st.markdown("---")
 
-# === DATA / UI ===
+# --- LOAD DATA ---
 excel_file = "A787.xlsx"
 if not os.path.exists(excel_file):
     st.error("❌ Không tìm thấy file A787.xlsx trong thư mục hiện tại.")
@@ -196,7 +185,6 @@ else:
         xls = pd.ExcelFile(excel_file)
         sheet_names = [n for n in xls.sheet_names if not n.startswith("Sheet")]
 
-        # Select boxes centered
         st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
 
@@ -230,14 +218,11 @@ else:
         st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("---")
-        # Only show result header + table when dataframe has rows
         if not df.empty:
-            # prepare display frame (drop internal columns)
             df_display = df.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
             df_display = df_display.dropna(axis=1, how="all")
 
             if not df_display.empty:
-                # reset index and add STT before PART NUMBER if exists
                 df_display = df_display.reset_index(drop=True)
                 cols = list(df_display.columns)
                 if "PART NUMBER" in cols:
@@ -246,7 +231,6 @@ else:
                 else:
                     df_display.insert(0, "STT", range(1, len(df_display) + 1))
 
-                # center header and cells via CSS above; hide dataframe index
                 st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
                 st.dataframe(df_display, hide_index=True, use_container_width=True)
         else:
