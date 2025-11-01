@@ -29,7 +29,7 @@ def load_and_clean(excel_file, sheet):
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS TOÀN BỘ (Đã chỉnh màu chữ dòng kết quả trên mobile thành màu đen) ---
+# --- CSS TOÀN BỘ (Đã tăng kích thước chữ tiêu đề dropbox) ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -131,19 +131,19 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     }}
 }}
 
-/* === LABEL SELECTBOX (Dropdown to hơn) === */
+/* === LABEL SELECTBOX (PC) - Đã tăng kích thước chữ === */
 .stSelectbox label {{
     color: #FFEB3B !important;
     font-weight: 700 !important;
     text-align: center;
     display: block;
-    font-size: 2.2rem !important; 
+    font-size: **2.6rem** !important; /* Đã tăng */
     line-height: 2.5rem !important;
 }}
 
-/* Force override Streamlit default */
+/* Force override Streamlit default (PC) - Đã tăng kích thước chữ */
 [data-testid="stWidgetLabel"] {{
-    font-size: 2.2rem !important;
+    font-size: **2.6rem** !important; /* Đã tăng */
     color: #FFEB3B !important;
     font-weight: 700 !important;
 }}
@@ -156,10 +156,10 @@ div[data-baseweb="select"] > div {{
     font-size: 1.1rem;
 }}
 
-/* Mobile label size */
+/* Mobile label size - Đã tăng kích thước chữ */
 @media (max-width: 768px) {{
     .stSelectbox label, [data-testid="stWidgetLabel"] {{
-        font-size: 1.2rem !important;
+        font-size: **1.5rem** !important; /* Đã tăng */
     }}
 }}
 
@@ -219,7 +219,7 @@ div[data-baseweb="select"] > div {{
     background-color: #e0e0e0;
 }}
 
-/* === Mobile optimization (Đã thêm màu chữ đen cho dòng kết quả) === */
+/* === Mobile optimization === */
 @media (max-width: 768px) {{
     .table-container {{
         overflow-x: scroll;
@@ -237,7 +237,7 @@ div[data-baseweb="select"] > div {{
         font-size: 0.85rem;
         white-space: normal; 
         word-wrap: break-word; 
-        color: #000000; /* ⬅️ Đã thêm: Đặt màu chữ đen cho dòng kết quả trên mobile */
+        color: #000000; 
     }}
 }}
 </style>
