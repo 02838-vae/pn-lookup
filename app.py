@@ -9,8 +9,6 @@ import time
 st.set_page_config(
     page_title="Tổ Bảo Dưỡng Số 1 - Tra Cứu PN",
     layout="wide",
-    # Không cần navigation logic hay session state cho page nữa
-    # initial_sidebar_state="collapsed"
 )
 
 # --- CÁC HÀM TIỆN ÍCH DÙNG CHUNG ---
@@ -42,7 +40,6 @@ def load_and_clean(excel_file, sheet):
 
 
 # --- TẢI FILE ẢNH NỀN ---
-# Dùng PN_PC.jpg làm background chính
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg") 
 bg_mobile_base64 = get_base64_encoded_file("PN_MOBILE.jpg") 
 
@@ -55,18 +52,19 @@ def render_main_interface():
         st.error("❌ Không tìm thấy file A787.xlsx. Vui lòng đặt file này vào cùng thư mục với script.")
         st.stop()
     
-    # === CSS PHONG CÁCH VINTAGE VÀ BACKGROUND MẶC ĐỊNH ===
+    # === CSS PHONG CÁCH VINTAGE VÀ BACKGROUND MẶC ĐỊNH (Đã điều chỉnh Tiêu đề) ===
     bg_img_base64 = get_base64_encoded_file("PN_PC.jpg")
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap');
     
     /* Ẩn Streamlit mặc định */
     #MainMenu, footer, header {{visibility: hidden;}}
     .main {{ padding: 0; margin: 0; }}
-    div.block-container {{ padding-top: 20px; }} /* Điều chỉnh padding cho nội dung */
+    div.block-container {{ padding-top: 20px; }} 
 
-    /* Nền tĩnh - Dùng PN_PC.jpg */
+    /* Nền tĩnh */
     .stApp {{
         font-family: 'Special Elite', cursive !important;
         background: linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
@@ -78,14 +76,61 @@ def render_main_interface():
         background: url("https://www.transparenttextures.com/patterns/aged-paper.png");
         opacity: 0.2; pointer-events: none; z-index: -1;
     }}
+    
+    /* Animations cho tiêu đề chạy */
+    @keyframes scrollText {{ 0% {{ transform: translate(100vw, 0); }} 100% {{ transform: translate(-100%, 0); }} }}
+    @keyframes colorShift {{ 0% {{ background-position: 0% 50%; }} 50% {{ background-position: 100% 50%; }} 100% {{ background-position: 0% 50%; }} }}
+
+    /* Tiêu đề 1: TỔ BẢO DƯỠNG SỐ 1 - Chạy và Đổi màu */
+    #main-animated-title-container {{ 
+        /* Container tràn hết chiều rộng để tiêu đề có thể chạy */
+        width: 100%; height: 60px; overflow: hidden; white-space: nowrap; 
+        margin: 0 auto; padding: 0; 
+    }}
+    #main-animated-title-container h1 {{
+        font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 900;
+        letter-spacing: 5px; margin: 0; padding: 0 50px; /* Thêm padding để không bị dính mép */
+        display: inline-block; /* Bắt buộc để animation chạy */
+        
+        /* Hiệu ứng gradient và animation */
+        background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+        background-size: 400% 400%; 
+        -webkit-background-clip: text; 
+        -webkit-text-fill-color: transparent;
+        
+        animation: colorShift 10s ease infinite, scrollText 20s linear infinite; /* Điều chỉnh tốc độ chạy */
+        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+    }}
+
+    /* Tiêu đề 2: TRA CỨU PART NUMBER - Căn giữa */
+    #sub-static-title h2 {{
+        font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700;
+        color: #1f77b4; /* Màu xanh nổi bật */
+        text-align: center;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        margin: 10px 0 20px 0;
+        white-space: nowrap; /* Đảm bảo vừa 1 dòng */
+    }}
+    
+    /* Điều chỉnh font và màu cho các lựa chọn tra cứu */
+    .stSelectbox label, .stMarkdown h3 {{
+        color: #000080; /* Màu xanh đậm cho label */
+        font-weight: bold;
+    }}
+
+    @media (max-width: 768px) {{
+        #main-animated-title-container h1 {{ font-size: 8vw; letter-spacing: 3px; }}
+        #sub-static-title h2 {{ font-size: 5vw; }}
+    }}
+    
     </style>
     """, unsafe_allow_html=True)
     
-    # ===== TIÊU ĐỀ =====
-    st.markdown('<div style="text-align: center;">', unsafe_allow_html=True)
-    st.markdown('<h1>📜 TỔ BẢO DƯỠNG SỐ 1</h1>', unsafe_allow_html=True)
-    st.markdown('<h2>🔎 TRA CỨU PART NUMBER</h2>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    # ===== TIÊU ĐỀ 1: CHẠY VÀ ĐỔI MÀU =====
+    st.markdown('<div id="main-animated-title-container"><h1>TỔ BẢO DƯỠNG SỐ 1</h1></div>', unsafe_allow_html=True)
+    
+    # ===== TIÊU ĐỀ 2: CĂN GIỮA VÀ TĨNH =====
+    st.markdown('<div id="sub-static-title"><h2>🔎 TRA CỨU PART NUMBER</h2></div>', unsafe_allow_html=True)
     
     st.markdown("---") # Đường phân cách
     
@@ -94,7 +139,6 @@ def render_main_interface():
         xls = pd.ExcelFile(excel_file)
         sheet_names = [name for name in xls.sheet_names if not name.startswith("Sheet")]
         
-        # Tạo container cho các selectbox
         selection_container = st.container()
         
         with selection_container:
@@ -158,5 +202,4 @@ def render_main_interface():
 
 
 # --- LOGIC CHÍNH CỦA ỨNG DỤNG ---
-# Giờ đây chỉ render một giao diện duy nhất
 render_main_interface()
