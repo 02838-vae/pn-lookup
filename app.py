@@ -69,9 +69,11 @@ def render_main_interface():
     /* Nền tĩnh PC */
     .stApp {{
         font-family: 'Special Elite', cursive !important;
+        /* Định nghĩa biến CSS */
         --main-bg-url-pc: url("data:image/jpeg;base64,{bg_img_base64}");
         --main-bg-url-mobile: url("data:image/jpeg;base64,{bg_mobile_img_base64}");
         
+        /* Áp dụng cho PC */
         background: linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
             var(--main-bg-url-pc) no-repeat center center fixed;
         background-size: cover;
@@ -89,7 +91,7 @@ def render_main_interface():
     /* Tiêu đề 1: TỔ BẢO DƯỠNG SỐ 1 - Chạy và Đổi màu (PC) */
     #main-animated-title-container {{ 
         width: 100%; height: 60px; overflow: hidden; white-space: nowrap; 
-        margin: 0 auto; padding: 0; text-align: center; /* Cần thiết cho mobile */
+        margin: 0 auto; padding: 0; text-align: center;
     }}
     #main-animated-title-container h1 {{
         font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 900;
@@ -123,33 +125,34 @@ def render_main_interface():
 
     /* === MEDIA QUERY CHO MOBILE (<= 768px) === */
     @media (max-width: 768px) {{
-        /* Đảm bảo dùng PN_MOBILE.jpg */
+        /* SỬA LỖI 3: Khôi phục Background trên mobile */
         .stApp {{ 
             background: linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
-                var(--main-bg-url-mobile) no-repeat center center fixed;
-            background-size: cover;
+                var(--main-bg-url-mobile) no-repeat center center fixed !important; /* Dùng !important để ghi đè */
+            background-size: cover !important;
         }}
         
         /* Tiêu đề 1: TỔ BẢO DƯỠNG SỐ 1 */
         #main-animated-title-container {{ 
-            height: auto; /* Cho phép chiều cao tự động co giãn */
-            overflow: visible; /* Cho phép hiển thị tiêu đề tĩnh */
+            height: auto; 
+            overflow: visible; 
+            white-space: normal; /* Cho phép ngắt dòng */
         }}
         
-        /* SỬA LỖI 1: Tiêu đề Tổ bảo dưỡng số 1 thu nhỏ thành 1 hàng */
+        /* SỬA LỖI 1 & 2: Tiêu đề Tổ bảo dưỡng số 1 vừa 1 hàng và KHÔNG chạy */
         #main-animated-title-container h1 {{ 
-            font-size: 6vw; /* Giảm size để vừa 1 hàng */
+            font-size: 8vw; /* Tăng nhẹ để chữ số 1 to hơn nhưng vẫn vừa */
             padding: 0 10px; 
-            white-space: normal; /* Cho phép ngắt dòng nếu cần, nhưng 6vw nên vừa */
-            animation: colorShift 10s ease infinite; /* BỎ hiệu ứng chạy (scrollText) */
-            display: block; /* Căn giữa */
-            text-align: center; /* Căn giữa */
+            white-space: normal; /* Đảm bảo chữ số 1 không bị nén */
+            animation: colorShift 10s ease infinite; /* CHỈ giữ hiệu ứng đổi màu */
+            display: block; 
+            text-align: center; 
         }}
 
         /* SỬA LỖI 2: Tiêu đề Tra Cứu Part Number dịch xuống dưới */
         #sub-static-title h2 {{ 
-            font-size: 5vw; /* Điều chỉnh kích thước */
-            margin-top: 50px; /* Tăng khoảng cách phía trên */
+            font-size: 5vw; 
+            margin-top: 50px; /* Tăng khoảng cách để dịch xuống */
             margin-bottom: 20px;
         }}
     }}
