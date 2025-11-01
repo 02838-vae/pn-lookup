@@ -53,7 +53,7 @@ def render_main_interface():
     #MainMenu, footer, header {{visibility: hidden;}}
     div.block-container {{padding-top: 20px;}}
 
-    /* PC BACKGROUND */
+    /* === PC BACKGROUND === */
     .stApp {{
         font-family: 'Oswald', sans-serif !important;
         background-image: url("data:image/jpeg;base64,{bg_pc_base64}");
@@ -74,19 +74,22 @@ def render_main_interface():
         100% {{ background-position: 0% 50%; }}
     }}
 
-    /* TIÊU ĐỀ CHÍNH */
+    /* === TIÊU ĐỀ CHÍNH (PC) === */
     #main-animated-title-container {{
-        width: 100%; height: 70px;
+        width: 100%;
+        height: 70px;
         overflow: hidden;
         white-space: nowrap;
         text-align: center;
+        margin-top: 15px; /* đẩy nhẹ xuống để tránh bị che */
     }}
     #main-animated-title-container h1 {{
         font-family: 'Oswald', sans-serif;
         font-size: 4rem;
         font-weight: 700;
         letter-spacing: 5px;
-        margin: 0; padding: 0 40px;
+        margin: 0;
+        padding: 0 40px;
         display: inline-block;
         text-transform: uppercase;
         background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
@@ -97,7 +100,7 @@ def render_main_interface():
         text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
     }}
 
-    /* TIÊU ĐỀ PHỤ */
+    /* === TIÊU ĐỀ PHỤ === */
     #sub-static-title h2 {{
         font-family: 'Playfair Display', serif;
         font-size: 2.2rem;
@@ -107,7 +110,7 @@ def render_main_interface():
         margin: 10px 0 20px 0;
     }}
 
-    /* MOBILE FIX */
+    /* === MOBILE FIX === */
     @media (max-width: 768px) {{
         .stApp {{
             background-image: url("data:image/jpeg;base64,{bg_mobile_base64}") !important;
@@ -121,12 +124,14 @@ def render_main_interface():
             overflow: hidden;
             height: auto;
             white-space: nowrap;
+            margin-top: 50px !important; /* ✅ đẩy xuống xa hơn để tránh lớp chồng */
         }}
+
         #main-animated-title-container h1 {{
             font-size: 8.5vw;
             letter-spacing: 3px;
             padding: 0 10px;
-            line-height: 1;
+            line-height: 1.1;
             display: inline-block;
             white-space: nowrap;
             animation: colorShift 10s ease infinite, scrollText 15s linear infinite;
