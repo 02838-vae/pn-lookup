@@ -29,7 +29,7 @@ def load_and_clean(excel_file, sheet):
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS TOÀN BỘ (Đã tăng kích thước chữ tiêu đề dropbox) ---
+# --- CSS TOÀN BỘ (Đã tăng kích thước chữ tiêu đề dropbox với độ ưu tiên cao) ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
@@ -131,19 +131,19 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     }}
 }}
 
-/* === LABEL SELECTBOX (PC) - Đã tăng kích thước chữ (V6) === */
+/* === LABEL SELECTBOX (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V7) === */
 .stSelectbox label {{
     color: #FFEB3B !important;
     font-weight: 700 !important;
     text-align: center;
     display: block;
-    font-size: **2.8rem** !important; /* Đã tăng */
+    font-size: **3rem** !important; /* Đã tăng lên 3rem */
     line-height: 2.5rem !important;
 }}
 
-/* Force override Streamlit default (PC) - Đã tăng kích thước chữ (V6) */
+/* Force override Streamlit default (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V7) */
 [data-testid="stWidgetLabel"] {{
-    font-size: **2.8rem** !important; /* Đã tăng */
+    font-size: **3rem** !important; /* Đã tăng lên 3rem */
     color: #FFEB3B !important;
     font-weight: 700 !important;
 }}
@@ -156,10 +156,10 @@ div[data-baseweb="select"] > div {{
     font-size: 1.1rem;
 }}
 
-/* Mobile label size - Đã tăng kích thước chữ (V6) */
+/* Mobile label size - Tăng kích thước chữ và ưu tiên CSS cao hơn (V7) */
 @media (max-width: 768px) {{
     .stSelectbox label, [data-testid="stWidgetLabel"] {{
-        font-size: **1.6rem** !important; /* Đã tăng */
+        font-size: **1.8rem** !important; /* Đã tăng lên 1.8rem */
     }}
 }}
 
