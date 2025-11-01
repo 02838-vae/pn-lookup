@@ -45,28 +45,10 @@ div.block-container {{padding-top: 0;}}
     font-family: 'Oswald', sans-serif !important;
 }}
 
-/* === TIÊU ĐỀ CHÍNH === */
-#main-animated-title-container {{
-  width: 100%;
-  height: auto;
-  overflow: visible;
-  text-align: center;
-  margin-top: 35px;
-  margin-bottom: 15px;
-}}
-#main-animated-title-container h1 {{
-  font-family: 'Oswald', sans-serif;
-  font-size: 4rem; /* ✅ Giảm nhẹ, không mất nét dưới */
-  font-weight: 700;
-  letter-spacing: 6px;
-  text-transform: uppercase;
-  color: transparent;
-  background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
-  animation: colorShift 10s ease infinite;
+/* === HIỆU ỨNG CHỮ === */
+@keyframes scrollText {{
+  0% {{ transform: translateX(100vw); }}
+  100% {{ transform: translateX(-100%); }}
 }}
 @keyframes colorShift {{
   0% {{ background-position: 0% 50%; }}
@@ -74,14 +56,39 @@ div.block-container {{padding-top: 0;}}
   100% {{ background-position: 0% 50%; }}
 }}
 
+/* === TIÊU ĐỀ CHÍNH (PC) === */
+#main-animated-title-container {{
+  width: 100%;
+  height: 110px;
+  overflow: hidden;
+  text-align: center;
+  margin-top: 35px;
+}}
+#main-animated-title-container h1 {{
+  font-family: 'Oswald', sans-serif;
+  font-size: 4.5rem;
+  font-weight: 700;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  display: inline-block;
+  background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: colorShift 10s ease infinite, scrollText 18s linear infinite;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+  line-height: 1.3;
+  padding-bottom: 10px;
+}}
+
 /* === TIÊU ĐỀ PHỤ === */
 #sub-static-title h2 {{
   font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
+  font-size: 2.4rem;
   color: #FFD54F;
   text-align: center;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-  margin-top: 20px;
+  margin-top: 35px;
   margin-bottom: 20px;
 }}
 
@@ -92,15 +99,26 @@ div.block-container {{padding-top: 0;}}
     background-size: cover !important;
   }}
 
+  #main-animated-title-container {{
+    margin-top: 10px !important;
+    overflow: hidden;
+    height: auto;
+    white-space: nowrap;
+  }}
+
   #main-animated-title-container h1 {{
     font-size: 8vw;
-    line-height: 1.2;
+    line-height: 1.1;
     letter-spacing: 3px;
+    display: inline-block;
+    white-space: nowrap;
+    animation: colorShift 10s ease infinite, scrollText 15s linear infinite;
     text-shadow: 2px 2px 7px rgba(0,0,0,0.8);
   }}
 
   #sub-static-title h2 {{
     font-size: 5vw;
+    color: #FFD54F;
     margin-top: 10px;
   }}
 }}
@@ -111,24 +129,23 @@ div.block-container {{padding-top: 0;}}
   font-weight: 700;
   text-align: center;
   display: block;
-  font-size: 1.2rem; /* ✅ To hơn một chút */
+  font-size: 1.2rem;
 }}
 div[data-baseweb="select"] > div {{
   text-align: center;
 }}
 
-/* === CANH GIỮA CỘT SELECTBOX === */
-div[data-testid="column"] {{
+/* === CANH GIỮA DROPBOX CONTAINER === */
+.element-container:has(.stSelectbox) {{
   display: flex;
   justify-content: center;
 }}
 
-/* === BẢNG DỮ LIỆU === */
+/* === CĂN GIỮA BẢNG DỮ LIỆU === */
 table.dataframe, .stDataFrame table {{
   width: 100%;
   border-collapse: collapse;
-  text-align: center;
-  vertical-align: middle;
+  margin: 0 auto;
 }}
 .stDataFrame tbody td, .stDataFrame thead th {{
   text-align: center !important;
@@ -137,9 +154,17 @@ table.dataframe, .stDataFrame table {{
 .stDataFrame table th, .stDataFrame table td {{
   text-align: center !important;
   vertical-align: middle !important;
+  padding: 8px !important;
+}}
+/* Căn giữa cả nội dung text trong mỗi cell */
+.stDataFrame div[data-testid="stDataFrameResizable"] {{
+  text-align: center !important;
+}}
+.stDataFrame div[data-testid="stDataFrameResizable"] > div {{
+  justify-content: center !important;
 }}
 
-/* === Cuộn ngang khi nhỏ === */
+/* === Cuộn ngang khi màn hình nhỏ === */
 .stDataFrame div[data-testid="stDataFrameContainer"] > div {{
   overflow-x: auto !important;
 }}
@@ -160,6 +185,7 @@ else:
         xls = pd.ExcelFile(excel_file)
         sheet_names = [name for name in xls.sheet_names if not name.startswith("Sheet")]
 
+        # --- CANH GIỮA DROPBOX ---
         st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
         with col1:
@@ -183,22 +209,24 @@ else:
         st.markdown("</div>", unsafe_allow_html=True)
 
         # --- HIỂN THỊ KẾT QUẢ ---
-        st.markdown("---")
-        if not df.empty:
+        df_display = df.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
+        df_display = df_display.dropna(axis=1, how="all")
+
+        if not df_display.empty and len(df_display) > 0:
+            st.markdown("---")
             st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
+            
+            df_display = df_display.reset_index(drop=True)
 
-            df_display = df.drop(columns=["A/C", "ITEM", "DESCRIPTION"], errors="ignore")
-            df_display = df_display.dropna(axis=1, how="all")
+            # Thêm cột STT vào trước PART NUMBER
+            cols = list(df_display.columns)
+            if "PART NUMBER" in cols:
+                idx = cols.index("PART NUMBER")
+                df_display.insert(idx, "STT", range(1, len(df_display) + 1))
+            else:
+                df_display.insert(0, "STT", range(1, len(df_display) + 1))
 
-            if not df_display.empty:
-                df_display = df_display.reset_index(drop=True)
-                cols = list(df_display.columns)
-                if "PART NUMBER" in cols:
-                    idx = cols.index("PART NUMBER")
-                    df_display.insert(idx, "STT", range(1, len(df_display) + 1))
-                else:
-                    df_display.insert(0, "STT", range(1, len(df_display) + 1))
-                st.dataframe(df_display, hide_index=True, use_container_width=True)
-        # ❌ Nếu không có dữ liệu, bảng sẽ không hiển thị
+            # Hiển thị bảng
+            st.dataframe(df_display, hide_index=True, use_container_width=True)
     except Exception as e:
         st.error(f"Lỗi khi đọc file Excel: {e}")
