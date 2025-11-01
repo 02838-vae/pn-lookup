@@ -17,7 +17,7 @@ def get_base64_encoded_file(file_path):
     try:
         with open(file_path, "rb") as f:
             data = f.read()
-        return base64.b64encode(f.read()).decode("utf-8")
+        return base64.b64encode(data).decode("utf-8")
     except:
         return fallback_base64
 
@@ -44,27 +44,26 @@ def render_main_interface():
         st.error("❌ Không tìm thấy file A787.xlsx.")
         st.stop()
 
-    bg_img_base64 = get_base64_encoded_file("PN_PC.jpg")
-    bg_mobile_img_base64 = get_base64_encoded_file("PN_mobile.jpg")
-
-    # --- CSS HOÀN CHỈNH ---
+    # --- CSS ---
     st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
 
     #MainMenu, footer, header {{visibility: hidden;}}
     div.block-container {{padding-top: 20px;}}
 
-    /* --- PC BACKGROUND --- */
+    /* PC BACKGROUND */
     .stApp {{
-        font-family: 'Bebas Neue', sans-serif !important;
-        background: linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
-            url("data:image/jpeg;base64,{bg_img_base64}") no-repeat center center fixed;
+        font-family: 'Oswald', sans-serif !important;
+        background-image: url("data:image/jpeg;base64,{bg_pc_base64}");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
         background-size: cover;
     }}
 
-    /* --- Hiệu ứng chạy & màu --- */
+    /* Hiệu ứng chạy + màu */
     @keyframes scrollText {{
         0% {{ transform: translateX(100vw); }}
         100% {{ transform: translateX(-100%); }}
@@ -75,15 +74,19 @@ def render_main_interface():
         100% {{ background-position: 0% 50%; }}
     }}
 
-    /* --- TIÊU ĐỀ CHÍNH --- */
+    /* TIÊU ĐỀ CHÍNH */
     #main-animated-title-container {{
-        width: 100%; height: 70px; overflow: hidden; white-space: nowrap; text-align: center;
+        width: 100%; height: 70px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-align: center;
     }}
     #main-animated-title-container h1 {{
-        font-family: 'Bebas Neue', sans-serif;
+        font-family: 'Oswald', sans-serif;
         font-size: 4rem;
-        letter-spacing: 6px;
-        margin: 0; padding: 0 50px;
+        font-weight: 700;
+        letter-spacing: 5px;
+        margin: 0; padding: 0 40px;
         display: inline-block;
         text-transform: uppercase;
         background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
@@ -91,26 +94,27 @@ def render_main_interface():
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         animation: colorShift 10s ease infinite, scrollText 18s linear infinite;
-        text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+        text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
     }}
 
-    /* --- TIÊU ĐỀ PHỤ --- */
+    /* TIÊU ĐỀ PHỤ */
     #sub-static-title h2 {{
         font-family: 'Playfair Display', serif;
-        font-size: 2rem;
+        font-size: 2.2rem;
         color: #1f77b4;
         text-align: center;
         text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         margin: 10px 0 20px 0;
     }}
 
-    /* --- MOBILE FIX --- */
+    /* MOBILE FIX */
     @media (max-width: 768px) {{
         .stApp {{
-            background: linear-gradient(rgba(245, 242, 230, 0.5), rgba(245, 242, 230, 0.5)),
-                url("data:image/jpeg;base64,{bg_mobile_img_base64}") no-repeat center center fixed !important;
+            background-image: url("data:image/jpeg;base64,{bg_mobile_base64}") !important;
+            background-repeat: no-repeat !important;
+            background-attachment: scroll !important;
+            background-position: center center !important;
             background-size: cover !important;
-            background-attachment: fixed !important;
         }}
 
         #main-animated-title-container {{
@@ -119,7 +123,7 @@ def render_main_interface():
             white-space: nowrap;
         }}
         #main-animated-title-container h1 {{
-            font-size: 9vw;
+            font-size: 8.5vw;
             letter-spacing: 3px;
             padding: 0 10px;
             line-height: 1;
@@ -130,7 +134,7 @@ def render_main_interface():
 
         #sub-static-title h2 {{
             font-size: 4.5vw;
-            margin-top: 40px;
+            margin-top: 35px;
         }}
     }}
     </style>
@@ -141,7 +145,7 @@ def render_main_interface():
     st.markdown('<div id="sub-static-title"><h2>🔎 TRA CỨU PART NUMBER</h2></div>', unsafe_allow_html=True)
     st.markdown("---")
 
-    # --- NỘI DUNG TRA CỨU ---
+    # --- TRA CỨU EXCEL ---
     try:
         xls = pd.ExcelFile(excel_file)
         sheet_names = [s for s in xls.sheet_names if not s.startswith("Sheet")]
