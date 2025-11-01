@@ -75,7 +75,7 @@ div.block-container {{padding-top: 0;}}
   background-size: 400% 400%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: colorShift 10s ease infinite, scrollText 18s linear infinite;
+  animation: colorShift 10s ease infinite, scrollText 8s linear infinite;
   text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
   line-height: 1.3;
   padding-bottom: 10px;
@@ -112,7 +112,7 @@ div.block-container {{padding-top: 0;}}
     letter-spacing: 3px;
     display: inline-block;
     white-space: nowrap;
-    animation: colorShift 10s ease infinite, scrollText 15s linear infinite;
+    animation: colorShift 10s ease infinite, scrollText 10s linear infinite;
     text-shadow: 2px 2px 7px rgba(0,0,0,0.8);
   }}
 
@@ -222,17 +222,34 @@ div[data-baseweb="select"] > div {{
   .table-container {{
     overflow-x: scroll;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
+    display: block;
   }}
   
   .custom-table {{
     font-size: 0.85rem;
     min-width: 100%;
+    width: 100%;
+    display: table !important;
+  }}
+  
+  .custom-table thead {{
+    display: table-header-group !important;
+  }}
+  
+  .custom-table tbody {{
+    display: table-row-group !important;
+  }}
+  
+  .custom-table tr {{
+    display: table-row !important;
   }}
   
   .custom-table th, .custom-table td {{
     padding: 8px 6px;
     font-size: 0.85rem;
     white-space: nowrap;
+    display: table-cell !important;
   }}
 }}
 </style>
