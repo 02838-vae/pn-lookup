@@ -17,11 +17,9 @@ def load_and_clean(excel_file, sheet):
     try:
         df = pd.read_excel(excel_file, sheet_name=sheet)
         df.columns = df.columns.str.strip().str.upper()
-        # **LƯU Ý:** Giữ lại các cột object rỗng (NA) để logic lọc chuỗi rỗng bên dưới xử lý, tránh lỗi nếu fillna("") bị gọi hai lần.
         df = df.replace(r'^\s*$', pd.NA, regex=True).dropna(how="all")
         for col in df.columns:
             if df[col].dtype == "object":
-                # Chuyển NA thành chuỗi rỗng để lọc dễ hơn
                 df[col] = df[col].fillna("").astype(str).str.strip()
         return df
     except Exception:
@@ -31,17 +29,15 @@ def load_and_clean(excel_file, sheet):
 bg_pc_base64 = get_base64_encoded_file("PN_PC.jpg")
 bg_mobile_base64 = get_base64_encoded_file("PN_mobile.jpg")
 
-# --- CSS TOÀN BỘ (Đã tăng kích thước chữ tiêu đề dropbox với độ ưu tiên cao) ---
+# --- CSS TOÀN BỘ ---
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
 
 #MainMenu, footer, header {{visibility: hidden;}}
-/* Đặt nền trong suốt cho container chính của Streamlit */
 div.block-container {{padding-top: 0; background-color: transparent !important;}} 
 [data-testid="stVerticalBlock"] > div:first-child {{background-color: transparent !important;}}
-
 
 /* === NỀN PC === */
 .stAppViewContainer, .st-emotion-cache-1r6slb0 {{
@@ -61,7 +57,7 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     100% {{ background-position: 0% 50%; }}
 }}
 
-/* === TIÊU ĐỀ CHÍNH (PC) === */
+/* === TIÊU ĐỀ CHÍNH === */
 #main-animated-title-container {{
     width: 100%;
     height: 110px;
@@ -104,18 +100,14 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
         background: url("data:image/jpeg;base64,{bg_mobile_base64}") no-repeat center top scroll !important;
         background-size: cover !important;
     }}
-    
-    /* Đảm bảo toàn bộ nội dung trong container không có nền trắng */
     .main > div {{
         background-color: transparent !important;
     }}
-
     #main-animated-title-container {{
         margin-top: 10px !important;
         overflow: hidden;
         height: auto;
     }}
-
     #main-animated-title-container h1 {{
         font-size: 8vw;
         line-height: 1.1;
@@ -125,7 +117,6 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
         animation: colorShift 10s ease infinite, scrollText 10s linear infinite;
         text-shadow: 2px 2px 7px rgba(0,0,0,0.8);
     }}
-
     #sub-static-title h2 {{
         font-size: 5vw;
         color: #FFD54F;
@@ -133,57 +124,53 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     }}
 }}
 
-/* === LABEL SELECTBOX (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V9) === */
-/* Nhắm mục tiêu thông qua container cha Streamlit để tăng độ ưu tiên */
-[data-testid="stHorizontalBlock"] .stSelectbox label, 
-.stSelectbox label 
-{{
+/* === LABEL SELECTBOX (PC) === */
+[data-testid="stHorizontalBlock"] .stSelectbox label,
+.stSelectbox label {{
     color: #FFEB3B !important;
     font-weight: 700 !important;
     text-align: center;
     display: block;
-    font-size: **3.5rem** !important; /* Đã tăng lên 3.5rem */
-    line-height: 2.5rem !important;
+    font-size: 3rem !important;
+    line-height: 3rem !important;
 }}
 
-/* Force override Streamlit default (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V9) */
 [data-testid="stWidgetLabel"] {{
-    font-size: **3.5rem** !important; /* Đã tăng lên 3.5rem */
+    font-size: 3rem !important;
     color: #FFEB3B !important;
     font-weight: 700 !important;
+    text-align: center !important;
 }}
 
 div[data-baseweb="select"] {{
-    min-width: 250px !important;
+    min-width: 280px !important;
 }}
 div[data-baseweb="select"] > div {{
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
 }}
 
-/* Mobile label size - Tăng kích thước chữ và ưu tiên CSS cao hơn (V9) */
+/* === LABEL MOBILE === */
 @media (max-width: 768px) {{
     [data-testid="stHorizontalBlock"] .stSelectbox label,
-    .stSelectbox label, 
-    [data-testid="stWidgetLabel"] 
-    {{
-        font-size: **2.2rem** !important; /* Đã tăng lên 2.2rem */
+    .stSelectbox label,
+    [data-testid="stWidgetLabel"] {{
+        font-size: 2rem !important;
+        line-height: 2.2rem !important;
     }}
 }}
 
-/* === CANH GIỮA DROPBOX CONTAINER === */
+/* === CANH GIỮA DROPBOX === */
 .element-container:has(.stSelectbox) {{
     display: flex;
     justify-content: center;
     background-color: transparent !important; 
 }}
-/* Loại bỏ nền trắng xung quanh các container Streamlit */
 [data-testid^="stHorizontalBlock"] {{
     background-color: transparent !important;
 }}
 
-
-/* === BẢNG HTML TÙY CHỈNH === */
+/* === BẢNG HIỂN THỊ === */
 .table-container {{
     overflow-x: auto;
     margin: 20px 0;
@@ -194,7 +181,7 @@ div[data-baseweb="select"] > div {{
     width: 100%;
     border-collapse: collapse;
     margin: 20px auto;
-    background-color: white; /* Giữ nền trắng cho chính bảng để dễ đọc */
+    background-color: white;
     box-shadow: 0 0 15px rgba(0,0,0,0.3); 
     border-radius: 8px; 
     overflow: hidden; 
@@ -202,7 +189,7 @@ div[data-baseweb="select"] > div {{
 
 .custom-table th {{
     background-color: #2E7D32;
-    color: white; /* Giữ màu chữ trắng cho tiêu đề bảng */
+    color: white;
     padding: 14px;
     text-align: center !important;
     font-weight: bold;
@@ -216,7 +203,7 @@ div[data-baseweb="select"] > div {{
     border: 1px solid #ddd;
     vertical-align: middle;
     font-size: 1rem;
-    color: #000000; /* Đặt màu chữ đen cho nội dung bảng (PC) */
+    color: #000000;
 }}
 
 .custom-table tr:nth-child(even) {{
@@ -227,19 +214,12 @@ div[data-baseweb="select"] > div {{
     background-color: #e0e0e0;
 }}
 
-/* === Mobile optimization === */
 @media (max-width: 768px) {{
-    .table-container {{
-        overflow-x: scroll;
-        -webkit-overflow-scrolling: touch;
-    }}
-    
     .custom-table {{
         font-size: 0.85rem;
         min-width: 100%;
         box-shadow: 0 0 10px rgba(0,0,0,0.5); 
     }}
-    
     .custom-table th, .custom-table td {{
         padding: 8px 6px;
         font-size: 0.85rem;
@@ -258,7 +238,7 @@ st.markdown("---")
 
 # --- TRA CỨU ---
 excel_file = "A787.xlsx"
-REQUIRED_COLS = ["A/C", "DESCRIPTION", "ITEM"] # Các cột cần cho Selectbox
+REQUIRED_COLS = ["A/C", "DESCRIPTION", "ITEM"]
 
 if not os.path.exists(excel_file):
     st.error("❌ Không tìm thấy file A787.xlsx trong thư mục hiện tại.")
@@ -266,16 +246,12 @@ else:
     try:
         xls = pd.ExcelFile(excel_file)
         sheet_names = [name for name in xls.sheet_names if not name.startswith("Sheet")]
-
-        # --- KHỞI TẠO GIÁ TRỊ BAN ĐẦU ---
         selection = {"Zone": None, "A/C": None, "DESCRIPTION": None, "ITEM": None}
         current_df = pd.DataFrame()
         
-        # --- CANH GIỮA DROPBOX ---
         st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
         cols = st.columns(4)
         
-        # 1. Zone Selectbox (Luôn hiển thị)
         with cols[0]:
             zone_options = ["Chọn Zone..."] + sheet_names
             zone_selected = st.selectbox("📂 **Zone**", zone_options)
@@ -287,23 +263,16 @@ else:
         else:
             current_df = pd.DataFrame() 
 
-        # Lọc các cột cần thiết có trong sheet hiện tại
         available_cols = [col for col in REQUIRED_COLS if col in current_df.columns]
-        
-        # Biến đếm số Selectbox đã được tạo (bao gồm Zone)
         selectbox_count = 1
         
-        # 2. Xử lý các Selectbox còn lại (A/C, DESCRIPTION, ITEM)
         for i, col_name in enumerate(REQUIRED_COLS):
             if col_name in available_cols:
                 selectbox_count += 1
-                # Sử dụng cột tiếp theo trong st.columns(4)
-                with cols[i + 1]: 
-                    
+                with cols[i + 1]:
                     if not current_df.empty:
-                        # Lấy giá trị duy nhất, chuyển sang chuỗi, loại bỏ chuỗi rỗng
                         options = current_df[col_name].astype(str).str.strip().unique().tolist()
-                        options = [opt for opt in options if opt != ""] # <--- LỌC CHUỖI RỖNG
+                        options = [opt for opt in options if opt != ""]
                         options.sort()
                     else:
                         options = []
@@ -321,28 +290,16 @@ else:
                         placeholder = "Chọn Item..."
                         
                     select_options = [placeholder] + options
-                    
-                    # Tạo selectbox
                     selected = st.selectbox(label, select_options)
-                    
                     if selected != placeholder:
                         selection[col_name] = selected
-
-                    # Lọc DataFrame dựa trên lựa chọn hiện tại
                     if selection[col_name]:
                         current_df = current_df[current_df[col_name] == selection[col_name]]
-                    else:
-                        pass
 
         st.markdown("</div>", unsafe_allow_html=True)
         
-        # --- HIỂN THỊ KẾT QUẢ ---
-        
-        # Đếm số Selectbox đã được chọn
         selected_count = sum(1 for key, value in selection.items() if key == "Zone" and value is not None)
         selected_count += sum(1 for col in available_cols if selection[col] is not None)
-        
-        # Điều kiện hiển thị
         is_fully_selected = (selected_count == selectbox_count)
         is_result_available = not current_df.empty and len(current_df) > 0
 
@@ -351,45 +308,28 @@ else:
             st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📋 KẾT QUẢ TRA CỨU</h3>", unsafe_allow_html=True)
             
             df_display = current_df.drop(columns=available_cols, errors="ignore")
-            df_display = df_display.dropna(axis=1, how="all")
-            df_display = df_display.reset_index(drop=True)
-
-            # Thêm cột STT
+            df_display = df_display.dropna(axis=1, how="all").reset_index(drop=True)
             cols_display = list(df_display.columns)
             if "PART NUMBER" in cols_display:
                 idx = cols_display.index("PART NUMBER")
                 df_display.insert(idx, "STT", range(1, len(df_display) + 1))
             else:
                 df_display.insert(0, "STT", range(1, len(df_display) + 1))
-
-            # Tạo HTML table
-            html_parts = ['<div class="table-container">']
-            html_parts.append('<table class="custom-table">')
             
-            # Header
-            html_parts.append('<thead><tr>')
+            html_parts = ['<div class="table-container">', '<table class="custom-table">', '<thead><tr>']
             for col in df_display.columns:
                 html_parts.append(f'<th>{str(col)}</th>')
-            html_parts.append('</tr></thead>')
-            
-            # Body
-            html_parts.append('<tbody>')
-            for idx, row in df_display.iterrows():
+            html_parts.append('</tr></thead><tbody>')
+            for _, row in df_display.iterrows():
                 html_parts.append('<tr>')
                 for val in row:
                     html_parts.append(f'<td>{str(val) if pd.notna(val) else ""}</td>')
                 html_parts.append('</tr>')
-            html_parts.append('</tbody>')
-            
-            html_parts.append('</table>')
-            html_parts.append('</div>')
-            
-            # Hiển thị bảng
+            html_parts.append('</tbody></table></div>')
             st.markdown(''.join(html_parts), unsafe_allow_html=True)
-        
-        elif is_fully_selected and not is_result_available:
-             st.markdown("---")
-             st.info("⚠️ **Không tìm thấy kết quả** nào phù hợp với tất cả các lựa chọn của bạn.")
 
+        elif is_fully_selected and not is_result_available:
+            st.markdown("---")
+            st.info("⚠️ **Không tìm thấy kết quả** nào phù hợp với tất cả các lựa chọn của bạn.")
     except Exception as e:
         st.error(f"Lỗi khi xử lý dữ liệu: {e}")
