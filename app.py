@@ -131,19 +131,22 @@ div.block-container {{padding-top: 0; background-color: transparent !important;}
     }}
 }}
 
-/* === LABEL SELECTBOX (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V7) === */
-.stSelectbox label {{
+/* === LABEL SELECTBOX (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V8) === */
+/* Nhắm mục tiêu vào label thông qua container cha Streamlit để tăng độ ưu tiên */
+[data-testid="stHorizontalBlock"] .stSelectbox label, 
+.stSelectbox label 
+{{
     color: #FFEB3B !important;
     font-weight: 700 !important;
     text-align: center;
     display: block;
-    font-size: **3rem** !important; /* Đã tăng lên 3rem */
+    font-size: **3.2rem** !important; /* Đã tăng lên 3.2rem */
     line-height: 2.5rem !important;
 }}
 
-/* Force override Streamlit default (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V7) */
+/* Force override Streamlit default (PC) - Tăng kích thước chữ và ưu tiên CSS cao hơn (V8) */
 [data-testid="stWidgetLabel"] {{
-    font-size: **3rem** !important; /* Đã tăng lên 3rem */
+    font-size: **3.2rem** !important; /* Đã tăng lên 3.2rem */
     color: #FFEB3B !important;
     font-weight: 700 !important;
 }}
@@ -156,10 +159,13 @@ div[data-baseweb="select"] > div {{
     font-size: 1.1rem;
 }}
 
-/* Mobile label size - Tăng kích thước chữ và ưu tiên CSS cao hơn (V7) */
+/* Mobile label size - Tăng kích thước chữ và ưu tiên CSS cao hơn (V8) */
 @media (max-width: 768px) {{
-    .stSelectbox label, [data-testid="stWidgetLabel"] {{
-        font-size: **1.8rem** !important; /* Đã tăng lên 1.8rem */
+    [data-testid="stHorizontalBlock"] .stSelectbox label,
+    .stSelectbox label, 
+    [data-testid="stWidgetLabel"] 
+    {{
+        font-size: **2rem** !important; /* Đã tăng lên 2rem */
     }}
 }}
 
