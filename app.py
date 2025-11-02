@@ -427,7 +427,7 @@ iframe:first-of-type {{
 }}
 
 /* === CSS CHO NAVIGATION BUTTON (ĐÃ CHỈNH SỬA) === */
-.nav-container {{
+.nav-container {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -439,23 +439,23 @@ iframe:first-of-type {{
     opacity: 0;
     transition: opacity 2s ease-out 3s;
     z-index: 50;
-}}
+}
 
-.video-finished .nav-container {{
+.video-finished .nav-container {
     opacity: 1;
-}}
+}
 
-.nav-btn {{
+.nav-btn {
     position: relative;
     /* ✅ 1. THU NHỎ: Giảm padding đáng kể */
-    padding: 20px 35px; 
-    /* ✅ 3. BỎ BLUR: Giảm alpha (0.1 -> 0.4) cho nền để nổi hơn so với nền. */
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 165, 0, 0.4));
-    border: 4px solid #FFD700;
-    border-radius: 20px;
+    padding: 15px 30px; 
+    /* ✅ 3. BỎ BLUR: Tăng alpha (0.4 -> 0.7) cho nền rõ nét hơn */
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.7), rgba(255, 165, 0, 0.7));
+    border: 3px solid #FFD700;
+    border-radius: 15px;
     color: #FFD700;
     font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 900;
     text-align: center;
     cursor: pointer;
@@ -465,14 +465,12 @@ iframe:first-of-type {{
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px; /* Giảm khoảng cách tối đa */
+    gap: 8px;
     overflow: hidden;
     box-shadow: 
-        0 10px 40px rgba(255, 215, 0, 0.3),
-        inset 0 0 30px rgba(255, 215, 0, 0.1);
-    /* ❌ 3. BỎ BLUR: Xóa bỏ dòng này để loại bỏ hiệu ứng làm mờ */
-    /* backdrop-filter: blur(10px); */
-}}
+        0 8px 30px rgba(255, 215, 0, 0.4),
+        inset 0 0 20px rgba(255, 215, 0, 0.2);
+}
 
 .nav-btn::before {{
     content: '';
@@ -947,3 +945,4 @@ st.markdown("""
     </a>
 </div>
 """, unsafe_allow_html=True)
+
