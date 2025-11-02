@@ -24,7 +24,6 @@ def get_base64_encoded_file(file_path):
             data = f.read()
         return base64.b64encode(data).decode("utf-8")
     except Exception as e:
-        # st.error(f"Lỗi khi đọc file {file_path}: {str(e)}") # Tắt lỗi này để tránh làm bẩn UI
         return None
 
 # MÃ HÓA TẤT CẢ CÁC FILE (Giữ nguyên logic)
@@ -37,7 +36,6 @@ try:
     logo_base64 = get_base64_encoded_file("logo.jpg")
 
     if not all([video_pc_base64, video_mobile_base64, audio_base64, bg_pc_base64, bg_mobile_base64]):
-        # Kiểm tra file bị thiếu
         missing_files = []
         if not video_pc_base64: missing_files.append("airplane.mp4")
         if not video_mobile_base64: missing_files.append("mobile.mp4")
@@ -57,7 +55,6 @@ if not 'logo_base64' in locals() or not logo_base64:
     logo_base64 = "" 
     st.info("ℹ️ Không tìm thấy file logo.jpg. Music player sẽ không có hình nền logo.")
 
-# Mã hóa các file nhạc nền (Giữ nguyên)
 music_files = []
 for i in range(1, 7):
     music_base64 = get_base64_encoded_file(f"background{i}.mp3")
@@ -88,14 +85,29 @@ hide_streamlit_style = f"""
     margin: 0;
 }}
 
-/* Đảm bảo khung chính không có padding */
 div.block-container {{
     padding: 0 !important;
     margin: 0 !important;
     max-width: 100% !important;
 }}
 
-/* Iframe Video Intro (Giữ nguyên) */
+/* Ghi đè CSS Streamlit mặc định bọc quanh button */
+/* Buộc thẻ p cha của button không có padding/margin và cho phép button nằm giữa */
+.nav-container + div > p {{
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 0; /* Loại bỏ khoảng trắng do line-height */
+}}
+.nav-container + div {{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Cần thiết để button nằm giữa màn hình */
+    width: 100%;
+}}
+
+
+/* Iframe Video Intro và Main Content Styles (Giữ nguyên) */
 iframe:first-of-type {{
     transition: opacity 1s ease-out, visibility 1s ease-out;
     opacity: 1;
@@ -137,18 +149,7 @@ iframe:first-of-type {{
     }}
 }}
 
-/* Keyframes và TIÊU ĐỀ CHÍNH (Giữ nguyên) */
-@keyframes scrollText {{
-    0% {{ transform: translate(100vw, 0); }}
-    100% {{ transform: translate(-100%, 0); }}
-}}
-
-@keyframes colorShift {{
-    0% {{ background-position: 0% 50%; }}
-    50% {{ background-position: 100% 50%; }}
-    100% {{ background-position: 0% 50%; }}
-}}
-
+/* TIÊU ĐỀ CHÍNH (Giữ nguyên) */
 #main-title-container {{
     position: fixed;
     top: 5vh;
@@ -183,82 +184,48 @@ iframe:first-of-type {{
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }}
 
-@media (max-width: 768px) {{
-    #main-title-container h1 {{
-        font-size: 6.5vw;
-        animation-duration: 8s;
-    }}
-}}
-
 /* Music Player Styles (Giữ nguyên) */
-@keyframes glow-random-color {{ ... }} 
+/* ... */
 
-#music-player-container {{
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 350px; 
-    padding: 8px 16px; 
-    background: rgba(0, 0, 0, 0.7); 
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7); 
-    z-index: 999;
-    opacity: 0;
-    transform: translateY(100px);
-    transition: opacity 1s ease-out 2s, transform 1s ease-out 2s;
-}}
 
-/* ... Các style phụ của Music Player (Giữ nguyên) ... */
-
-@media (max-width: 768px) {{
-    #music-player-container {{
-        width: calc(100% - 40px);
-        right: 20px;
-        left: 20px;
-        bottom: 15px;
-        padding: 8px 12px;
-    }}
-    /* ... Các style phụ của Music Player Mobile (Giữ nguyên) ... */
-}}
-
-/* === CSS CHO NAVIGATION BUTTON (ĐÃ GHI ĐÈ) === */
+/* === CSS CHO NAVIGATION BUTTON (ĐÃ GHI ĐÈ MẠNH) === */
 .nav-container {{
+    /* Đã được điều chỉnh để chỉ là điểm neo, các CSS quan trọng nằm ở a.nav-btn */
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 2s ease-out 3s;
+    /* Kích thước full để chiếm trọn vị trí cần thiết */
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;
-    opacity: 0;
-    transition: opacity 2s ease-out 3s;
-    z-index: 50;
-    /* Streamlit bọc các thành phần con trong một div, ta cần nhắm vào div đó */
-    width: 100%; 
-    height: 100%;
+    padding: 0; 
 }}
 
 .video-finished .nav-container {{
     opacity: 1;
 }}
 
-/* Quan trọng: Phải nhắm vào thẻ Streamlit tạo ra cho div chứa link <a> */
+/* Nhắm mục tiêu thẻ a */
 .stApp a.nav-btn {{
     position: relative;
     
     /* ✅ 1. THU NHỎ KHUNG */
-    padding: 15px 30px; /* Giảm padding mạnh */
+    padding: 15px 30px !important; /* Ghi đè padding */
     
-    /* ❌ 3. BỎ BLUR: Không dùng backdrop-filter */
-    /* Nền không mờ, đủ trong suốt để thấy background */
+    /* ❌ 3. BỎ BLUR: Dùng nền trong suốt */
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 165, 0, 0.4));
     
     border: 4px solid #FFD700;
     border-radius: 20px;
     color: #FFD700;
     font-family: 'Playfair Display', serif;
-    font-size: 1.2rem; /* Giảm cỡ chữ chính */
+    font-size: 1.2rem; 
     font-weight: 900;
     text-align: center;
     cursor: pointer;
@@ -274,10 +241,12 @@ iframe:first-of-type {{
         0 10px 40px rgba(255, 215, 0, 0.3),
         inset 0 0 30px rgba(255, 215, 0, 0.1);
     
-    /* Đảm bảo nút nằm giữa và nổi bật */
-    margin: auto; 
-    width: fit-content; /* Quan trọng: Thu hẹp kích thước theo nội dung */
+    /* Quan trọng: Thu hẹp kích thước theo nội dung */
+    width: fit-content !important; 
     max-width: 90%;
+    
+    /* Loại bỏ margin/khoảng cách dư thừa */
+    margin: 0 !important;
 }}
 
 .stApp a.nav-btn:hover {{
@@ -291,29 +260,29 @@ iframe:first-of-type {{
 }}
 
 .nav-btn-icon {{
-    font-size: 2.5rem; /* Giảm kích thước icon */
+    font-size: 2.5rem; 
     margin-bottom: 5px;
     filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
 }}
 
 .nav-btn-text {{
-    font-size: 1.1rem; /* Giảm kích thước chữ */
+    font-size: 1.1rem; 
     letter-spacing: 3px;
     text-transform: uppercase;
     white-space: nowrap; 
 }}
 
 .nav-btn-desc {{
-    /* ✅ 2. XÓA CHỮ PHỤ: Sử dụng !important để ghi đè mọi CSS mặc định */
+    /* ✅ 2. XÓA CHỮ PHỤ */
     display: none !important;
 }}
 
 /* Responsive cho mobile */
 @media (max-width: 768px) {{
     .stApp a.nav-btn {{
-        padding: 15px 25px; /* Giảm padding mobile */
+        padding: 15px 25px !important; 
         font-size: 1rem;
-        width: 80%; /* Cho phép chiếm 80% chiều rộng màn hình mobile */
+        width: 80% !important; 
     }}
     
     .nav-btn-icon {{
@@ -389,7 +358,7 @@ js_callback_video = f"""
         setTimeout(() => {{
              const revealGridParent = revealGrid.parentElement;
              if (revealGridParent) {{
-                 revealGridParent.style.display = 'none'; // Ẩn container chứa lưới
+                 revealGridParent.style.display = 'none';
              }}
              revealGrid.remove();
         }}, shuffledCells.length * 10 + 1000);
@@ -502,35 +471,26 @@ js_callback_video = f"""
             
             if (video && audio && introTextContainer) {{
                 clearInterval(waitForElements);
-                console.log("All elements found, initializing...");
                 
                 const isMobile = window.innerWidth <= 768;
                 const videoSource = isMobile ? 'data:video/mp4;base64,{video_mobile_base64}' : 'data:video/mp4;base64,{video_pc_base64}';
 
                 video.src = videoSource;
                 audio.src = 'data:audio/mp3;base64,{audio_base64}';
-
-                console.log("Video/Audio source set. Loading metadata...");
                 
                 const tryToPlay = () => {{
-                    console.log("Attempting to play video (User interaction or Canplay event)");
-                    
                     video.play().then(() => {{
-                        console.log("✅ Video is playing!");
                     }}).catch(err => {{
-                        console.error("❌ Still can't play video, skipping intro (Error/File issue):", err);
                         setTimeout(sendBackToStreamlit, 2000);
                     }});
 
                     audio.play().catch(e => {{
-                        console.log("Audio autoplay blocked (normal), waiting for video end.");
                     }});
                 }};
 
                 video.addEventListener('canplaythrough', tryToPlay, {{ once: true }});
                 
                 video.addEventListener('ended', () => {{
-                    console.log("Video ended, transitioning...");
                     video.style.opacity = 0;
                     audio.pause();
                     audio.currentTime = 0;
@@ -539,12 +499,10 @@ js_callback_video = f"""
                 }});
 
                 video.addEventListener('error', (e) => {{
-                    console.error("Video error detected (Codec/Base64/File corrupted). Skipping intro:", e);
                     sendBackToStreamlit();
                 }});
 
                 const clickHandler = () => {{
-                    console.log("User interaction detected, forcing play attempt.");
                     tryToPlay();
                     document.removeEventListener('click', clickHandler);
                     document.removeEventListener('touchstart', clickHandler);
@@ -567,7 +525,6 @@ js_callback_video = f"""
             clearInterval(waitForElements);
             const video = document.getElementById('intro-video');
             if (video && !video.src) {{
-                console.warn("Timeout before video source set. Force transitioning to main content.");
                 sendBackToStreamlit();
             }}
         }}, 5000);
@@ -588,7 +545,6 @@ html_content_modified = f"""
             width: 100vw;
             background-color: #000;
         }}
-        /* ... Các style khác của Intro Video (Giữ nguyên) ... */
     </style>
 </head>
 <body>
@@ -658,7 +614,7 @@ if len(music_files) > 0:
 """, unsafe_allow_html=True)
 
 # --- NAVIGATION BUTTON (ĐÃ GHI ĐÈ CSS) ---
-# Dòng nav-btn-desc vẫn phải tồn tại trong HTML, nhưng đã bị ẩn bằng CSS
+# Thẻ nav-btn-desc vẫn phải tồn tại trong HTML.
 st.markdown("""
 <div class="nav-container">
     <a href="/partnumber" target="_self" class="nav-btn">
