@@ -447,29 +447,27 @@ iframe:first-of-type {{
 
 .nav-btn {
     position: relative;
-    /* ✅ 1. THU NHỎ: Giảm padding đáng kể */
-    padding: 15px 30px; 
-    /* ✅ 3. BỎ BLUR: Tăng alpha (0.4 -> 0.7) cho nền rõ nét hơn */
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.7), rgba(255, 165, 0, 0.7));
+    padding: 12px 28px; 
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 165, 0, 0.9));
     border: 3px solid #FFD700;
-    border-radius: 15px;
-    color: #FFD700;
+    border-radius: 12px;
+    color: #FFFFFF;
     font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 900;
     text-align: center;
     cursor: pointer;
-    transition: all 0.4s ease;
+    transition: all 0.3s ease;
     text-decoration: none;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 12px;
     overflow: hidden;
     box-shadow: 
-        0 8px 30px rgba(255, 215, 0, 0.4),
-        inset 0 0 20px rgba(255, 215, 0, 0.2);
+        0 6px 20px rgba(255, 215, 0, 0.5),
+        inset 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
 .nav-btn::before {{
@@ -945,4 +943,5 @@ st.markdown("""
     </a>
 </div>
 """, unsafe_allow_html=True)
+
 
